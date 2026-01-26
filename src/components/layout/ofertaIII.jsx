@@ -12,7 +12,7 @@ const imgs = [
 
 export default function OfertaIII() {
     return (
-        <section className="w-full">
+        <section className="w-full py-33">
             <div className="bg-gray-300 dark:bg-gray-900 relative rounded-3xl h-[480px] flex items-center px-10 overflow-visible shadow-lg">
                 <div className="w-fit  z-10 text-white space-y-4.5 ">
                     <p className="font-bold uppercase tracking-wide bg-red-500 w-fit px-3 py-1 rounded-sm">

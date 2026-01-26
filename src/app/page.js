@@ -5,6 +5,8 @@ import Categoria from "@/components/layout/categorias";
 import Beneficons from "@/components/layout/beneficios";
 import OfertaII from "@/components/layout/ofertaII";
 import OfertaIII from "@/components/layout/ofertaIII";
+import Marcas from "@/components/layout/Marcas";
+import EmailNewsletter from "@/components/layout/Email-newsletter";
 
 export default function Home() {
     return (
@@ -18,6 +20,8 @@ export default function Home() {
                     <Categoria />
                     <OfertaII />
                     <OfertaIII />
+                    <Marcas />
+                    <EmailNewsletter/>
                 </section>
             </main>
         </div>
