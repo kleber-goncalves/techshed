@@ -2,6 +2,9 @@ import Hero from "@/components/layout/hero";
 import Nav from "@/components/nav";
 import Ofertas from "@/components/layout/ofertas";
 import Categoria from "@/components/layout/categorias";
+import Beneficons from "@/components/layout/beneficios";
+import OfertaII from "@/components/layout/ofertaII";
+import OfertaIII from "@/components/layout/ofertaIII";
 
 export default function Home() {
     return (
@@ -11,7 +14,10 @@ export default function Home() {
                 <section className="flex flex-col px-7 mt-7">
                     <Hero />
                     <Ofertas />
+                    <Beneficons />
                     <Categoria />
+                    <OfertaII />
+                    <OfertaIII />
                 </section>
             </main>
         </div>
