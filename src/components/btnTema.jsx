@@ -8,6 +8,7 @@ export default function BtnTemas() {
     const [mounted, setMounted] = useState(false);
     const { resolvedTheme, setTheme } = useTheme();
     // resolvedTheme lida melhor com o tema 'system'
+    
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
