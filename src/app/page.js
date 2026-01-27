@@ -7,6 +7,7 @@ import OfertaII from "@/components/layout/ofertaII";
 import OfertaIII from "@/components/layout/ofertaIII";
 import Marcas from "@/components/layout/Marcas";
 import EmailNewsletter from "@/components/layout/Email-newsletter";
+import CentralAjuda from "@/components/layout/Central-ajuda";
 
 export default function Home() {
     return (
@@ -21,7 +22,8 @@ export default function Home() {
                     <OfertaII />
                     <OfertaIII />
                     <Marcas />
-                    <EmailNewsletter/>
+                    <EmailNewsletter />
+                    <CentralAjuda/>
                 </section>
             </main>
         </div>
