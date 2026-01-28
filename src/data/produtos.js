@@ -11,6 +11,7 @@ export const produtos = {
             stock: 0,
             category: "celulare",
             features: [],
+            promocao: "promoção",
         },
         {
             id: "ove-light-space-5g-128-gb",
