@@ -6,16 +6,20 @@ export default function ProductCard({ produto }) {
    
     return (
         <Link href={`/src/components/components-loja/ProductCard.jsx`}>
-            <section className="border border-black flex flex-col w-full h-full  bg-red-200">
+            <section className="border border-black  rounded-2xl flex flex-col w-full h-full  hover:shadow-[0_0_40px_0px_rgba(0,0,0,0.5)] transition ease-in-out duration-400">
+                <p className="text-base absolute left-43 text-white bg-red-500 w-fit px-2 rounded-2xl">
+                    {produto.promocao}
+                </p>
                 <div className="">
                     <Image
                         src={produto.img}
                         alt={produto.alt}
                         width={320}
                         height={320}
+                        className="rounded-2xl"
                     />
                 </div>
-                <div className="flex flex-col max-w-xs h-full px-4 items-start bg-gray-300 gap-3">
+                <div className="flex flex-col max-w-xs h-full px-4 items-start bg-gray-300 gap-3 rounded-b-2xl">
                     <p className="text-base text-black ">{produto.name}</p>
                     <p className="text-xl text-violet-600">
                         R$ {(produto.priceCents / 100).toFixed(2)}
