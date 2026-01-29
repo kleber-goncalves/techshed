@@ -4,7 +4,7 @@ export default function RatingFilter({ filters, setFilters }) {
             <p className="font-semibold mb-2">Avaliação mínima</p>
 
             <select
-                className="w-full border p-2 rounded"
+                className="w-full border p-2 rounded bg-black"
                 value={filters.minRating}
                 onChange={(e) =>
                     setFilters({

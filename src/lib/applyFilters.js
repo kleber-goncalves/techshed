@@ -5,58 +5,64 @@
  * @returns {Array} produtos filtrados
  */
 export function applyFilters(produtos, filters) {
-  // Segurança defensiva
-  if (!Array.isArray(produtos)) return [];
-  if (!filters) return produtos;
+    // Segurança defensiva
+    if (!Array.isArray(produtos)) return [];
+    if (!filters) return produtos;
 
-  return produtos.filter((produto) => {
-    // 🔍 Busca textual
-    const matchSearch =
-      !filters.search ||
-      produto.name
-        .toLowerCase()
-        .includes(filters.search.toLowerCase());
+    return produtos.filter((produto) => {
+        const price = produto.priceCents ?? 0;
+        const rating = produto.rating ?? 0;
 
-    // 📂 Categoria
-    const matchCategory =
-      !filters.category ||
-      filters.category === "all" ||
-      produto.category === filters.category;
+        // 🔍 Busca textual
+        const matchSearch =
+            !filters.search ||
+            produto.name.toLowerCase().includes(filters.search.toLowerCase());
 
-    // 💰 Faixa de preço
-    const matchPrice =
-      produto.priceCents >= (filters.minPrice ?? 0) &&
-      produto.priceCents <= (filters.maxPrice ?? Infinity);
+        // 📂 Categoria
+        const matchCategory =
+            filters.category === "all" || produto.category === filters.category;
 
-    // 📦 Estoque
-    const matchStock =
-      !filters.onlyInStock || produto.stock > 0;
+        // 💰 Faixa de preço
+        const matchPrice =
+            produto.priceCents >= (filters.minPrice ?? 0) &&
+            produto.priceCents <= (filters.maxPrice ?? Infinity);
 
-    // 🆕 Novidade
-    const matchNew =
-      !filters.onlyNew || produto.isNew === true;
+        // 📦 Estoque
+        const matchStock = !filters.onlyInStock || (produto.stock ?? 0) > 0;
 
-    // ⭐ Avaliação mínima
-    const matchRating =
-      produto.rating >= (filters.minRating ?? 0);
+        // 🆕 Novidade
+        const matchNew = !filters.onlyNew || produto.isNew === true;
 
-    // 🏷️ Features
-    const matchFeatures =
-      !filters.features ||
-      filters.features.length === 0 ||
-      filters.features.every((feature) =>
-        produto.features?.includes(feature)
-      );
+        // ⭐ Avaliação mínima
+        const matchRating = rating >= (filters.minRating ?? 0);
 
-    // ✅ Produto passa se TODOS forem verdadeiros
-    return (
-      matchSearch &&
-      matchCategory &&
-      matchPrice &&
-      matchStock &&
-      matchNew &&
-      matchRating &&
-      matchFeatures
-    );
-  });
+        // 🏷️ Features
+        const matchFeatures =
+            !filters.features?.length ||
+            filters.features.every((f) => produto.features?.includes(f));
+
+        console.log("Filtro categoria:", filters.category);
+        console.log(
+            "Categorias dos produtos:",
+            produtos.map((p) => p.category),
+        );
+        console.log({
+            name: produto.name,
+            category: produto.category,
+            priceCents: produto.priceCents,
+            rating: produto.rating,
+            stock: produto.stock,
+        });
+
+        // ✅ Produto passa se TODOS forem verdadeiros
+        return (
+            matchSearch &&
+            matchCategory &&
+            matchPrice &&
+            matchStock &&
+            matchNew &&
+            matchRating &&
+            matchFeatures
+        );
+    });
 }

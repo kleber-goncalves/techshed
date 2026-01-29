@@ -24,7 +24,7 @@ export default function FeatureFilter({ filters, setFilters }) {
                         className={`px-3 py-1 rounded border text-sm ${
                             filters.features.includes(feature)
                                 ? "bg-black text-white"
-                                : "bg-white"
+                                : "bg-white text-black"
                         }`}
                     >
                         {feature}
