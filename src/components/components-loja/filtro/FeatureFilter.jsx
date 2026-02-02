@@ -13,7 +13,7 @@ export default function FeatureFilter({ filters, setFilters }) {
     }
 
     return (
-        <div>
+        <div className=" py-10">
             <p className="font-semibold mb-2">Recursos</p>
 
             <div className="flex flex-wrap gap-2">

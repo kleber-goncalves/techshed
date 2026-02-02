@@ -7,10 +7,7 @@ export default function ProductCard({ produto }) {
     return (
         <Link href={`/src/components/components-loja/ProductCard.jsx`}>
             <section className="border border-black  rounded-2xl flex flex-col w-full h-full  hover:shadow-[0_0_40px_0px_rgba(0,0,0,0.5)] transition ease-in-out duration-400">
-                <p className="text-base absolute left-43 text-white bg-red-500 w-fit px-2 rounded-2xl">
-                    {produto.promocao}
-                </p>
-                <div className="">
+                <div className="bg-white flex items-center justify-center rounded-t-2xl">
                     <Image
                         src={produto.img}
                         alt={produto.alt}
