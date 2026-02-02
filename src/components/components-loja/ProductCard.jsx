@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function ProductCard({ produto }) {
    
     return (
-        <Link href={`/src/components/components-loja/ProductCard.jsx`}>
+        <Link href={`/produto/${produto.slug}`}>
             <section className="border border-black  rounded-2xl flex flex-col w-full h-full  hover:shadow-[0_0_40px_0px_rgba(0,0,0,0.5)] transition ease-in-out duration-400">
                 <div className="bg-white flex items-center justify-center rounded-t-2xl">
                     <Image

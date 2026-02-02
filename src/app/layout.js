@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
                     rel="stylesheet"
                 />
             </head>
-            <body className="min-h-screen bg-gray-50 transition-colors duration-300 ease-in-out">
+            <body className="min-h-screen bg-gray-50 dark:bg-black transition-colors duration-300 ease-in-out">
                 <Providers>
                     <Header />
                     <main>{children}</main>
