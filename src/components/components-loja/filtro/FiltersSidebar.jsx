@@ -11,7 +11,7 @@ import StockFilter from "./StockFilter";
 export default function FiltersSidebar({ filters, setFilters }) {
 
     return (
-        <aside className="w-full md:w-64 h-fit p-4 border rounded-2xl space-y-6 text-black border-black dark:text-white dark:border-white dark:bg-gray-800">
+        <aside className="w-full md:w-64 h-fit p-4  rounded-2xl flex flex-col  justify-center  text-black border-white dark:text-white">
             <h2 className="text-lg font-bold">Filtros</h2>
 
             <CategoryFilter filters={filters} setFilters={setFilters} />

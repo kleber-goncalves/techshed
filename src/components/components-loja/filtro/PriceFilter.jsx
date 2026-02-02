@@ -13,8 +13,8 @@ const applyPrice = () => {
 };
 
     return (
-        <div className="py-4 border-b border-gray-200 bg-white max-w-[250px] text-black">
-            <p className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wider">
+        <div className=" max-w-[250px] border-y py-10 text-black dark:text-white">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white mb-3 uppercase tracking-wider">
                 Preço
             </p>
 
@@ -24,8 +24,8 @@ const applyPrice = () => {
                     <input
                         type="text"
                         inputMode="numeric"
-                        placeholder="Mínimo"
-                        className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 transition-all"
+                        placeholder="Min"
+                        className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md hover:border-blue-500 hover:border-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 transition-all"
                         value={localMin}
                         onChange={(e) => setLocalMin(e.target.value)}
                     />
@@ -38,17 +38,17 @@ const applyPrice = () => {
                     <input
                         type="text"
                         inputMode="numeric"
-                        placeholder="Máximo"
-                        className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 transition-all"
+                        placeholder="Max"
+                        className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md  hover:border-blue-500 hover:border-2  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 transition-all"
                         value={localMax}
                         onChange={(e) => setLocalMax(e.target.value)}
                     />
                 </div>
 
-                {/* Botão de Aplicar (Estilo ML) */}
+               
                 <button
                     onClick={applyPrice}
-                    className="ml-1 p-2 cursor-pointer bg-white border border-gray-300 rounded-full hover:bg-gray-50 shadow-sm text-blue-500 transition-colors"
+                    className="ml-1 p-2 cursor-pointer bg-white border border-gray-300 rounded-full hover:bg-gray-50  shadow-sm text-blue-500 dark:bg-gray-700  dark:text-blue-400 dark:hover:bg-gray-800 dark:border-gray-700 transition-colors"
                     aria-label="Aplicar filtro"
                 >
                     <svg

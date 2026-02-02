@@ -37,38 +37,39 @@ export default function CategoryFilter({
     };
 
     return (
-        <div className="bg-green-200 border rounded-2xl p-4 border-black text-black">
+        <div className="rounded-2xl text-black dark:text-white py-10">
             {/* Select mapeado a partir das categorias (mantém coerência com o accordion) */}
-            <Accordion
-                type="single"
-                collapsible
-                defaultValue="item-1"
-            >
+            <Accordion type="single" collapsible defaultValue="item-1">
                 {Categorias.map((categoria) => (
                     <AccordionItem
                         key={categoria.id}
                         value={`item-${categoria.id}`}
                     >
-                        <AccordionTrigger className="flex justify-between items-center">
-                            <p className="font-semibold text-base">
+                        <AccordionTrigger className="flex justify-between items-center hover:no-underline ">
+                            <p className="font-semibold text-base cursor-pointer ">
                                 {categoria.title}
                             </p>
                         </AccordionTrigger>
 
                         <AccordionContent>
-                                <ul className="space-y-1">
-                                   {categoria.content.map((sub) => {
+                            <ul className="space-y-1">
+                                {categoria.content.map((sub) => {
                                     // Comparamos o valor salvo no filtro com o value do item
-                                    const selected = filters?.category === sub.value;
-                                    
+                                    const selected =
+                                        filters?.category === sub.value;
+
                                     return (
                                         <li key={sub.id}>
                                             <button
-                                                onClick={() => handleSelectCategory(sub.value)}
-                                                className={`w-full text-left p-2 rounded transition ${
+                                                onClick={() =>
+                                                    handleSelectCategory(
+                                                        sub.value,
+                                                    )
+                                                }
+                                                className={`w-full text-left p-2 cursor-pointer rounded transition-all ease-in-out duration-75 ${
                                                     selected
-                                                        ? "bg-black text-white"
-                                                        : "bg-transparent hover:bg-black/10"
+                                                        ? "bg-black text-white dark:bg-white dark:text-black"
+                                                        : "bg-transparent hover:bg-black/10 dark:hover:bg-white/10"
                                                 }`}
                                             >
                                                 {sub.title}
@@ -76,8 +77,7 @@ export default function CategoryFilter({
                                         </li>
                                     );
                                 })}
-                                </ul>
-                           
+                            </ul>
                         </AccordionContent>
                     </AccordionItem>
                 ))}
