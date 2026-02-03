@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import VariantsButton from "@/components/componets-page-produto/variants-btn";
 import VariantsImg from "@/components/componets-page-produto/variants-img";
 import QuantitySelector from "@/components/componets-page-produto/QuantitySelector";
+import { ProductAccordion } from "@/components/componets-page-produto/acordion";
 
 export default function ProdutoClient({ produto }) {
     const [imagemAtiva, setImagemAtiva] = useState(produto.colors[0].img);
@@ -83,6 +84,8 @@ const [quantity, setQuantity] = useState(1);
                         <Button variant="default">Adicionar ao carrinho</Button>
                         <Button variant="default">Comprar</Button>
                     </div>
+
+                    <ProductAccordion product={produto} />
                 </section>
             </section>
         </section>

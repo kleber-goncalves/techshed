@@ -27,7 +27,7 @@ export default function VariantsImg({
                         width={900}
                         height={900}
                         src={cor.img}
-                        alt={cor.label}
+                        alt={cor.alt || produto.name}
                         className="w-16 h-16 object-cover rounded-md"
                     />
                 </button>
