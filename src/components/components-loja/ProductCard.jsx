@@ -16,11 +16,13 @@ export default function ProductCard({ produto }) {
                         className="rounded-2xl"
                     />
                 </div>
-                <div className="flex flex-col max-w-xs h-full px-4 items-start bg-gray-300 gap-3 rounded-b-2xl">
+                <div className="flex flex-col  h-23.25 px-4 items-start bg-gray-300 gap-3  rounded-b-2xl">
                     <p className="text-base text-black ">{produto.name}</p>
-                    <p className="text-xl text-violet-600">
-                        R$ {(produto.priceCents / 100).toFixed(2)}
-                    </p>
+                    <div className=" w-full h-full flex ">
+                        <p className="text-xl text-violet-600">
+                            R$ {(produto.priceCents / 100).toFixed(2)}
+                        </p>
+                    </div>
                 </div>
             </section>
         </Link>
