@@ -9,10 +9,19 @@ import QuantitySelector from "@/components/componets-page-produto/QuantitySelect
 import { ProductAccordion } from "@/components/componets-page-produto/acordion";
 
 export default function ProdutoClient({ produto }) {
-    const [imagemAtiva, setImagemAtiva] = useState(produto.colors[0].img);
-    const [corAtiva, setCorAtiva] = useState(produto.colors[0].id);
-const [quantity, setQuantity] = useState(1);
+    // Verificamos se existem cores definidas no produto
+    const hasColors = produto.colors && produto.colors.length > 0;
 
+    // Estado inicial seguro: Se tiver cores, usa a primeira. Se não, usa a imagem principal do produto.
+    const [imagemAtiva, setImagemAtiva] = useState(
+        hasColors ? produto.colors[0].img : produto.img,
+    );
+
+    // Estado da cor ativa (null se não houver cores)
+    const [corAtiva, setCorAtiva] = useState(
+        hasColors ? produto.colors[0].id : null,
+    );
+    const [quantity, setQuantity] = useState(1);
 
     return (
         <section className="grid grid-cols-2 gap-2 dark:bg-red-500  h-screen  px-73 ">
@@ -27,16 +36,19 @@ const [quantity, setQuantity] = useState(1);
                         />
                     )}
                 </div>
-                <div className="flex flex-row w-full bg-green-400">
-                    <VariantsImg
-                        produto={produto}
-                        imagemAtiva={imagemAtiva}
-                        setImagemAtiva={setImagemAtiva}
-                        corAtiva={corAtiva}
-                        setCorAtiva={setCorAtiva}
-                        ClassBase="bg-red-100"
-                    />
-                </div>
+                {/* Só renderiza a galeria de variantes se o produto tiver cores */}
+                {hasColors && (
+                    <div className="flex flex-row w-full bg-green-400">
+                        <VariantsImg
+                            produto={produto}
+                            imagemAtiva={imagemAtiva}
+                            setImagemAtiva={setImagemAtiva}
+                            corAtiva={corAtiva}
+                            setCorAtiva={setCorAtiva}
+                            ClassBase="bg-red-100"
+                        />
+                    </div>
+                )}
 
                 <div>
                     <p className="text-black">
@@ -57,16 +69,19 @@ const [quantity, setQuantity] = useState(1);
                         R$ {(produto.priceCents / 100).toFixed(2)}
                     </p>
                     {/* variação de cores */}
-                    <div>
-                        <VariantsButton
-                            produto={produto}
-                            imagemAtiva={imagemAtiva}
-                            setImagemAtiva={setImagemAtiva}
-                            corAtiva={corAtiva}
-                            setCorAtiva={setCorAtiva}
-                            ClassBase="bg-red-100"
-                        />
-                    </div>
+                    {/* Só renderiza botões de cor se houver cores */}
+                    {hasColors && (
+                        <div>
+                            <VariantsButton
+                                produto={produto}
+                                imagemAtiva={imagemAtiva}
+                                setImagemAtiva={setImagemAtiva}
+                                corAtiva={corAtiva}
+                                setCorAtiva={setCorAtiva}
+                                ClassBase="bg-red-100"
+                            />
+                        </div>
+                    )}
                     <p>Quantidade</p>
                     <div id="contador">
                         <QuantitySelector
