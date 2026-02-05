@@ -21,13 +21,15 @@ export function ProductAccordion({ product }) {
     return (
         <Accordion
             type="multiple"
-            className="w-full max-w-lg text-black"
+            className="w-full max-w-lg text-black dark:text-white"
             defaultValue={["details"]} // Opcional: deixa a aba de detalhes aberta por padrão
         >
             {/* ITEM 1: Informações do Produto (Dados Dinâmicos) */}
             <AccordionItem value="details">
-                <AccordionTrigger>Detalhes do Produto</AccordionTrigger>
-                <AccordionContent className="text-sm text-gray-600  space-y-2">
+                <AccordionTrigger className="hover:no-underline cursor-pointer">
+                    Detalhes do Produto
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
                     <p>
                         <strong className="text-foreground">Nome:</strong>{" "}
                         {product.name}
@@ -65,10 +67,10 @@ export function ProductAccordion({ product }) {
 
             {/* ITEM 2: Política de Devolução e Reembolso (Texto Estático) */}
             <AccordionItem value="refund">
-                <AccordionTrigger>
+                <AccordionTrigger className="hover:no-underline cursor-pointer">
                     Política de Devolução e Reembolso
                 </AccordionTrigger>
-                <AccordionContent className="text-sm text-gray-600 ">
+                <AccordionContent className="text-sm text-gray-600 dark:text-gray-300">
                     <p className="mb-2">
                         Aceitamos devoluções gratuitas no prazo de{" "}
                         <strong>30 dias</strong> após a data de entrega. O
@@ -85,8 +87,10 @@ export function ProductAccordion({ product }) {
 
             {/* ITEM 3: Informações de Entrega (Texto Estático) */}
             <AccordionItem value="shipping">
-                <AccordionTrigger>Informações de Entrega</AccordionTrigger>
-                <AccordionContent className="text-sm text-gray-600 ">
+                <AccordionTrigger className="hover:no-underline cursor-pointer">
+                    Informações de Entrega
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-600 dark:text-gray-300">
                     <ul className="list-disc pl-4 space-y-1">
                         <li>Envio Padrão: 5-7 dias úteis.</li>
                         <li>Envio Expresso: 2-3 dias úteis.</li>

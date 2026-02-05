@@ -26,7 +26,7 @@ export default function ProdutoClient({ produto }) {
     const [quantity, setQuantity] = useState(1);
 
     return (
-        <section className="h-full flex flex-col gap-23">
+        <section className="py-25 h-full flex flex-col gap-23">
             <section className="px-73">
                 <Breadcrumb
                     items={[
@@ -38,34 +38,36 @@ export default function ProdutoClient({ produto }) {
                         },
                     ]}
                 />
-                <section className="grid grid-cols-2 gap-2  ">
-                    <section className="flex flex-col items-end  h-fit gap-4">
-                        <div className=" bg-gray-400 border">
-                            {imagemAtiva && (
-                                <Image
-                                    src={imagemAtiva}
-                                    alt={produto.name}
-                                    width={900}
-                                    height={900}
-                                />
+                <section className="grid grid-cols-2 dark:bg-neutral-800 gap-6 dark:gap-0 rounded-2xl">
+                    <section className="flex flex-col items-end  h-fit gap-4 dark:p-6">
+                        <div className="gap-2 flex flex-col">
+                            <div className=" bg-gray-400 border  border-black">
+                                {imagemAtiva && (
+                                    <Image
+                                        src={imagemAtiva}
+                                        alt={produto.name}
+                                        width={900}
+                                        height={900}
+                                        className=" border border-black"
+                                    />
+                                )}
+                            </div>
+                            {/* Só renderiza a galeria de variantes se o produto tiver cores */}
+                            {hasColors && (
+                                <div className="flex flex-row w-full">
+                                    <VariantsImg
+                                        produto={produto}
+                                        imagemAtiva={imagemAtiva}
+                                        setImagemAtiva={setImagemAtiva}
+                                        corAtiva={corAtiva}
+                                        setCorAtiva={setCorAtiva}
+                                        ClassBase=""
+                                    />
+                                </div>
                             )}
                         </div>
-                        {/* Só renderiza a galeria de variantes se o produto tiver cores */}
-                        {hasColors && (
-                            <div className="flex flex-row w-full bg-green-400">
-                                <VariantsImg
-                                    produto={produto}
-                                    imagemAtiva={imagemAtiva}
-                                    setImagemAtiva={setImagemAtiva}
-                                    corAtiva={corAtiva}
-                                    setCorAtiva={setCorAtiva}
-                                    ClassBase="bg-red-100"
-                                />
-                            </div>
-                        )}
-
                         <div>
-                            <p className="text-black">
+                            <p className="text-black dark:text-white">
                                 Sou uma descrição do produto. Este é um ótimo
                                 lugar para vender seu produto e chamar a atenção
                                 dos visitantes. Descreva seu produto de forma
@@ -75,46 +77,53 @@ export default function ProdutoClient({ produto }) {
                         </div>
                     </section>
 
-                    <section className="flex flex-col  gap-8 h-fit">
-                        <h1 className="text-3xl font-semibold dark:text-white max-w-xs">
+                    <section className="flex flex-col  gap-8 h-fit dark:p-6">
+                        <h1 className="text-3xl font-semibold dark:text-white ">
                             {produto.name}
                         </h1>
-                        <section className="flex flex-col w-full justify-center gap-3">
-                            <p className="text-xl text-green-600">
+                        <section className="flex flex-col w-full justify-center gap-10">
+                            <p className="text-3xl text-green-600 dark:text-green-400">
                                 R$ {(produto.priceCents / 100).toFixed(2)}
                             </p>
                             {/* variação de cores */}
                             {/* Só renderiza botões de cor se houver cores */}
+
                             {hasColors && (
-                                <div>
+                                <div className="flex flex-col ">
                                     <VariantsButton
                                         produto={produto}
                                         imagemAtiva={imagemAtiva}
                                         setImagemAtiva={setImagemAtiva}
                                         corAtiva={corAtiva}
                                         setCorAtiva={setCorAtiva}
-                                        ClassBase="bg-red-100"
+                                        ClassBase=""
                                     />
                                 </div>
                             )}
-                            <p>Quantidade</p>
-                            <div id="contador">
-                                <QuantitySelector
-                                    quantity={quantity}
-                                    setQuantity={setQuantity}
-                                    max={produto.stock}
-                                />
-                                {quantity >= produto.stock && (
-                                    <p className="text-sm text-red-600">
-                                        Limite máximo de estoque atingido
-                                    </p>
-                                )}
+
+                            <div className="flex flex-col gap-1">
+                                <p>Quantidade</p>
+                                <div id="contador">
+                                    <QuantitySelector
+                                        quantity={quantity}
+                                        setQuantity={setQuantity}
+                                        max={produto.stock}
+                                    />
+                                    {quantity >= produto.stock && (
+                                        <p className="text-sm text-red-600">
+                                            Limite máximo de estoque atingido
+                                        </p>
+                                    )}
+                                </div>
                             </div>
+
                             <div className="flex flex-col w-full gap-2">
-                                <Button variant="default">
+                                <Button variant="addCart" size="xl">
                                     Adicionar ao carrinho
                                 </Button>
-                                <Button variant="default">Comprar</Button>
+                                <Button variant="buy" size="xxl">
+                                    Comprar
+                                </Button>
                             </div>
 
                             <ProductAccordion product={produto} />

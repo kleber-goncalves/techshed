@@ -14,7 +14,7 @@ export default function Home() {
     return (
         <div className="flex min-h-screen flex-col bg-zinc-50 font-sans dark:bg-black">
             <main className="flex min-h-screen w-full flex-col bg-white dark:bg-black ">
-                <Nav />
+              
                 <section className="flex flex-col px-7 mt-7 py-12">
                     <Hero />
                     <Ofertas />
@@ -25,10 +25,7 @@ export default function Home() {
                     <Marcas />
                     <EmailNewsletter />
                 </section>
-                <section className="flex flex-col px-7 py-12">
-                    <CentralAjuda />
-                    <Footer />
-                </section>
+
             </main>
         </div>
     );

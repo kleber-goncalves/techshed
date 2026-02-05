@@ -20,7 +20,7 @@ export default function VariantsImg({
                     }}
                     className={`border-2 rounded-lg transition
 
-        ${corAtiva === cor.id ? "border-black" : "border-transparent"}
+        ${corAtiva === cor.id ? "border-black dark:border-white dark:border-2" : "border-transparent"}
       `}
                 >
                     <Image 
@@ -28,7 +28,7 @@ export default function VariantsImg({
                         height={900}
                         src={cor.img}
                         alt={cor.alt || produto.name}
-                        className="w-16 h-16 object-cover rounded-md"
+                        className="w-16 h-16 object-cover rounded-md cursor-pointer"
                     />
                 </button>
             ))}

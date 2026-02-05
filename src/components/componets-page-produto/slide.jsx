@@ -39,7 +39,7 @@ export default function ProductSlider({
                 spaceBetween={53}
                 slidesPerView={1}
                 navigation
-             
+                
                 keyboard={{ enabled: true }}
                 grabCursor
                 breakpoints={{

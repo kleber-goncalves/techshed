@@ -17,7 +17,7 @@ export default function QuantitySelector({ quantity, setQuantity, max = 99 }) {
     }
 
     return (
-        <div className="flex items-center border border-black w-fit">
+        <div className="flex items-center border rounded-md border-black w-fit">
             {/* Botão - */}
             <button
                 onClick={diminuir}
@@ -28,7 +28,7 @@ export default function QuantitySelector({ quantity, setQuantity, max = 99 }) {
                     ${
                         isMin
                             ? "opacity-40 cursor-not-allowed"
-                            : "hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                            : "dark:hover:bg-gray-100 hover:bg-gray-800 hover:text-white dark:hover:text-black cursor-pointer"
                     }
                 `}
             >
@@ -50,7 +50,7 @@ export default function QuantitySelector({ quantity, setQuantity, max = 99 }) {
                     ${
                         isMax
                             ? "opacity-40 cursor-not-allowed"
-                            : "hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                            : "dark:hover:bg-gray-100 hover:bg-gray-800 hover:text-white dark:hover:text-black cursor-pointer"
                     }
                 `}
             >

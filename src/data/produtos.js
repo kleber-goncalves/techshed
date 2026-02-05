@@ -257,6 +257,7 @@ export const produtos = {
                     priceCents: 39900,
                     stock: 12,
                     hex: "#FF7F50",
+                    corName: "Laranja",
                 },
                 {
                     id: "alto-falante-mini-portatil-bluetooth-roxo",
@@ -265,7 +266,8 @@ export const produtos = {
                     alt: "Alto Falante Mini Portatil Bluetooth Roxo imagem do produto",
                     priceCents: 39900,
                     stock: 12,
-                    hex: "#8A2BE2",
+                    hex: "#BC13FE",
+                    corName: "Roxo",
                 },
                 {
                     id: "alto-falante-mini-portatil-bluetooth-verde",
@@ -275,6 +277,7 @@ export const produtos = {
                     priceCents: 39900,
                     stock: 10,
                     hex: "#00FF00",
+                    corName: "Verde",
                 },
             ],
             features: [],

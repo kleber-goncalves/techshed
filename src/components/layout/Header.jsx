@@ -25,13 +25,13 @@ const BtnThemas = dynamic(() => import("../btnTema"), {
 export default function Header() {
     return (
         <header className="flex items-center justify-between px-6 py-4 bg-white dark:bg-black shadow-md">
-            <div className="flex flex-row">
+            <Link href="/"  className="flex flex-row">
                 <h1 className="text-[40px] font-semibold">TechShed</h1>
 
                 <Button variant="ghost">
                     <Search className="w-5 h-5" />
                 </Button>
-            </div>
+            </Link>
 
             <div className="flex items-center gap-4">
                 <BtnThemas />

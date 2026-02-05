@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Breadcrumb({ items }) {
     return (
-        <nav className=" text-gray-600 mb-4">
+        <nav className=" text-gray-600 mb-4 dark:text-gray-200">
             <ol className="flex items-center gap-2 flex-wrap">
                 {items.map((item, index) => {
                     const isLast = index === items.length - 1;
@@ -17,7 +17,7 @@ export default function Breadcrumb({ items }) {
                                     {item.label}
                                 </Link>
                             ) : (
-                                <span className="font-medium text-gray-900">
+                                <span className="font-medium text-gray-900 dark:text-white">
                                     {item.label}
                                 </span>
                             )}
