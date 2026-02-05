@@ -7,3 +7,4 @@ Este diretorio guarda a documentacao dos componentes e fluxos principais do proj
 
 Arquivos:
 - `docs/slider-produtos.md` - carrossel reutilizavel de produtos com Swiper.
+- `docs/breadcrumb.md` - trilha de navegacao reutilizavel da pagina de produto.
