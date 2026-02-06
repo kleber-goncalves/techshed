@@ -67,6 +67,36 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.3 — 2026-02-06
+**Resumo**
+- Categorias dinâmicas por URL com navegação e mapeamento centralizado.
+
+**Motivação**
+- Permitir que o usuário escolha a categoria pelo menu e ver apenas os produtos correspondentes.
+
+**Impacto**
+- Componentes afetados: `Nav`, `Categoria`, `categories.js`, `docs/categorias-nav-produtos.md`.
+- Compatibilidade: sim.
+- Risco: baixo — mudanças localizadas na rota e no menu.
+
+**Mudanças**
+- **Added**
+  - `src/data/categories.js` com `categorySlugMap` e `navCategories`.
+  - Documentação detalhada em `docs/categorias-nav-produtos.md`.
+- **Changed**
+  - Página de categoria agora resolve slugs por mapa centralizado.
+  - Menu de categorias passou a consumir `navCategories`.
+
+**Como testar**
+1. Abrir `/categoria/desktops` e verificar listagem.
+2. Clicar em categorias no menu e validar a troca.
+3. Verificar a documentação em `docs/categorias-nav-produtos.md`.
+
+**Diagrama**
+```
+Nav -> /categoria/{slug} -> categorySlugMap -> produtos -> ProductCard
+```
+
 ### v0.1.2 — 2026-02-06
 **Resumo**
 - Documentação de melhorias planejadas e atualização da skill de revisão.
