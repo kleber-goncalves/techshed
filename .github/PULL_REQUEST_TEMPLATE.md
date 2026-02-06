@@ -1,7 +1,3 @@
-# Título (use o padrão Conventional Commits):
-# <tipo>(<escopo>): Breve descrição
-# Ex: fix(ui): corrige ortografia no parágrafo sobre
-
 ## 🔎 O que foi feito
 - Descreva sucintamente as mudanças feitas.
 
