@@ -1,9 +1,11 @@
-
 import Image from "next/image";
 import Link from "next/link";
 
-export default function ProductCard({ produto }) {
-   
+export default function ProductCard({ produto, noMaxWidth = false }) {
+    const infoClassName = `flex flex-col h-23.25 pl-3  items-start bg-white gap-3 rounded-b-2xl${
+        noMaxWidth ? "" : " max-w-xs"
+    }`;
+
     return (
         <Link href={`/produto/${produto.slug}`}>
             <section className=" border border-black  rounded-2xl flex flex-col w-full h-full  hover:shadow-[0_0_40px_0px_rgba(0,0,0,0.5)] transition ease-in-out duration-400">
@@ -16,7 +18,7 @@ export default function ProductCard({ produto }) {
                         className="rounded-2xl"
                     />
                 </div>
-                <div className="flex flex-col h-23.25 max-w-xs items-start bg-gray-300 gap-3  rounded-b-2xl">
+                <div className={infoClassName}>
                     <p className="text-base text-black ">{produto.name}</p>
                     <div className=" w-full h-full flex ">
                         <p className="text-xl text-violet-600">
