@@ -79,6 +79,7 @@ description: Perform full project review in a Next.js repository for performance
 **Documentation Generation**
 1. For each significant change, update or create a Markdown doc.
 2. Diagrams should accompany Markdown in `docs/`.
+3. Whenever Codex suggests project improvements, create a branch named after the planned work and document all suggestions in `docs/melhorias-codex.md` with detailed, professional structure, checklists, and ASCII graphic diagrams.
 
 ## 6) Output Expectations
 

@@ -67,6 +67,38 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.2 — 2026-02-06
+**Resumo**
+- Documentação de melhorias planejadas e atualização da skill de revisão.
+
+**Motivação**
+- Registrar sugestões de melhorias com checklist e orientar o fluxo de planejamento.
+
+**Impacto**
+- Componentes afetados: `docs/melhorias-codex.md`, `.codex/skills/nextjs-superreview/SKILL.md`.
+- Compatibilidade: sim.
+- Risco: baixo — mudanças documentais e de processo.
+
+**Mudanças**
+- **Added**
+  - Documento `docs/melhorias-codex.md` com plano de melhorias.
+- **Changed**
+  - Skill `nextjs-superreview` atualizada para exigir registro das sugestões.
+
+**Como testar**
+1. Abrir `docs/melhorias-codex.md`.
+2. Validar estrutura, checklists e diagramas.
+3. Conferir a regra adicionada na skill.
+
+**Diagrama**
+```
+Antes:
+Sugestões -> conversa
+
+Depois:
+Sugestões -> branch + docs/melhorias-codex.md
+```
+
 ### v0.1.1 — 2026-02-06
 **Resumo**
 - Footer ganhou um accordion mais profissional usando shadcn/ui.
