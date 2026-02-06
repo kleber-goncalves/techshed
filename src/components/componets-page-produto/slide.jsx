@@ -9,7 +9,7 @@ import "swiper/css/pagination";
 import ProductCard from "@/components/components-loja/ProductCard";
 import { produtos } from "@/data/produtos";
 
-import styles from "./slide.module.css";
+import styles from "@/style/slide.module.css";
 
 export default function ProductSlider({
     items,
@@ -39,7 +39,6 @@ export default function ProductSlider({
                 spaceBetween={53}
                 slidesPerView={1}
                 navigation
-                
                 keyboard={{ enabled: true }}
                 grabCursor
                 breakpoints={{
@@ -49,7 +48,7 @@ export default function ProductSlider({
             >
                 {list.map((produto) => (
                     <SwiperSlide key={produto.id} className="h-auto">
-                        <ProductCard produto={produto} />
+                        <ProductCard produto={produto} noMaxWidth />
                     </SwiperSlide>
                 ))}
             </Swiper>
