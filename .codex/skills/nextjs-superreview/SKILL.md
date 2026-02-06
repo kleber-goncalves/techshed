@@ -20,6 +20,11 @@ description: Perform full project review in a Next.js repository for performance
 2. Check for unused or duplicate route definitions.
 3. Suggest restructure for nested routing clarity.
 
+**Folder Architecture**
+1. Enforce consistent, well-structured folder architecture.
+2. Flag misnamed or inconsistent directories and suggest corrections.
+3. Encourage clear separation of concerns (components, pages, lib, styles, data).
+
 ## 2) UI/UX Improvements
 
 **User Interaction**
@@ -52,6 +57,7 @@ description: Perform full project review in a Next.js repository for performance
    - how each page works
    - data flow between APIs/components
    - lifecycle of user actions
+3. Create and maintain a detailed `CHANGELOG.md` to inform users and developers about software evolution, written in a clear, explanatory style with illustrative diagrams (ASCII or linked graphics) when helpful.
 
 **Diagrams and Graphics**
 1. Use ASCII diagrams or embed links to generated graphics explaining:
@@ -68,6 +74,7 @@ description: Perform full project review in a Next.js repository for performance
 **Testing**
 1. Generate Jest or React Testing Library tests for any new components/routes.
 2. Run `npm test` or equivalent and fix failures before commit.
+3. Use Vercel Preview Deployments for production-like testing, PR-to-PR comparison, CI/CD verification, and Next.js performance validation when applicable.
 
 **Documentation Generation**
 1. For each significant change, update or create a Markdown doc.
