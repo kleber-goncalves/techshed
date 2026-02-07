@@ -5,7 +5,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const Categorias = [
+const DEFAULT_CATEGORIES = [
     {
         id: 1,
         title: "Categorias",
@@ -26,21 +26,23 @@ const Categorias = [
     },
 ];
 
-
 export default function CategoryFilter({
     filters = { category: "all" },
     setFilters,
+    categories,
 }) {
     const handleSelectCategory = (value) => {
         setFilters({ ...filters, category: value });
         console.log("Categoria selecionada:", value); // debug: ver no console do navegador
     };
 
+    const data = Array.isArray(categories) ? categories : DEFAULT_CATEGORIES;
+
     return (
         <div className="rounded-2xl text-black dark:text-white py-10">
             {/* Select mapeado a partir das categorias (mantém coerência com o accordion) */}
             <Accordion type="single" collapsible defaultValue="item-1">
-                {Categorias.map((categoria) => (
+                {data.map((categoria) => (
                     <AccordionItem
                         key={categoria.id}
                         value={`item-${categoria.id}`}
