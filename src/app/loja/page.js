@@ -12,6 +12,14 @@ import SortSelect from "@/components/components-loja/filtro/SortSelect";
 
 export default function Loja() {
     const listaCompleta = Object.values(produtos).flat();
+    const filtersEnabled = [
+        "category",
+        "price",
+        "rating",
+        "stock",
+        "features",
+    ];
+    const filtersData = {};
     const [filters, setFilters] = useState({
         search: "",
         category: "all",
@@ -22,7 +30,7 @@ export default function Loja() {
         minRating: 0,
         features: [],
     });
-    const [sort, setSort] = useState("az");
+    const [sort, setSort] = useState("relevance");
   
     const produtosFiltrados = applyFilters(listaCompleta, filters);
 
@@ -37,6 +45,8 @@ export default function Loja() {
                 <FiltersSidebar
                     filters={filters}
                     setFilters={setFilters}
+                    enabled={filtersEnabled}
+                    data={filtersData}
                     className="md:w-64 p-4 border rounded-lg space-y-6  text-black"
                 />
                 <section>
