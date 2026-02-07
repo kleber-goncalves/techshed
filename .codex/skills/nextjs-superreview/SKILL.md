@@ -90,3 +90,29 @@ Upon review or implementation request:
 4. Provide SEO issues and improvement list.
 5. Generate documentation drafts with comments and graphics.
 6. Create/checkout new Git branch, apply changes + tests + commit.
+
+## 7) Review Request Template
+
+Use this template when requesting a Codex review before commit or PR:
+
+**Context**
+- What changed:
+- Why:
+
+**Files changed (main)**
+- `path/file1`
+- `path/file2`
+
+**Focus areas**
+- Potential regressions:
+- Edge cases:
+- Performance/UX:
+- Imports/routes consistency:
+
+**Quick checks**
+- [ ] `npm run lint`
+- [ ] Manual behavior validated
+- [ ] `CHANGELOG.md` updated (if applicable)
+
+**Codex request**
+- Review the files above focusing on bugs/regressions, empty states, UI/UX inconsistencies, and route/import issues.
