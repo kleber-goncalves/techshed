@@ -3,7 +3,7 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-02-06
+Última atualização: 2026-02-07
 Branch: `plan/melhorias-projeto`
 
 ## Visão Geral
@@ -16,6 +16,15 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ```
 
 ## Melhorias Prioritárias
+
+## Prioridade e Esforço (Resumo)
+1. Remover Logs de Debug no Filtro — **Impacto:** médio, **Esforço:** baixo
+2. Estado de Filtros Compartilhado — **Impacto:** médio, **Esforço:** baixo
+3. Centralização de Dados do Footer — **Impacto:** médio, **Esforço:** baixo
+4. Responsividade do Footer — **Impacto:** médio, **Esforço:** médio
+5. Normalização de Categorias e Slugs — **Impacto:** alto, **Esforço:** médio
+6. Padronização de Pastas e Nomes — **Impacto:** alto, **Esforço:** alto
+7. Uso do Codex na Revisão de Código — **Impacto:** médio, **Esforço:** baixo
 
 ### 1) Padronização de Pastas e Nomes
 **Descrição**
@@ -31,6 +40,16 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - [ ] Definir padrão de nomenclatura (PT-BR ou EN)
 - [ ] Renomear pastas e ajustar imports
 - [ ] Validar build local
+
+**Plano de execução da melhoria**
+1. Levantar um inventário com `rg --files` e mapear inconsistências de nomes.
+2. Definir o padrão oficial (PT-BR ou EN) e registrar no README.
+3. Renomear as pastas com inconsistência e ajustar todos os imports.
+4. Rodar `npm run lint` e `npm run build` para validar.
+
+**Estimativa**
+- Esforço: alto (renomes em múltiplos paths)
+- Tempo: 1–2 dias
 
 **Risco**
 - Médio: mudanças em paths podem quebrar imports se não atualizados.
@@ -50,6 +69,16 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - [ ] Validar comportamento no accordion
 - [ ] Verificar legibilidade dos textos
 
+**Plano de execução da melhoria**
+1. Inspecionar o footer em 360px, 768px e 1024px.
+2. Definir os breakpoints e a direção do layout em cada faixa.
+3. Ajustar `gap`, `padding` e alinhamento no componente do footer.
+4. Validar abertura do accordion e legibilidade após os ajustes.
+
+**Estimativa**
+- Esforço: médio
+- Tempo: 0,5–1 dia
+
 **Risco**
 - Baixo: mudanças apenas visuais.
 
@@ -68,8 +97,125 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - [ ] Ajustar renderização no componente
 - [ ] Validar se nada quebrou
 
+**Plano de execução da melhoria**
+1. Criar `src/data/footer.js` com o schema de links e textos.
+2. Substituir hardcode no componente do footer por map do data.
+3. Validar o render em desktop e mobile.
+4. Rodar lint e garantir que nenhum link foi perdido.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 2–4 horas
+
 **Risco**
 - Baixo: refatoração simples.
+
+### 4) Normalização de Categorias e Slugs
+**Descrição**
+- Padronizar os valores de `category` nos produtos e alinhar com `categorySlugMap`.
+- Corrigir typos (ex.: `headse`, `smartst`, `celulare`) e garantir consistência entre dados e filtros.
+
+**Benefícios**
+- Filtros de categoria mais confiáveis.
+- Menos condicionais e correções pontuais por slug.
+
+**Checklist**
+- [ ] Mapear categorias atuais em `produtos.js`
+- [ ] Definir tabela de normalização (slug → value e value → label)
+- [ ] Atualizar dados e ajustar filtros
+- [ ] Validar rotas `/categoria/[categoria]` e filtros
+
+**Plano de execução da melhoria**
+1. Levantar todas as categorias em `produtos.js` e `CategoryFilter`.
+2. Criar uma tabela única de mapeamento e labels canônicas.
+3. Normalizar os valores nos dados e ajustar filtros/rotas.
+4. Testar `/categoria/[categoria]` e a lista de filtros.
+
+**Estimativa**
+- Esforço: médio
+- Tempo: 0,5–1 dia
+
+**Risco**
+- Médio: alteração em dados pode afetar rotas e filtros se não for bem mapeada.
+
+### 5) Estado de Filtros Compartilhado
+**Descrição**
+- Centralizar o estado padrão de filtros em um helper (ex.: `src/lib/filtersDefault.js`)
+- Usar esse default em `/loja` e `/categoria/[categoria]` para evitar divergência.
+
+**Benefícios**
+- Evita inconsistências entre páginas.
+- Facilita evolução do filtro sem duplicação.
+
+**Checklist**
+- [ ] Criar constante `DEFAULT_FILTERS`
+- [ ] Usar em `src/app/loja/page.js`
+- [ ] Usar em `src/app/categoria/[categoria]/CategoryPageClient.jsx`
+- [ ] Garantir compatibilidade com `applyFilters`
+
+**Plano de execução da melhoria**
+1. Criar `src/lib/filtersDefault.js` exportando `DEFAULT_FILTERS`.
+2. Substituir objetos inline por imports nas páginas.
+3. Garantir que `applyFilters` continua usando o mesmo shape.
+4. Verificar fluxo de filtros em `/loja` e `/categoria/[categoria]`.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 1–2 horas
+
+**Risco**
+- Baixo: mudança de manutenção.
+
+### 6) Remover Logs de Debug no Filtro
+**Descrição**
+- Remover ou proteger `console.log` em `applyFilters` para evitar poluição no console.
+
+**Benefícios**
+- Menos ruído em produção.
+- Melhor performance e UX para debug real.
+
+**Checklist**
+- [ ] Remover logs ou condicionar por `NODE_ENV`
+- [ ] Validar que o filtro continua funcionando
+
+**Plano de execução da melhoria**
+1. Identificar os `console.log` em `applyFilters`.
+2. Remover ou condicionar por `process.env.NODE_ENV !== "production"`.
+3. Validar que filtros continuam respondendo corretamente.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 30–60 min
+
+**Risco**
+- Baixo: não altera comportamento funcional.
+
+### 7) Uso do Codex na Revisão de Código
+**Descrição**
+- Incluir uma etapa padrão de revisão com Codex antes de abrir PR.
+
+**Quando usar**
+- Antes de cada commit relevante.
+- Antes de abrir PR.
+- Após alterações em rotas, filtros, dados e UI crítica.
+
+**Checklist**
+- [ ] Rodar `npm run lint`
+- [ ] Pedir para o Codex revisar arquivos alterados com foco em regressões e edge cases
+- [ ] Verificar consistência de imports, dados e rotas
+- [ ] Atualizar `CHANGELOG.md` quando aplicável
+
+**Plano de execução da melhoria**
+1. Adicionar ao fluxo interno: “Revisão Codex” antes de `git commit`.
+2. Padronizar o formato do pedido ao Codex (contexto + arquivos).
+3. Registrar achados e ações no PR/descrição do commit.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 15–30 min por ciclo
+
+**Risco**
+- Baixo: melhoria de processo sem impacto no runtime.
 
 ## Roadmap Visual (ASCII)
 ```
@@ -90,3 +236,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 
 ## Histórico
 - 2026-02-06: Documento criado.
+- 2026-02-07: Adicionadas sugestões de normalização de categorias, default de filtros e limpeza de logs.

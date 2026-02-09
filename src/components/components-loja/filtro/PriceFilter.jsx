@@ -1,16 +1,33 @@
 import { useState } from "react";
 
-export default function PriceFilter({ filters, setFilters }) {
-const [localMin, setLocalMin] = useState("");
-const [localMax, setLocalMax] = useState("");
+export default function PriceFilter({
+    filters,
+    setFilters,
+    minPlaceholder = "Min",
+    maxPlaceholder = "Max",
+    minLimit,
+    maxLimit,
+}) {
+    const [localMin, setLocalMin] = useState("");
+    const [localMax, setLocalMax] = useState("");
 
-const applyPrice = () => {
-    setFilters({
-        ...filters,
-        minPrice: localMin === "" ? 0 : Number(localMin) * 100,
-        maxPrice: localMax === "" ? Infinity : Number(localMax) * 100,
-    });
-};
+    const applyPrice = () => {
+        const minValue =
+            localMin === "" ? 0 : Math.max(Number(localMin), minLimit ?? 0);
+        const maxValue =
+            localMax === ""
+                ? Infinity
+                : Math.min(
+                      Number(localMax),
+                      maxLimit ?? Number.POSITIVE_INFINITY,
+                  );
+
+        setFilters({
+            ...filters,
+            minPrice: minValue * 100,
+            maxPrice: maxValue * 100,
+        });
+    };
 
     return (
         <div className=" max-w-[250px] border-y py-10 text-black dark:text-white">
@@ -24,7 +41,7 @@ const applyPrice = () => {
                     <input
                         type="text"
                         inputMode="numeric"
-                        placeholder="Min"
+                        placeholder={minPlaceholder}
                         className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md hover:border-blue-500 hover:border-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 transition-all"
                         value={localMin}
                         onChange={(e) => setLocalMin(e.target.value)}
@@ -38,7 +55,7 @@ const applyPrice = () => {
                     <input
                         type="text"
                         inputMode="numeric"
-                        placeholder="Max"
+                        placeholder={maxPlaceholder}
                         className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md  hover:border-blue-500 hover:border-2  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 transition-all"
                         value={localMax}
                         onChange={(e) => setLocalMax(e.target.value)}

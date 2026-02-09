@@ -67,6 +67,101 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.4 — 2026-02-07
+**Resumo**
+- Filtros reutilizáveis por página e refinamento dinâmico por categoria, com ordenação na página de categoria.
+
+**Motivação**
+- Permitir que cada página escolha quais filtros exibir e que a categoria da rota ajuste automaticamente as opções e limites do filtro.
+
+**Impacto**
+- Componentes afetados: `FiltersSidebar`, `CategoryFilter`, `FeatureFilter`, `PriceFilter`, `Categoria`, `CategoryPageClient`, `SortSelect`, `docs/filters-reutilizaveis.md`.
+- Compatibilidade: sim — defaults preservam comportamento anterior.
+- Risco: baixo — mudanças localizadas e com fallback.
+
+**Mudanças**
+- **Added**
+  - `src/app/categoria/[categoria]/CategoryPageClient.jsx` para estado e filtragem no cliente.
+  - `docs/filters-reutilizaveis.md` com documentação detalhada e diagramas.
+- **Changed**
+  - `FiltersSidebar` agora aceita `enabled` e `data` para seleção/ordem de filtros e dados dinâmicos.
+  - `CategoryFilter` e `FeatureFilter` aceitam dados via props com fallback interno.
+  - `PriceFilter` aceita placeholders e limites opcionais.
+  - Página de categoria separada em Server/Client com dados dinâmicos de filtros.
+  - Ordenação (`SortSelect`) integrada na página de categoria.
+  - Página `/loja` configurada para usar `enabled`/`data`.
+
+**Como testar**
+1. Abrir `/loja` e verificar filtros e ordenação funcionando.
+2. Abrir `/categoria/tablets` e verificar que só tablets aparecem.
+3. Validar que o filtro mostra apenas features e limites daquela categoria.
+4. Alterar ordenação e conferir a lista ordenada.
+5. Trocar de categoria no nav e confirmar que filtros e título atualizam.
+
+**Diagrama**
+```
+Rota /categoria/[categoria] -> page.jsx (Server) -> CategoryPageClient (Client)
+-> FiltersSidebar (enabled/data) -> applyFilters/applySort -> ProductCard
+```
+
+### v0.1.5 — 2026-02-07
+**Resumo**
+- Processo de revisão com Codex formalizado e documentação de melhorias expandida.
+
+**Motivação**
+- Padronizar o pedido de revisão antes de commits/PRs e registrar planos de execução detalhados.
+
+**Impacto**
+- Componentes afetados: `docs/melhorias-codex.md`, `.codex/skills/nextjs-superreview/SKILL.md`.
+- Compatibilidade: sim.
+- Risco: baixo — mudanças apenas de processo/documentação.
+
+**Mudanças**
+- **Added**
+  - Template de revisão Codex na skill `nextjs-superreview`.
+- **Changed**
+  - `docs/melhorias-codex.md` com estimativas, priorização e planos de execução por melhoria.
+
+**Como testar**
+1. Abrir `docs/melhorias-codex.md` e validar a nova estrutura.
+2. Abrir `.codex/skills/nextjs-superreview/SKILL.md` e verificar o template de revisão.
+
+**Diagrama**
+```
+Antes: revisão ad-hoc -> commit
+Depois: template Codex -> revisão estruturada -> commit/PR
+```
+
+### v0.1.3 — 2026-02-06
+**Resumo**
+- Categorias dinâmicas por URL com navegação e mapeamento centralizado.
+
+**Motivação**
+- Permitir que o usuário escolha a categoria pelo menu e ver apenas os produtos correspondentes.
+
+**Impacto**
+- Componentes afetados: `Nav`, `Categoria`, `categories.js`, `docs/categorias-nav-produtos.md`.
+- Compatibilidade: sim.
+- Risco: baixo — mudanças localizadas na rota e no menu.
+
+**Mudanças**
+- **Added**
+  - `src/data/categories.js` com `categorySlugMap` e `navCategories`.
+  - Documentação detalhada em `docs/categorias-nav-produtos.md`.
+- **Changed**
+  - Página de categoria agora resolve slugs por mapa centralizado.
+  - Menu de categorias passou a consumir `navCategories`.
+
+**Como testar**
+1. Abrir `/categoria/desktops` e verificar listagem.
+2. Clicar em categorias no menu e validar a troca.
+3. Verificar a documentação em `docs/categorias-nav-produtos.md`.
+
+**Diagrama**
+```
+Nav -> /categoria/{slug} -> categorySlugMap -> produtos -> ProductCard
+```
+
 ### v0.1.2 — 2026-02-06
 **Resumo**
 - Documentação de melhorias planejadas e atualização da skill de revisão.
