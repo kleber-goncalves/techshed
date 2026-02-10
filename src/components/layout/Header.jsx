@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import SearchModal from "@/components/Search/SearchModal";
+
 import React from "react";
 import Link from "next/link";
 
@@ -23,56 +26,68 @@ const BtnThemas = dynamic(() => import("../btnTema"), {
 });
 
 export default function Header() {
+    const [openSearch, setOpenSearch] = useState(false);
     return (
-        <header className="flex items-center justify-between px-6 py-4 bg-white dark:bg-black shadow-md">
-            <Link href="/"  className="flex flex-row">
-                <h1 className="text-[40px] font-semibold">TechShed</h1>
-
-                <Button variant="ghost">
-                    <Search className="w-5 h-5" />
+        <>
+            <header className="flex items-center justify-between px-6 py-4 bg-white dark:bg-black shadow-md">
+                <div className="flex flex-row gap-5">
+  <Link href="/" className="flex flex-row">
+                    <h1 className="text-[40px] font-semibold">TechShed</h1>
+                </Link>
+   
+                <Button variant="ghost" onClick={() => setOpenSearch(true)} className="cursor-pointer">
+                    <Search className="w-12 h-12" />
                 </Button>
-            </Link>
-
-            <div className="flex items-center gap-4">
-                <BtnThemas />
-                <div className="flex items-center gap-2">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                className="flex items-center gap-1"
-                            >
-                                <Avatar className="w-8 h-8">
-                                    <AvatarImage
-                                        src="/avatar.png"
-                                        alt="Avatar"
-                                    />
-                                    <AvatarFallback>SK</AvatarFallback>
-                                </Avatar>
-                                <ChevronDown className="w-4 h-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuItem>
-                                Configurações da Conta
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>Meus Pedidos</DropdownMenuItem>
-                            <DropdownMenuItem>Sair</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
                 </div>
-                <Link href="/favoritos">
-                    <Button variant="ghost" className="flex items-center gap-1">
-                        <Heart className="w-5 h-5 text-red-500" />
-                        Favoritos
-                    </Button>
-                </Link>
-                <Link href="/carrinho">
-                    <Button variant="ghost">
-                        <ShoppingCart className="w-5 h-5" />
-                    </Button>
-                </Link>
-            </div>
-        </header>
+              
+
+                <div className="flex items-center gap-4">
+                    <BtnThemas />
+                    <div className="flex items-center gap-2">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    className="flex items-center gap-1"
+                                >
+                                    <Avatar className="w-8 h-8">
+                                        <AvatarImage
+                                            src="/avatar.png"
+                                            alt="Avatar"
+                                        />
+                                        <AvatarFallback>SK</AvatarFallback>
+                                    </Avatar>
+                                    <ChevronDown className="w-4 h-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem>
+                                    Configurações da Conta
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    Meus Pedidos
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>Sair</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                    <Link href="/favoritos">
+                        <Button
+                            variant="ghost"
+                            className="flex items-center gap-1"
+                        >
+                            <Heart className="w-5 h-5 text-red-500" />
+                            Favoritos
+                        </Button>
+                    </Link>
+                    <Link href="/carrinho">
+                        <Button variant="ghost">
+                            <ShoppingCart className="w-5 h-5" />
+                        </Button>
+                    </Link>
+                </div>
+            </header>
+            {openSearch && <SearchModal onClose={() => setOpenSearch(false)} />}
+        </>
     );
 }

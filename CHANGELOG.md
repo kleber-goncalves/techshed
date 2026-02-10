@@ -67,6 +67,44 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.6 — 2026-02-10
+**Resumo**
+- Busca completa com modal, pagina `/busca` e filtros reutilizados do layout de categoria, com documentacao detalhada.
+
+**Motivação**
+- Melhorar a descoberta de produtos com resultados rapidos no modal e refinamento completo em pagina dedicada.
+
+**Impacto**
+- Componentes afetados: `Header`, `SearchModal`, `SearchInput`, `SearchResults`, `ProductCard`, `SearchPageClient`, `useDebouncedValue`, `docs/search.md`.
+- Compatibilidade: sim — funcionalidades adicionadas sem quebrar rotas existentes.
+- Risco: baixo — mudancas concentradas em busca e nova rota.
+
+**Mudanças**
+- **Added**
+  - Pagina `/busca` com layout de categoria (`src/app/busca/page.jsx` e `SearchPageClient.jsx`).
+  - Componentes de busca: `SearchModal`, `SearchResults`, `SearchInput`.
+  - Hook `useDebouncedValue` para sincronizar `?q=` com debounce.
+  - Documentacao profissional em `docs/search.md`.
+- **Changed**
+  - Header abre o modal de busca via icone.
+  - `ProductCard` agora aceita `onClick` para fechar modal ao navegar.
+  - Modal exibe 3 sugestoes iniciais e mostra "Mostrar mais" apenas quando necessario.
+- **Fixed**
+  - Evitado warning de render cascata removendo setState em effect na pagina `/busca`.
+  - Query de busca agora e codificada via `encodeURIComponent`.
+
+**Como testar**
+1. Abrir o modal pelo header e ver 3 produtos iniciais.
+2. Digitar um termo com mais de 3 resultados e verificar o botao "Mostrar mais".
+3. Clicar em "Mostrar mais" e confirmar redirecionamento para `/busca?q=...`.
+4. Na pagina `/busca`, testar filtros e ordenacao.
+5. Digitar na barra superior e confirmar atualizacao da URL com debounce.
+
+**Diagrama**
+```
+Header -> SearchModal -> SearchResults -> /busca -> FiltersSidebar + SortSelect
+```
+
 ### v0.1.4 — 2026-02-07
 **Resumo**
 - Filtros reutilizáveis por página e refinamento dinâmico por categoria, com ordenação na página de categoria.

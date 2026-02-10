@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-02-07
-Branch: `plan/melhorias-projeto`
+Última atualização: 2026-02-10
+Branch: `feat/add-search`
 
 ## Visão Geral
 Objetivo: evoluir a estrutura do projeto e a qualidade do UI/UX de forma organizada e rastreável.
@@ -25,6 +25,7 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 5. Normalização de Categorias e Slugs — **Impacto:** alto, **Esforço:** médio
 6. Padronização de Pastas e Nomes — **Impacto:** alto, **Esforço:** alto
 7. Uso do Codex na Revisão de Código — **Impacto:** médio, **Esforço:** baixo
+8. Busca: Relevância e Sincronização — **Impacto:** médio, **Esforço:** médio
 
 ### 1) Padronização de Pastas e Nomes
 **Descrição**
@@ -216,6 +217,33 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 
 **Risco**
 - Baixo: melhoria de processo sem impacto no runtime.
+
+### 8) Busca: Relevância e Sincronização
+**Descrição**
+- Melhorar a relevância das sugestões iniciais do modal e garantir sincronização do input com o histórico do navegador sem warnings de render.
+
+**Benefícios**
+- Sugestões mais úteis e alinhadas ao comportamento do usuario.
+- Experiencia mais consistente ao usar back/forward.
+
+**Checklist**
+- [ ] Definir criterio de relevancia (promocao, estoque, popularidade).
+- [ ] Ajustar o modal para usar criterio de relevancia.
+- [ ] Implementar sincronizacao segura do input com a URL.
+- [ ] Validar comportamento de back/forward.
+
+**Plano de execução da melhoria**
+1. Definir o ranking (ex.: promocao > maior estoque > nome).
+2. Criar helper em `src/lib/searchRanking.js` e aplicar no modal.
+3. Refatorar o input da pagina `/busca` para sincronizar via `key` ou `useMemo` sem setState em effect.
+4. Testar com historico do navegador e validar ausencia de warnings.
+
+**Estimativa**
+- Esforço: médio
+- Tempo: 0,5–1 dia
+
+**Risco**
+- Baixo: mudanca isolada no fluxo de busca.
 
 ## Roadmap Visual (ASCII)
 ```

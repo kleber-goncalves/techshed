@@ -1,0 +1,36 @@
+import { produtos } from "@/data/produtos";
+import SearchPageClient from "./SearchPageClient";
+
+export default function Busca({ searchParams }) {
+    const query =
+        typeof searchParams?.q === "string" ? searchParams.q : "";
+    const listaCompleta = Object.values(produtos).flat();
+
+    const features = [
+        ...new Set(
+            listaCompleta.flatMap((produto) => produto.features || []),
+        ),
+    ];
+
+    const priceCentsList = listaCompleta.map(
+        (produto) => produto.priceCents ?? 0,
+    );
+    const minPriceCents =
+        priceCentsList.length > 0 ? Math.min(...priceCentsList) : 0;
+    const maxPriceCents =
+        priceCentsList.length > 0 ? Math.max(...priceCentsList) : 0;
+
+    const filtersData = {
+        features,
+        minLimit: Math.floor(minPriceCents / 100),
+        maxLimit: Math.ceil(maxPriceCents / 100),
+    };
+
+    return (
+        <SearchPageClient
+            produtos={listaCompleta}
+            filtersData={filtersData}
+            initialQuery={query}
+        />
+    );
+}
