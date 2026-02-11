@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-02-07
-Branch: `plan/melhorias-projeto`
+Última atualização: 2026-02-11
+Branch: `fix/next-erro`
 
 ## Visão Geral
 Objetivo: evoluir a estrutura do projeto e a qualidade do UI/UX de forma organizada e rastreável.
@@ -25,6 +25,9 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 5. Normalização de Categorias e Slugs — **Impacto:** alto, **Esforço:** médio
 6. Padronização de Pastas e Nomes — **Impacto:** alto, **Esforço:** alto
 7. Uso do Codex na Revisão de Código — **Impacto:** médio, **Esforço:** baixo
+8. Busca: Relevância e Sincronização — **Impacto:** médio, **Esforço:** médio
+9. Tailwind Content Paths — **Impacto:** médio, **Esforço:** baixo
+10. Dev Server Lock (Windows) — **Impacto:** médio, **Esforço:** baixo
 
 ### 1) Padronização de Pastas e Nomes
 **Descrição**
@@ -217,6 +220,83 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 **Risco**
 - Baixo: melhoria de processo sem impacto no runtime.
 
+### 8) Busca: Relevância e Sincronização
+**Descrição**
+- Melhorar a relevância das sugestões iniciais do modal e garantir sincronização do input com o histórico do navegador sem warnings de render.
+
+**Benefícios**
+- Sugestões mais úteis e alinhadas ao comportamento do usuario.
+- Experiencia mais consistente ao usar back/forward.
+
+**Checklist**
+- [ ] Definir criterio de relevancia (promocao, estoque, popularidade).
+- [ ] Ajustar o modal para usar criterio de relevancia.
+- [ ] Implementar sincronizacao segura do input com a URL.
+- [ ] Validar comportamento de back/forward.
+
+**Plano de execução da melhoria**
+1. Definir o ranking (ex.: promocao > maior estoque > nome).
+2. Criar helper em `src/lib/searchRanking.js` e aplicar no modal.
+3. Refatorar o input da pagina `/busca` para sincronizar via `key` ou `useMemo` sem setState em effect.
+4. Testar com historico do navegador e validar ausencia de warnings.
+
+**Estimativa**
+- Esforço: médio
+- Tempo: 0,5–1 dia
+
+**Risco**
+- Baixo: mudanca isolada no fluxo de busca.
+
+### 9) Tailwind Content Paths
+**Descrição**
+- Garantir que o `tailwind.config.js` inclua todos os diretórios reais do projeto (`src/`, `app/`, `components/`) para evitar classes ausentes no build.
+
+**Benefícios**
+- Evita falhas de hover/cores por classes nao geradas.
+- Reduz bugs visuais difíceis de rastrear.
+
+**Checklist**
+- [ ] Validar paths reais do projeto e manter `content` atualizado.
+- [ ] Rodar `npm run dev` e inspecionar classes criticas (hover/dark).
+- [ ] Documentar a regra no README ou docs de UI.
+
+**Plano de execução da melhoria**
+1. Conferir a estrutura das pastas e revisar `tailwind.config.js`.
+2. Incluir paths faltantes (ex.: `./src/**/*`).
+3. Reiniciar o dev server e validar classes importantes.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 30–60 min
+
+**Risco**
+- Baixo: configuracao simples e controlada.
+
+### 10) Dev Server Lock (Windows)
+**Descrição**
+- Criar automacao para liberar lock do Next.js no Windows e reduzir erros `EPERM`/`Unable to acquire lock`.
+
+**Benefícios**
+- Menos interrupcoes no `npm run dev`.
+- Diagnostico mais rapido quando houver lock em `.next/dev/lock`.
+
+**Checklist**
+- [ ] Criar script `scripts/dev-clean.ps1` para encerrar Node e limpar `.next`.
+- [ ] Documentar uso no README ou docs operacionais.
+- [ ] Validar que o `next dev` inicia sem lock.
+
+**Plano de execução da melhoria**
+1. Implementar script PowerShell com `taskkill` e limpeza seletiva da `.next`.
+2. Atualizar documentacao com exemplos de uso.
+3. Testar em Windows com instancia travada.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 30–60 min
+
+**Risco**
+- Baixo: acao local, sem impacto em producao.
+
 ## Roadmap Visual (ASCII)
 ```
 [Arquitetura] ---> [Footer Responsivo] ---> [Dados Centralizados]
@@ -237,3 +317,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ## Histórico
 - 2026-02-06: Documento criado.
 - 2026-02-07: Adicionadas sugestões de normalização de categorias, default de filtros e limpeza de logs.
+- 2026-02-11: Incluida melhoria de automacao para lock do dev server no Windows.

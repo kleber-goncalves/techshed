@@ -67,6 +67,102 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.8 — 2026-02-11
+**Resumo**
+- Correcoes de runtime no `next dev` e documentacao operacional sobre EPERM/lock no Windows.
+
+**Motivação**
+- Eliminar warnings e falhas de lock/rename durante o desenvolvimento local.
+
+**Impacto**
+- Componentes afetados: `layout.js`, `src/app/busca/page.jsx`, `Header`.
+- Compatibilidade: sim — ajustes locais e documentacao.
+- Risco: baixo — mudancas pontuais.
+
+**Mudanças**
+- **Added**
+  - `docs/operacional-eperm-windows.md` com guia de diagnostico e solucao.
+- **Changed**
+  - `layout.js` usa `crossOrigin` correto no preconnect do Google Fonts.
+- **Fixed**
+  - `searchParams` em `/busca` agora e resolvido de forma assincrona.
+  - Header nao tenta mais carregar `avatar.png` inexistente.
+
+**Como testar**
+1. Rodar `npm run dev` e confirmar ausencia do warning `crossorigin`.
+2. Abrir `/busca?q=tv` e confirmar ausencia do erro de `searchParams` Promise.
+3. Verificar o header sem request `GET /avatar.png` com erro.
+
+**Diagrama**
+```
+Dev server -> sem lock -> build ok -> /busca renderiza sem erro
+```
+
+### v0.1.7 — 2026-02-10
+**Resumo**
+- Correção de geração de classes Tailwind para `src/` e ajuste visual do botão "Mostrar mais" no modal de busca.
+
+**Motivação**
+- Garantir que classes como `dark:hover:bg-white` sejam compiladas e o hover funcione no modo dark.
+
+**Impacto**
+- Componentes afetados: `SearchResults`, `tailwind.config.js`.
+- Compatibilidade: sim — apenas correções de estilo e build de CSS.
+- Risco: baixo — mudança de configuração e estilo local.
+
+**Mudanças**
+- **Changed**
+  - `tailwind.config.js` agora inclui `./src/**/*` no `content`.
+  - Botão "Mostrar mais" usa estilos de fundo/hover consistentes no modal.
+
+**Como testar**
+1. Reiniciar o `npm run dev`.
+2. Abrir o modal e verificar o hover no modo dark.
+3. Confirmar que o botão alterna `bg`/`text` no hover.
+
+**Diagrama**
+```
+Tailwind content -> CSS gerado -> classes dark:hover funcionando
+```
+
+### v0.1.6 — 2026-02-10
+**Resumo**
+- Busca completa com modal, pagina `/busca` e filtros reutilizados do layout de categoria, com documentacao detalhada.
+
+**Motivação**
+- Melhorar a descoberta de produtos com resultados rapidos no modal e refinamento completo em pagina dedicada.
+
+**Impacto**
+- Componentes afetados: `Header`, `SearchModal`, `SearchInput`, `SearchResults`, `ProductCard`, `SearchPageClient`, `useDebouncedValue`, `docs/search.md`.
+- Compatibilidade: sim — funcionalidades adicionadas sem quebrar rotas existentes.
+- Risco: baixo — mudancas concentradas em busca e nova rota.
+
+**Mudanças**
+- **Added**
+  - Pagina `/busca` com layout de categoria (`src/app/busca/page.jsx` e `SearchPageClient.jsx`).
+  - Componentes de busca: `SearchModal`, `SearchResults`, `SearchInput`.
+  - Hook `useDebouncedValue` para sincronizar `?q=` com debounce.
+  - Documentacao profissional em `docs/search.md`.
+- **Changed**
+  - Header abre o modal de busca via icone.
+  - `ProductCard` agora aceita `onClick` para fechar modal ao navegar.
+  - Modal exibe 3 sugestoes iniciais e mostra "Mostrar mais" apenas quando necessario.
+- **Fixed**
+  - Evitado warning de render cascata removendo setState em effect na pagina `/busca`.
+  - Query de busca agora e codificada via `encodeURIComponent`.
+
+**Como testar**
+1. Abrir o modal pelo header e ver 3 produtos iniciais.
+2. Digitar um termo com mais de 3 resultados e verificar o botao "Mostrar mais".
+3. Clicar em "Mostrar mais" e confirmar redirecionamento para `/busca?q=...`.
+4. Na pagina `/busca`, testar filtros e ordenacao.
+5. Digitar na barra superior e confirmar atualizacao da URL com debounce.
+
+**Diagrama**
+```
+Header -> SearchModal -> SearchResults -> /busca -> FiltersSidebar + SortSelect
+```
+
 ### v0.1.4 — 2026-02-07
 **Resumo**
 - Filtros reutilizáveis por página e refinamento dinâmico por categoria, com ordenação na página de categoria.
