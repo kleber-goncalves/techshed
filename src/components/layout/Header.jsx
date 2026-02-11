@@ -13,7 +13,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
 // Lucide icons
@@ -51,10 +51,6 @@ export default function Header() {
                                     className="flex items-center gap-1"
                                 >
                                     <Avatar className="w-8 h-8">
-                                        <AvatarImage
-                                            src="/avatar.png"
-                                            alt="Avatar"
-                                        />
                                         <AvatarFallback>SK</AvatarFallback>
                                     </Avatar>
                                     <ChevronDown className="w-4 h-4" />

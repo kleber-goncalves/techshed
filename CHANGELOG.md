@@ -67,6 +67,37 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.8 — 2026-02-11
+**Resumo**
+- Correcoes de runtime no `next dev` e documentacao operacional sobre EPERM/lock no Windows.
+
+**Motivação**
+- Eliminar warnings e falhas de lock/rename durante o desenvolvimento local.
+
+**Impacto**
+- Componentes afetados: `layout.js`, `src/app/busca/page.jsx`, `Header`.
+- Compatibilidade: sim — ajustes locais e documentacao.
+- Risco: baixo — mudancas pontuais.
+
+**Mudanças**
+- **Added**
+  - `docs/operacional-eperm-windows.md` com guia de diagnostico e solucao.
+- **Changed**
+  - `layout.js` usa `crossOrigin` correto no preconnect do Google Fonts.
+- **Fixed**
+  - `searchParams` em `/busca` agora e resolvido de forma assincrona.
+  - Header nao tenta mais carregar `avatar.png` inexistente.
+
+**Como testar**
+1. Rodar `npm run dev` e confirmar ausencia do warning `crossorigin`.
+2. Abrir `/busca?q=tv` e confirmar ausencia do erro de `searchParams` Promise.
+3. Verificar o header sem request `GET /avatar.png` com erro.
+
+**Diagrama**
+```
+Dev server -> sem lock -> build ok -> /busca renderiza sem erro
+```
+
 ### v0.1.7 — 2026-02-10
 **Resumo**
 - Correção de geração de classes Tailwind para `src/` e ajuste visual do botão "Mostrar mais" no modal de busca.
