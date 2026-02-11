@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-02-10
-Branch: `feat/add-search`
+Última atualização: 2026-02-11
+Branch: `fix/next-erro`
 
 ## Visão Geral
 Objetivo: evoluir a estrutura do projeto e a qualidade do UI/UX de forma organizada e rastreável.
@@ -27,6 +27,7 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 7. Uso do Codex na Revisão de Código — **Impacto:** médio, **Esforço:** baixo
 8. Busca: Relevância e Sincronização — **Impacto:** médio, **Esforço:** médio
 9. Tailwind Content Paths — **Impacto:** médio, **Esforço:** baixo
+10. Dev Server Lock (Windows) — **Impacto:** médio, **Esforço:** baixo
 
 ### 1) Padronização de Pastas e Nomes
 **Descrição**
@@ -271,6 +272,31 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 **Risco**
 - Baixo: configuracao simples e controlada.
 
+### 10) Dev Server Lock (Windows)
+**Descrição**
+- Criar automacao para liberar lock do Next.js no Windows e reduzir erros `EPERM`/`Unable to acquire lock`.
+
+**Benefícios**
+- Menos interrupcoes no `npm run dev`.
+- Diagnostico mais rapido quando houver lock em `.next/dev/lock`.
+
+**Checklist**
+- [ ] Criar script `scripts/dev-clean.ps1` para encerrar Node e limpar `.next`.
+- [ ] Documentar uso no README ou docs operacionais.
+- [ ] Validar que o `next dev` inicia sem lock.
+
+**Plano de execução da melhoria**
+1. Implementar script PowerShell com `taskkill` e limpeza seletiva da `.next`.
+2. Atualizar documentacao com exemplos de uso.
+3. Testar em Windows com instancia travada.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 30–60 min
+
+**Risco**
+- Baixo: acao local, sem impacto em producao.
+
 ## Roadmap Visual (ASCII)
 ```
 [Arquitetura] ---> [Footer Responsivo] ---> [Dados Centralizados]
@@ -291,3 +317,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ## Histórico
 - 2026-02-06: Documento criado.
 - 2026-02-07: Adicionadas sugestões de normalização de categorias, default de filtros e limpeza de logs.
+- 2026-02-11: Incluida melhoria de automacao para lock do dev server no Windows.

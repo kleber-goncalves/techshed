@@ -1,9 +1,12 @@
 import { produtos } from "@/data/produtos";
 import SearchPageClient from "./SearchPageClient";
 
-export default function Busca({ searchParams }) {
+export default async function Busca({ searchParams }) {
+    const resolvedSearchParams = await searchParams;
     const query =
-        typeof searchParams?.q === "string" ? searchParams.q : "";
+        typeof resolvedSearchParams?.q === "string"
+            ? resolvedSearchParams.q
+            : "";
     const listaCompleta = Object.values(produtos).flat();
 
     const features = [
