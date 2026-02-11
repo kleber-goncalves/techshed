@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchModal from "@/components/Search/SearchModal";
 
-import React from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 // shadcn/ui components
 import {
@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/button";
 // Lucide icons
 import { Search, Heart, ShoppingCart, ChevronDown } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useCart } from "@/contexts/cart-context";
+import { getCartBackPath, saveCartReturnPath } from "@/lib/cartReturnPath";
 
 const BtnThemas = dynamic(() => import("../btnTema"), {
     ssr: false,
@@ -27,6 +29,26 @@ const BtnThemas = dynamic(() => import("../btnTema"), {
 
 export default function Header() {
     const [openSearch, setOpenSearch] = useState(false);
+    const { totalItems } = useCart();
+    const router = useRouter();
+    const pathname = usePathname();
+    const currentRoute = pathname || "/";
+
+    useEffect(() => {
+        if (pathname === "/carrinho") return;
+        saveCartReturnPath(currentRoute);
+    }, [currentRoute, pathname]);
+
+    function handleCartIconClick() {
+        if (pathname === "/carrinho") {
+            router.push(getCartBackPath());
+            return;
+        }
+
+        saveCartReturnPath(currentRoute);
+        router.push("/carrinho");
+    }
+
     return (
         <>
             <header className="flex items-center justify-between px-6 py-4 bg-white dark:bg-black shadow-md">
@@ -76,11 +98,23 @@ export default function Header() {
                             Favoritos
                         </Button>
                     </Link>
-                    <Link href="/carrinho">
-                        <Button variant="ghost">
-                            <ShoppingCart className="w-5 h-5" />
-                        </Button>
-                    </Link>
+                    <Button
+                        variant="ghost"
+                        className="relative cursor-pointer"
+                        onClick={handleCartIconClick}
+                        aria-label={
+                            totalItems > 0
+                                ? `Carrinho com ${totalItems} itens`
+                                : "Carrinho vazio"
+                        }
+                    >
+                        <ShoppingCart className="w-5 h-5" />
+                        {totalItems > 0 && (
+                            <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[11px] leading-none flex items-center justify-center font-semibold">
+                                {totalItems > 99 ? "99+" : totalItems}
+                            </span>
+                        )}
+                    </Button>
                 </div>
             </header>
             {openSearch && <SearchModal onClose={() => setOpenSearch(false)} />}
