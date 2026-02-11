@@ -67,6 +67,47 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.9 — 2026-02-11
+**Resumo**
+- Implementacao completa do carrinho com estado global, persistencia local, pagina dedicada e navegacao inteligente de retorno.
+
+**Motivação**
+- Conectar o fluxo real de compra entre pagina de produto, icone do header e tela de carrinho.
+- Garantir experiencia consistente ao adicionar itens, alterar quantidade e voltar para a pagina anterior.
+
+**Impacto**
+- Componentes afetados: `ProdutoClient`, `Header`, `Providers`, nova rota `/carrinho`, `cart-context`, helpers de moeda e retorno de rota, documentacao tecnica.
+- Compatibilidade: sim — nao quebra rotas existentes e adiciona funcionalidade.
+- Risco: medio — fluxo novo com estado global e persistencia.
+
+**Mudanças**
+- **Added**
+  - `src/contexts/cart-context.jsx` com API `useCart()` (`addItem`, `setItemQuantity`, `removeItem`, `clearCart`, `items`, `totalItems`, `subtotalCents`).
+  - `src/app/carrinho/page.jsx` e `src/app/carrinho/CarrinhoClient.jsx` (MVP completo de carrinho).
+  - `src/lib/formatCurrency.js` para padronizacao de `BRL`.
+  - `src/lib/cartReturnPath.js` para salvar/recuperar rota de retorno do carrinho.
+  - `docs/carrinho-logica.md` com documentacao detalhada para estudo e reaproveitamento da logica em outros projetos.
+- **Changed**
+  - `src/contexts/providers.jsx` agora injeta `CartProvider` globalmente.
+  - `src/app/produto/[slug]/ProdutoClient.jsx` conecta botoes "Adicionar ao carrinho" e "Comprar" ao estado do carrinho, com clamp por estoque/variacao.
+  - `src/components/layout/Header.jsx` exibe badge com total de itens e implementa toggle do icone (abrir `/carrinho` e, se ja estiver nele, voltar para a ultima rota).
+- **Fixed**
+  - Correcoes de renderizacao e navegacao para suportar prerender/build com a logica de toggle do carrinho.
+
+**Como testar**
+1. Abrir um produto sem variacao, adicionar quantidade e validar badge no header.
+2. Abrir um produto com variacao, adicionar duas cores e validar linhas separadas no carrinho.
+3. Em `/carrinho`, alterar quantidade, remover item e limpar carrinho.
+4. Clicar no icone do carrinho no header fora de `/carrinho` (deve abrir carrinho).
+5. Clicar no icone do carrinho estando em `/carrinho` (deve voltar para rota anterior).
+6. Recarregar a pagina e validar persistencia do carrinho.
+
+**Diagrama**
+```
+Produto -> addItem -> CartContext(localStorage) -> Header badge
+Header cart icon -> /carrinho -> CarrinhoClient -> voltar (sessionStorage returnPath)
+```
+
 ### v0.1.8 — 2026-02-11
 **Resumo**
 - Correcoes de runtime no `next dev` e documentacao operacional sobre EPERM/lock no Windows.

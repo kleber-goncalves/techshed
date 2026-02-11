@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import VariantsButton from "@/components/componets-page-produto/variants-btn";
 import VariantsImg from "@/components/componets-page-produto/variants-img";
@@ -9,8 +10,13 @@ import QuantitySelector from "@/components/componets-page-produto/QuantitySelect
 import { ProductAccordion } from "@/components/componets-page-produto/acordion";
 import ProductSlider from "@/components/componets-page-produto/slide";
 import Breadcrumb from "@/components/componets-page-produto/Breadcrumb";
+import { useCart } from "@/contexts/cart-context";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 export default function ProdutoClient({ produto }) {
+    const router = useRouter();
+    const { addItem } = useCart();
+
     // Verificamos se existem cores definidas no produto
     const hasColors = produto.colors && produto.colors.length > 0;
 
@@ -24,6 +30,47 @@ export default function ProdutoClient({ produto }) {
         hasColors ? produto.colors[0].id : null,
     );
     const [quantity, setQuantity] = useState(1);
+
+    const selectedVariant = useMemo(() => {
+        if (!hasColors) return null;
+        return (
+            produto.colors.find((color) => color.id === corAtiva) ??
+            produto.colors[0]
+        );
+    }, [corAtiva, hasColors, produto.colors]);
+
+    const availableStock = useMemo(() => {
+        const rawStock = selectedVariant?.stock ?? produto.stock ?? 0;
+        const parsedStock = Number(rawStock);
+        return Number.isFinite(parsedStock) ? Math.max(0, parsedStock) : 0;
+    }, [produto.stock, selectedVariant?.stock]);
+
+    const displayPriceCents =
+        selectedVariant?.priceCents ?? produto.priceCents ?? 0;
+
+    const clampedQuantity =
+        availableStock > 0 ? Math.min(quantity, availableStock) : 1;
+
+    function handleAddToCart() {
+        if (availableStock <= 0) return;
+
+        addItem({
+            productId: produto.id,
+            variantId: selectedVariant?.id ?? null,
+            quantity: clampedQuantity,
+        });
+    }
+
+    function handleBuyNow() {
+        if (availableStock <= 0) return;
+
+        addItem({
+            productId: produto.id,
+            variantId: selectedVariant?.id ?? null,
+            quantity: clampedQuantity,
+        });
+        router.push("/carrinho");
+    }
 
     return (
         <section className="py-25 h-full flex flex-col gap-23">
@@ -83,7 +130,7 @@ export default function ProdutoClient({ produto }) {
                         </h1>
                         <section className="flex flex-col w-full justify-center gap-10">
                             <p className="text-3xl text-green-600 dark:text-green-400">
-                                R$ {(produto.priceCents / 100).toFixed(2)}
+                                {formatCurrency(displayPriceCents)}
                             </p>
                             {/* variação de cores */}
                             {/* Só renderiza botões de cor se houver cores */}
@@ -105,23 +152,39 @@ export default function ProdutoClient({ produto }) {
                                 <p>Quantidade</p>
                                 <div id="contador">
                                     <QuantitySelector
-                                        quantity={quantity}
+                                        quantity={clampedQuantity}
                                         setQuantity={setQuantity}
-                                        max={produto.stock}
+                                        max={Math.max(1, availableStock)}
                                     />
-                                    {quantity >= produto.stock && (
+                                    {availableStock > 0 &&
+                                        clampedQuantity >= availableStock && (
                                         <p className="text-sm text-red-600">
                                             Limite máximo de estoque atingido
+                                        </p>
+                                    )}
+                                    {availableStock === 0 && (
+                                        <p className="text-sm text-red-600">
+                                            Produto indisponível no momento
                                         </p>
                                     )}
                                 </div>
                             </div>
 
                             <div className="flex flex-col w-full gap-2">
-                                <Button variant="addCart" size="xl">
+                                <Button
+                                    variant="addCart"
+                                    size="xl"
+                                    onClick={handleAddToCart}
+                                    disabled={availableStock <= 0}
+                                >
                                     Adicionar ao carrinho
                                 </Button>
-                                <Button variant="buy" size="xxl">
+                                <Button
+                                    variant="buy"
+                                    size="xxl"
+                                    onClick={handleBuyNow}
+                                    disabled={availableStock <= 0}
+                                >
                                     Comprar
                                 </Button>
                             </div>

@@ -4,7 +4,7 @@ Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
 Última atualização: 2026-02-11
-Branch: `fix/next-erro`
+Branch: `feat/carrinho`
 
 ## Visão Geral
 Objetivo: evoluir a estrutura do projeto e a qualidade do UI/UX de forma organizada e rastreável.
@@ -28,6 +28,8 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 8. Busca: Relevância e Sincronização — **Impacto:** médio, **Esforço:** médio
 9. Tailwind Content Paths — **Impacto:** médio, **Esforço:** baixo
 10. Dev Server Lock (Windows) — **Impacto:** médio, **Esforço:** baixo
+11. Carrinho: Cupom/Frete/Resumo Real — **Impacto:** alto, **Esforço:** médio
+12. Carrinho: Testes Automatizados da Regra de Negócio — **Impacto:** alto, **Esforço:** médio
 
 ### 1) Padronização de Pastas e Nomes
 **Descrição**
@@ -297,6 +299,61 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 **Risco**
 - Baixo: acao local, sem impacto em producao.
 
+### 11) Carrinho: Cupom/Frete/Resumo Real
+**Descrição**
+- Evoluir o resumo do carrinho para calculo real de frete, desconto e total final.
+- Preparar o contrato para integracao futura com checkout.
+
+**Benefícios**
+- Aproxima o comportamento de um e-commerce real.
+- Reduz retrabalho quando o checkout for implementado.
+
+**Checklist**
+- [ ] Definir modelo de valores: `subtotal`, `frete`, `desconto`, `total`.
+- [ ] Criar helper de calculo centralizado em `src/lib/cartTotals.js`.
+- [ ] Atualizar `CarrinhoClient` para exibir breakdown completo.
+- [ ] Garantir fallback quando frete/cupom nao estiverem disponiveis.
+
+**Plano de execução da melhoria**
+1. Definir schema de totais no contexto do carrinho.
+2. Criar funcoes puras de calculo (com testes unitarios).
+3. Integrar no resumo visual do carrinho.
+4. Validar cenarios com e sem cupom/frete.
+
+**Estimativa**
+- Esforço: médio
+- Tempo: 0,5–1 dia
+
+**Risco**
+- Médio: mudanças no dominio de preco exigem validacao cuidadosa.
+
+### 12) Carrinho: Testes Automatizados da Regra de Negócio
+**Descrição**
+- Criar testes para garantir estabilidade da logica do carrinho (`merge`, `clamp`, persistencia e retorno de rota).
+
+**Benefícios**
+- Evita regressao em alteracoes futuras.
+- Garante confiabilidade dos fluxos criticos de compra.
+
+**Checklist**
+- [ ] Adicionar ambiente de testes (Vitest/Jest + RTL).
+- [ ] Testar `sanitizeLines` e regras de merge por `productId + variantId`.
+- [ ] Testar limites de estoque (`1..stock`) nas operacoes de quantidade.
+- [ ] Testar persistencia (`localStorage`) e retorno (`sessionStorage`).
+
+**Plano de execução da melhoria**
+1. Configurar base de testes e scripts no `package.json`.
+2. Extrair utilitarios puros quando necessario para facilitar teste.
+3. Criar suite para `cart-context` e `cartReturnPath`.
+4. Cobrir cenarios de edge cases (produto removido do catalogo, estoque zerado, chave invalida).
+
+**Estimativa**
+- Esforço: médio
+- Tempo: 1 dia
+
+**Risco**
+- Baixo: adiciona seguranca sem mudar comportamento final.
+
 ## Roadmap Visual (ASCII)
 ```
 [Arquitetura] ---> [Footer Responsivo] ---> [Dados Centralizados]
@@ -318,3 +375,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-06: Documento criado.
 - 2026-02-07: Adicionadas sugestões de normalização de categorias, default de filtros e limpeza de logs.
 - 2026-02-11: Incluida melhoria de automacao para lock do dev server no Windows.
+- 2026-02-11: Incluidas melhorias de evolucao do carrinho (totais reais e testes automatizados).
