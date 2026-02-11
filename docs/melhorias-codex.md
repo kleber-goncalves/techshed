@@ -26,6 +26,7 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 6. Padronização de Pastas e Nomes — **Impacto:** alto, **Esforço:** alto
 7. Uso do Codex na Revisão de Código — **Impacto:** médio, **Esforço:** baixo
 8. Busca: Relevância e Sincronização — **Impacto:** médio, **Esforço:** médio
+9. Tailwind Content Paths — **Impacto:** médio, **Esforço:** baixo
 
 ### 1) Padronização de Pastas e Nomes
 **Descrição**
@@ -244,6 +245,31 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 
 **Risco**
 - Baixo: mudanca isolada no fluxo de busca.
+
+### 9) Tailwind Content Paths
+**Descrição**
+- Garantir que o `tailwind.config.js` inclua todos os diretórios reais do projeto (`src/`, `app/`, `components/`) para evitar classes ausentes no build.
+
+**Benefícios**
+- Evita falhas de hover/cores por classes nao geradas.
+- Reduz bugs visuais difíceis de rastrear.
+
+**Checklist**
+- [ ] Validar paths reais do projeto e manter `content` atualizado.
+- [ ] Rodar `npm run dev` e inspecionar classes criticas (hover/dark).
+- [ ] Documentar a regra no README ou docs de UI.
+
+**Plano de execução da melhoria**
+1. Conferir a estrutura das pastas e revisar `tailwind.config.js`.
+2. Incluir paths faltantes (ex.: `./src/**/*`).
+3. Reiniciar o dev server e validar classes importantes.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 30–60 min
+
+**Risco**
+- Baixo: configuracao simples e controlada.
 
 ## Roadmap Visual (ASCII)
 ```

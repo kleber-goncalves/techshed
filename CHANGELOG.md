@@ -67,6 +67,33 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.7 — 2026-02-10
+**Resumo**
+- Correção de geração de classes Tailwind para `src/` e ajuste visual do botão "Mostrar mais" no modal de busca.
+
+**Motivação**
+- Garantir que classes como `dark:hover:bg-white` sejam compiladas e o hover funcione no modo dark.
+
+**Impacto**
+- Componentes afetados: `SearchResults`, `tailwind.config.js`.
+- Compatibilidade: sim — apenas correções de estilo e build de CSS.
+- Risco: baixo — mudança de configuração e estilo local.
+
+**Mudanças**
+- **Changed**
+  - `tailwind.config.js` agora inclui `./src/**/*` no `content`.
+  - Botão "Mostrar mais" usa estilos de fundo/hover consistentes no modal.
+
+**Como testar**
+1. Reiniciar o `npm run dev`.
+2. Abrir o modal e verificar o hover no modo dark.
+3. Confirmar que o botão alterna `bg`/`text` no hover.
+
+**Diagrama**
+```
+Tailwind content -> CSS gerado -> classes dark:hover funcionando
+```
+
 ### v0.1.6 — 2026-02-10
 **Resumo**
 - Busca completa com modal, pagina `/busca` e filtros reutilizados do layout de categoria, com documentacao detalhada.
