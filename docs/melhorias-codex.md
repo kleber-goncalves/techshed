@@ -4,7 +4,7 @@ Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
 Última atualização: 2026-02-12
-Branch: `feat/favoritos`
+Branch: `feat/conta-usuario`
 
 ## Visão Geral
 Objetivo: evoluir a estrutura do projeto e a qualidade do UI/UX de forma organizada e rastreável.
@@ -32,6 +32,7 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 12. Carrinho: Testes Automatizados da Regra de Negócio — **Impacto:** alto, **Esforço:** médio
 13. Favoritos: Toggle de Retorno no Header — **Impacto:** alto, **Esforço:** baixo
 14. Favoritos: Testes E2E de Navegação e Persistência — **Impacto:** alto, **Esforço:** médio
+15. Conta do usuário: Nav ativo e acessibilidade do formulário — **Impacto:** médio, **Esforço:** baixo
 
 ### 1) Padronização de Pastas e Nomes
 **Descrição**
@@ -412,6 +413,34 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 **Risco**
 - Baixo: adiciona proteção sem alterar lógica de produção.
 
+### 15) Conta do Usuário: Nav ativo e acessibilidade do formulário
+**Descrição**
+- Aplicar estado ativo no menu de configurações da conta.
+- Corrigir acessibilidade do formulário (labels com `htmlFor` + `id`, `type="tel"`, botões dentro do form).
+
+**Benefícios**
+- Usuário entende em qual seção está.
+- Formulário mais acessível e semântico.
+
+**Checklist**
+- [ ] Aplicar classe ativa baseada na rota atual.
+- [ ] Ajustar `label` e `input` para IDs únicos.
+- [ ] Corrigir tipos de input e posição dos botões.
+- [ ] Validar navegação por teclado.
+
+**Plano de execução da melhoria**
+1. Usar `usePathname` no `TopHeader` e aplicar classe ativa no `Link` da rota atual.
+2. Ajustar `SectionInfP` para IDs únicos e `type="tel"`.
+3. Mover botões para dentro do `<form>` e definir `type="submit"`/`type="button"`.
+4. Testar navegação por teclado e foco visível.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 1–2 horas
+
+**Risco**
+- Baixo: mudanças pontuais e isoladas.
+
 ## Roadmap Visual (ASCII)
 ```
 [Arquitetura] ---> [Footer Responsivo] ---> [Dados Centralizados]
@@ -435,3 +464,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-11: Incluida melhoria de automacao para lock do dev server no Windows.
 - 2026-02-11: Incluidas melhorias de evolucao do carrinho (totais reais e testes automatizados).
 - 2026-02-12: Incluidas melhorias de favoritos (toggle de retorno no header e testes E2E).
+- 2026-02-12: Incluida melhoria de conta do usuario (nav ativo e acessibilidade do formulario).

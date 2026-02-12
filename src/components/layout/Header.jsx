@@ -80,15 +80,18 @@ export default function Header() {
         <>
             <header className="flex items-center justify-between px-6 py-4 bg-white dark:bg-black shadow-md">
                 <div className="flex flex-row gap-5">
-  <Link href="/" className="flex flex-row">
-                    <h1 className="text-[40px] font-semibold">TechShed</h1>
-                </Link>
-   
-                <Button variant="ghost" onClick={() => setOpenSearch(true)} className="cursor-pointer">
-                    <Search className="w-12 h-12" />
-                </Button>
+                    <Link href="/" className="flex flex-row">
+                        <h1 className="text-[40px] font-semibold">TechShed</h1>
+                    </Link>
+
+                    <Button
+                        variant="ghost"
+                        onClick={() => setOpenSearch(true)}
+                        className="cursor-pointer"
+                    >
+                        <Search className="w-12 h-12" />
+                    </Button>
                 </div>
-              
 
                 <div className="flex items-center gap-4">
                     <BtnThemas />
@@ -106,9 +109,12 @@ export default function Header() {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
-                                <DropdownMenuItem>
-                                    Configurações da Conta
-                                </DropdownMenuItem>
+                                <Link href="/cnfgContaUsers">
+                                    <DropdownMenuItem>
+                                        Configurações da Conta
+                                    </DropdownMenuItem>
+                                </Link>
+
                                 <DropdownMenuItem>
                                     Meus Pedidos
                                 </DropdownMenuItem>
@@ -116,26 +122,26 @@ export default function Header() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                   
-                        <Button
-                            variant="ghost"
-                            className="relative cursor-pointer flex items-center gap-1"
-                            onClick={handleFvrtIconClick}
-                            aria-label={
-                                totalFavorites > 0
-                                    ? `Favoritos com ${totalFavorites} itens`
-                                    : "Favoritos vazio"
-                            }
-                        >
-                            <Heart className="w-6 h-6 text-red-500 size-1" />
-                           
-                            {totalFavorites > 0 && (
-                                <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[11px] leading-none flex items-center justify-center font-semibold">
-                                    {totalFavorites > 99 ? "99+" : totalFavorites}
-                                </span>
-                            )}
-                        </Button>
-                  
+
+                    <Button
+                        variant="ghost"
+                        className="relative cursor-pointer flex items-center gap-1"
+                        onClick={handleFvrtIconClick}
+                        aria-label={
+                            totalFavorites > 0
+                                ? `Favoritos com ${totalFavorites} itens`
+                                : "Favoritos vazio"
+                        }
+                    >
+                        <Heart className="w-6 h-6 text-red-500 size-1" />
+
+                        {totalFavorites > 0 && (
+                            <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[11px] leading-none flex items-center justify-center font-semibold">
+                                {totalFavorites > 99 ? "99+" : totalFavorites}
+                            </span>
+                        )}
+                    </Button>
+
                     <Button
                         variant="ghost"
                         className="relative cursor-pointer"

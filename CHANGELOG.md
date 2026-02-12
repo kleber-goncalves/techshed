@@ -67,6 +67,37 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.12 — 2026-02-12
+**Resumo**
+- Sub-rotas de Configurações da Conta com layout persistente e navegação interna.
+
+**Motivação**
+- Permitir troca de seções sem perder o header do módulo.
+- Organizar o conteúdo da conta do usuário em rotas claras e diretas.
+
+**Impacto**
+- Componentes afetados: `src/app/cnfgContaUsers/*`, `TopHeader`, `Header`, remoção da rota `src/app/mhCont`.
+- Compatibilidade: não — rota `/mhCont` removida.
+- Risco: médio — mudanças em rotas e navegação interna.
+
+**Mudanças**
+- **Added**
+  - `src/app/cnfgContaUsers/layout.jsx` para manter o header fixo e renderizar conteúdo variável.
+  - Sub-rotas `/cnfgContaUsers/minha-conta`, `/cnfgContaUsers/enderecos`, `/cnfgContaUsers/carteira`.
+  - Componente reutilizável `src/components/componemts-conta-users/layout/minha-conta.jsx`.
+- **Changed**
+  - `src/components/componemts-conta-users/layout/top.jsx` com navegação semântica e links para sub-rotas.
+  - `src/app/cnfgContaUsers/page.jsx` agora renderiza a seção “Minha conta” como padrão.
+  - `src/components/layout/Header.jsx` aponta “Configurações da Conta” para `/cnfgContaUsers`.
+- **Removed**
+  - Rota antiga `/mhCont` (arquivos em `src/app/mhCont/`).
+
+**Como testar**
+1. Abrir `/cnfgContaUsers` e confirmar que o header do módulo aparece.
+2. Clicar em “Minha conta”, “Meus endereços” e “Meus carteira” e validar que só o conteúdo abaixo muda.
+3. Acessar diretamente `/cnfgContaUsers/minha-conta`, `/enderecos`, `/carteira`.
+4. Confirmar que `/mhCont` não existe mais.
+
 ### v0.1.11 — 2026-02-12
 **Resumo**
 - Refinamentos do fluxo de favoritos com retorno pelo ícone do header e ajustes de documentação técnica do carrinho.
