@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-02-11
-Branch: `feat/carrinho`
+Última atualização: 2026-02-12
+Branch: `feat/favoritos`
 
 ## Visão Geral
 Objetivo: evoluir a estrutura do projeto e a qualidade do UI/UX de forma organizada e rastreável.
@@ -30,6 +30,8 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 10. Dev Server Lock (Windows) — **Impacto:** médio, **Esforço:** baixo
 11. Carrinho: Cupom/Frete/Resumo Real — **Impacto:** alto, **Esforço:** médio
 12. Carrinho: Testes Automatizados da Regra de Negócio — **Impacto:** alto, **Esforço:** médio
+13. Favoritos: Toggle de Retorno no Header — **Impacto:** alto, **Esforço:** baixo
+14. Favoritos: Testes E2E de Navegação e Persistência — **Impacto:** alto, **Esforço:** médio
 
 ### 1) Padronização de Pastas e Nomes
 **Descrição**
@@ -354,6 +356,62 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 **Risco**
 - Baixo: adiciona seguranca sem mudar comportamento final.
 
+### 13) Favoritos: Toggle de Retorno no Header
+**Descrição**
+- Consolidar o comportamento do ícone de favoritos para funcionar como toggle:
+- fora de `/favoritos` abre a página;
+- dentro de `/favoritos` retorna para a rota anterior salva.
+
+**Benefícios**
+- Navegação mais fluida e previsível para o usuário.
+- Consistência com o padrão já usado no carrinho.
+
+**Checklist**
+- [ ] Garantir que o clique do ícone não conflite com `Link` pai.
+- [ ] Validar gravação de rota com `saveFvrtReturnPath`.
+- [ ] Validar retorno com `getFvrtBackPath` e fallback seguro.
+- [ ] Cobrir cenários de navegação direta por URL.
+
+**Plano de execução da melhoria**
+1. Centralizar o clique de favoritos em um único handler no `Header`.
+2. Remover qualquer navegação duplicada que force `/favoritos` após o retorno.
+3. Padronizar fallback para `/loja` quando não houver histórico válido.
+4. Validar fluxo manual em `/`, `/loja`, `/produto/[slug]` e `/favoritos`.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 1–2 horas
+
+**Risco**
+- Médio: evento de clique duplicado pode mascarar o retorno e gerar falsa regressão.
+
+### 14) Favoritos: Testes E2E de Navegação e Persistência
+**Descrição**
+- Criar cenários E2E para o fluxo de favoritos cobrindo persistência, toggle de header e integração com carrinho.
+
+**Benefícios**
+- Evita regressão no principal fluxo novo de UX.
+- Dá segurança para evoluir header e contextos globais.
+
+**Checklist**
+- [ ] Configurar suite E2E (Playwright) para fluxo de favoritos.
+- [ ] Cobrir favoritar/desfavoritar no produto.
+- [ ] Cobrir navegação via ícone no header (abrir e voltar).
+- [ ] Cobrir persistência após reload e ação "Adicionar ao carrinho" em `/favoritos`.
+
+**Plano de execução da melhoria**
+1. Criar dados determinísticos para cenários de favoritos.
+2. Implementar spec de navegação e persistência no header.
+3. Implementar spec de integração favoritos -> carrinho.
+4. Rodar em CI e publicar relatório simples no PR.
+
+**Estimativa**
+- Esforço: médio
+- Tempo: 0,5–1 dia
+
+**Risco**
+- Baixo: adiciona proteção sem alterar lógica de produção.
+
 ## Roadmap Visual (ASCII)
 ```
 [Arquitetura] ---> [Footer Responsivo] ---> [Dados Centralizados]
@@ -376,3 +434,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-07: Adicionadas sugestões de normalização de categorias, default de filtros e limpeza de logs.
 - 2026-02-11: Incluida melhoria de automacao para lock do dev server no Windows.
 - 2026-02-11: Incluidas melhorias de evolucao do carrinho (totais reais e testes automatizados).
+- 2026-02-12: Incluidas melhorias de favoritos (toggle de retorno no header e testes E2E).

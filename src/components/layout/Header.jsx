@@ -20,7 +20,9 @@ import { Button } from "@/components/ui/button";
 import { Search, Heart, ShoppingCart, ChevronDown } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useCart } from "@/contexts/cart-context";
+import { useFavorite } from "@/contexts/favorit-context";
 import { getCartBackPath, saveCartReturnPath } from "@/lib/cartReturnPath";
+import { getFvrtBackPath, saveFvrtReturnPath} from "@/lib/fvrtReturnPath"
 
 const BtnThemas = dynamic(() => import("../btnTema"), {
     ssr: false,
@@ -30,6 +32,7 @@ const BtnThemas = dynamic(() => import("../btnTema"), {
 export default function Header() {
     const [openSearch, setOpenSearch] = useState(false);
     const { totalItems } = useCart();
+    const { totalFavorites } = useFavorite();
     const router = useRouter();
     const pathname = usePathname();
     const currentRoute = pathname || "/";
@@ -38,6 +41,8 @@ export default function Header() {
         if (pathname === "/carrinho") return;
         saveCartReturnPath(currentRoute);
     }, [currentRoute, pathname]);
+
+
 
     function handleCartIconClick() {
         if (pathname === "/carrinho") {
@@ -48,6 +53,28 @@ export default function Header() {
         saveCartReturnPath(currentRoute);
         router.push("/carrinho");
     }
+
+
+
+        useEffect(() => {
+            if (pathname === "/favoritos") return;
+           
+        saveFvrtReturnPath(currentRoute);
+    }, [currentRoute, pathname]);
+
+    function handleFvrtIconClick() {
+        if (pathname === "/favoritos") {
+           
+            router.push(getFvrtBackPath());
+            
+            return;
+        }
+
+        saveFvrtReturnPath(currentRoute);
+        router.push("/favoritos");
+    }
+    
+    
 
     return (
         <>
@@ -89,15 +116,26 @@ export default function Header() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                    <Link href="/favoritos">
+                   
                         <Button
                             variant="ghost"
-                            className="flex items-center gap-1"
+                            className="relative cursor-pointer flex items-center gap-1"
+                            onClick={handleFvrtIconClick}
+                            aria-label={
+                                totalFavorites > 0
+                                    ? `Favoritos com ${totalFavorites} itens`
+                                    : "Favoritos vazio"
+                            }
                         >
-                            <Heart className="w-5 h-5 text-red-500" />
-                            Favoritos
+                            <Heart className="w-6 h-6 text-red-500 size-1" />
+                           
+                            {totalFavorites > 0 && (
+                                <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[11px] leading-none flex items-center justify-center font-semibold">
+                                    {totalFavorites > 99 ? "99+" : totalFavorites}
+                                </span>
+                            )}
                         </Button>
-                    </Link>
+                  
                     <Button
                         variant="ghost"
                         className="relative cursor-pointer"
@@ -108,7 +146,7 @@ export default function Header() {
                                 : "Carrinho vazio"
                         }
                     >
-                        <ShoppingCart className="w-5 h-5" />
+                        <ShoppingCart className="w-5 h-5 size-1" />
                         {totalItems > 0 && (
                             <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[11px] leading-none flex items-center justify-center font-semibold">
                                 {totalItems > 99 ? "99+" : totalItems}

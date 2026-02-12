@@ -12,6 +12,7 @@ import ProductSlider from "@/components/componets-page-produto/slide";
 import Breadcrumb from "@/components/componets-page-produto/Breadcrumb";
 import { useCart } from "@/contexts/cart-context";
 import { formatCurrency } from "@/lib/formatCurrency";
+import IconFavorit from "@/components/componets-page-produto/iconFavorito";
 
 export default function ProdutoClient({ produto }) {
     const router = useRouter();
@@ -125,9 +126,13 @@ export default function ProdutoClient({ produto }) {
                     </section>
 
                     <section className="flex flex-col  gap-8 h-fit dark:p-6">
-                        <h1 className="text-3xl font-semibold dark:text-white ">
+                        <div className="flex flex-row items-center justify-between">
+   <h1 className="text-3xl font-semibold dark:text-white ">
                             {produto.name}
                         </h1>
+                        <IconFavorit productId={produto.id} />
+                        </div>
+                     
                         <section className="flex flex-col w-full justify-center gap-10">
                             <p className="text-3xl text-green-600 dark:text-green-400">
                                 {formatCurrency(displayPriceCents)}
