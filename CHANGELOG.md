@@ -67,6 +67,86 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.11 — 2026-02-12
+**Resumo**
+- Refinamentos do fluxo de favoritos com retorno pelo ícone do header e ajustes de documentação técnica do carrinho.
+
+**Motivação**
+- Fechar o comportamento de navegação ao clicar no coração estando em `/favoritos`.
+- Melhorar a legibilidade do código de carrinho para manutenção e estudo.
+
+**Impacto**
+- Componentes afetados: `Header`, helper de retorno dos favoritos, `ProdutoClient`, `providers`, contexto de favoritos, documentação de favoritos e `cart-context`.
+- Compatibilidade: sim — mudanças incrementais sem quebrar rotas existentes.
+- Risco: médio — alterações em navegação de header e estado global.
+
+**Mudanças**
+- **Added**
+  - `src/lib/fvrtReturnPath.js` para salvar e recuperar rota de retorno dos favoritos em `sessionStorage`.
+- **Changed**
+  - `src/components/layout/Header.jsx` com fluxo dedicado de favoritos (abrir `/favoritos` e voltar para rota anterior quando já estiver em `/favoritos`), além de badge com contagem.
+  - `src/app/produto/[slug]/ProdutoClient.jsx` com integração do botão de favoritar por `productId`.
+  - `src/contexts/providers.jsx` agora injeta `FavoriteProvider` junto do `CartProvider`.
+  - `src/contexts/cart-context.jsx` recebeu comentários explicativos para facilitar manutenção e onboarding.
+  - `docs/melhorias-codex.md` atualizado com novas sugestões de evolução para favoritos.
+- **Fixed**
+  - Padronização do fallback em `getFvrtBackPath` para evitar retorno inválido quando não houver rota salva.
+
+**Como testar**
+1. Entrar em qualquer página de produto e favoritar um item.
+2. Clicar no ícone de favoritos no header fora de `/favoritos` (deve abrir `/favoritos`).
+3. Clicar novamente no ícone estando em `/favoritos` (deve voltar para a rota anterior salva).
+4. Recarregar a página e validar persistência dos favoritos e da badge.
+5. Validar carrinho e favoritos coexistindo sem regressões de contexto.
+
+**Diagrama**
+```
+Header Heart -> saveFvrtReturnPath -> /favoritos
+/favoritos + Heart -> getFvrtBackPath -> rota anterior (fallback /loja)
+```
+
+### v0.1.10 — 2026-02-11
+**Resumo**
+- Implementacao completa do sistema de favoritos com persistencia local, badge no header e pagina dedicada integrada ao carrinho.
+
+**Motivação**
+- Permitir que o usuario salve produtos para consultar depois sem perder estado ao recarregar a pagina.
+- Conectar favoritos ao fluxo existente de compra com baixo atrito.
+
+**Impacto**
+- Componentes afetados: `favorit-context`, `providers`, `Header`, `ProdutoClient`, `IconFavorit`, pagina `/favoritos`, documentacao tecnica.
+- Compatibilidade: sim — fluxo de carrinho permanece inalterado.
+- Risco: medio — adicao de novo estado global e persistencia no browser.
+
+**Mudanças**
+- **Added**
+  - `src/contexts/favorit-context.jsx` com API `useFavorite()` (`isFavorite`, `addFavorite`, `removeFavorite`, `toggleFavorite`, `clearFavorites`, `items`, `favoriteIds`, `totalFavorites`, `isEmpty`).
+  - `docs/favoritos-logica.md` com explicacao completa da arquitetura e validacoes manuais.
+- **Changed**
+  - `src/contexts/providers.jsx` agora injeta `FavoriteProvider` globalmente.
+  - `src/components/componets-page-produto/iconFavorito.jsx` virou toggle funcional com acessibilidade (`aria-pressed`, `aria-label`) e estado visual ativo/inativo.
+  - `src/app/produto/[slug]/ProdutoClient.jsx` passa `productId` para o botao de favoritos.
+  - `src/components/layout/Header.jsx` agora exibe badge de favoritos com limite visual `99+`.
+  - `src/app/favoritos/FavoritoClient.jsx` foi implementado com estado vazio, listagem, remocao, limpeza global, voltar com fallback e acao de adicionar ao carrinho.
+  - `src/app/favoritos/page.jsx` simplificado para renderizar apenas o client component.
+
+**Como testar**
+1. Abrir um produto em `/produto/[slug]` e clicar no coracao.
+2. Recarregar a pagina e validar que o favorito persiste.
+3. Conferir badge de favoritos no header.
+4. Acessar `/favoritos` e validar listagem com links de produto.
+5. Remover um favorito e validar atualizacao imediata.
+6. Adicionar ao carrinho via `/favoritos` e validar badge/carrinho.
+7. Validar item sem estoque com botao de carrinho desabilitado.
+8. Clicar em `Limpar favoritos` e validar estado vazio.
+9. Clicar em `Voltar` em `/favoritos` com e sem historico, validando fallback para `/loja`.
+
+**Diagrama**
+```
+Produto -> toggleFavorite -> FavoriteContext(localStorage) -> Header badge
+/favoritos -> listar/remover/clear -> addItem(useCart) sem redirecionar
+```
+
 ### v0.1.9 — 2026-02-11
 **Resumo**
 - Implementacao completa do carrinho com estado global, persistencia local, pagina dedicada e navegacao inteligente de retorno.
