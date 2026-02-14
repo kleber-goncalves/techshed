@@ -3,7 +3,7 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-02-12
+Última atualização: 2026-02-13
 Branch: `feat/conta-usuario`
 
 ## Visão Geral
@@ -33,6 +33,7 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 13. Favoritos: Toggle de Retorno no Header — **Impacto:** alto, **Esforço:** baixo
 14. Favoritos: Testes E2E de Navegação e Persistência — **Impacto:** alto, **Esforço:** médio
 15. Conta do usuário: Nav ativo e acessibilidade do formulário — **Impacto:** médio, **Esforço:** baixo
+16. Conta do usuário: Padronizar rotas (kebab-case) e links do nav — **Impacto:** médio, **Esforço:** baixo
 
 ### 1) Padronização de Pastas e Nomes
 **Descrição**
@@ -441,6 +442,34 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 **Risco**
 - Baixo: mudanças pontuais e isoladas.
 
+### 16) Conta do Usuário: Padronizar rotas (kebab-case) e links do nav
+**Descrição**
+- Definir padrão único para rotas de conta (kebab-case recomendado).
+- Atualizar links e imports para evitar mistura com `snake_case`.
+
+**Benefícios**
+- URLs mais legíveis e consistentes.
+- Menos chance de erro ao digitar rotas.
+
+**Checklist**
+- [ ] Definir padrão (kebab-case).
+- [ ] Renomear pastas de rotas e ajustar links do nav.
+- [ ] Atualizar imports dos componentes ligados às rotas.
+- [ ] Validar navegação direta nas rotas.
+
+**Plano de execução da melhoria**
+1. Mapear rotas atuais em `/cnfgContaUsers/*`.
+2. Renomear para kebab-case e ajustar `TopHeader`.
+3. Revisar imports e links em `Header` e páginas relacionadas.
+4. Testar navegação manual nas rotas.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 1–2 horas
+
+**Risco**
+- Baixo: mudanças apenas em paths e links.
+
 ## Roadmap Visual (ASCII)
 ```
 [Arquitetura] ---> [Footer Responsivo] ---> [Dados Centralizados]
@@ -465,3 +494,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-11: Incluidas melhorias de evolucao do carrinho (totais reais e testes automatizados).
 - 2026-02-12: Incluidas melhorias de favoritos (toggle de retorno no header e testes E2E).
 - 2026-02-12: Incluida melhoria de conta do usuario (nav ativo e acessibilidade do formulario).
+- 2026-02-13: Incluida melhoria de padronizacao das rotas de conta (kebab-case).

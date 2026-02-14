@@ -1,10 +1,11 @@
 import TopHeader from "@/components/componemts-conta-users/layout/top";
 
+
 export default function CnfgContaUsersLayout({ children }) {
     return (
-        <section>
+        <section className="w-full flex flex-col px-6 py-12 bg-zinc-300 text-black ">
             <TopHeader />
-            <div className="mt-6">{children}</div>
+            <section className="mt-6 px-3">{children}</section>
         </section>
     );
 }
