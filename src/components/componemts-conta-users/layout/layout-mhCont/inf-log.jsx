@@ -1,4 +1,16 @@
+"use client";
+
+import { useUsers } from "@/hooks/useAPIs";
+
 export default function InfLog() {
+
+    const {data: users, loading, error} = useUsers();
+
+    if (loading) return <p>Carregando...</p>;
+    if (error) return <p>Erro ao carregar os usuários</p>;
+
+    const user = users[0];
+
     return (
         <section className="flex flex-col gap-7 py-8 pb-7 border-b border-black">
             <div className="flex flex-col  gap-3">
@@ -9,7 +21,7 @@ export default function InfLog() {
                 <p>
                     Email:
                 </p>
-                <p>exemplo@gmail.com</p>
+                <p>{user.email}</p>
                
             </div>
             <div>
