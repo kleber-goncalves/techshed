@@ -19,3 +19,16 @@ model User {
   phone     String?
   createdAt DateTime @default(now())
 }
+
+model Address {
+  id        String   @id @default(uuid())
+  userId    String
+  label     String
+  street    String
+  city      String
+  state     String
+  zipCode   String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}

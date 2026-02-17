@@ -67,6 +67,37 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.14 — 2026-02-17
+**Resumo**
+- CRUD de endereços com API protegida, UI de modais e documentação técnica.
+
+**Motivação**
+- Permitir que o usuário gerencie endereços com segurança e persistência.
+- Centralizar o fluxo de criação/edição/exclusão em uma UI simples.
+
+**Impacto**
+- Componentes afetados: `src/app/api/addresses/*`, `src/hooks/addressHooks.js`, `src/lib/helpers/api/addressApi.js`, modais e seção de endereços, Prisma (schema + migration), documentação.
+- Compatibilidade: sim — adição de novas rotas e componentes.
+- Risco: médio — envolve CRUD e autenticação.
+
+**Mudanças**
+- **Added**
+  - Rotas `GET/POST /api/addresses` e `PUT/DELETE /api/addresses/[id]`.
+  - Hook `addressHooks` e helper `addressApi` para consumo das rotas.
+  - Modais de formulário e confirmação de exclusão de endereço.
+  - Documentação `docs/section-end.md`.
+  - Migration e modelo `Address` no Prisma.
+- **Changed**
+  - Seção de endereços para usar modais e fluxo de CRUD.
+- **Security**
+  - Rotas de endereço exigem token Supabase.
+
+**Como testar**
+1. Estar autenticado (Supabase).
+2. Abrir a seção “Meus endereços” e adicionar um endereço.
+3. Editar e excluir um endereço existente.
+4. Testar chamadas para `/api/addresses` sem token e validar retorno 401.
+
 ### v0.1.13 — 2026-02-17
 **Resumo**
 - Autenticação com Supabase, sincronização de usuários no banco e edição de perfil.

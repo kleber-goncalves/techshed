@@ -4,7 +4,7 @@ Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
 Última atualização: 2026-02-17
-Branch: `feat/auth-supabase`
+Branch: `feat/add-api-enderecos`
 
 ## Visão Geral
 Objetivo: evoluir a estrutura do projeto e a qualidade do UI/UX de forma organizada e rastreável.
@@ -37,6 +37,9 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 17. Rotas de usuário: Autenticação e autorização completa — **Impacto:** alto, **Esforço:** médio
 18. Sincronização Supabase/Prisma de perfil — **Impacto:** médio, **Esforço:** médio
 19. Conta do usuário: UX segura para senha — **Impacto:** médio, **Esforço:** baixo
+20. Endereços: validação e mensagens de erro nas APIs — **Impacto:** médio, **Esforço:** baixo
+21. Endereços: reset de formulário e edição segura — **Impacto:** médio, **Esforço:** baixo
+22. Endereços: feedback de loading e estado vazio — **Impacto:** médio, **Esforço:** baixo
 
 ### 1) Padronização de Pastas e Nomes
 **Descrição**
@@ -555,6 +558,84 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 **Risco**
 - Baixo: mudança apenas visual e de UX.
 
+### 20) Endereços: validação e mensagens de erro nas APIs
+**Descrição**
+- Validar `label`, `street`, `city`, `state`, `zipCode` no backend.
+- Retornar erros claros (400) quando faltar dados obrigatórios.
+
+**Benefícios**
+- Evita salvar dados incompletos.
+- Facilita debug e melhora a UX.
+
+**Checklist**
+- [ ] Validar payload no `POST /api/addresses`.
+- [ ] Validar payload no `PUT /api/addresses/[id]`.
+- [ ] Retornar mensagens padronizadas por campo.
+
+**Plano de execução da melhoria**
+1. Criar função de validação (schema simples ou manual).
+2. Reutilizar no `POST` e `PUT`.
+3. Ajustar front para exibir erros no modal.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 1–2 horas
+
+**Risco**
+- Baixo: ajustes simples de validação.
+
+### 21) Endereços: reset de formulário e edição segura
+**Descrição**
+- Garantir que o formulário seja resetado ao abrir modal.
+- Evitar reutilizar estado de endereço anterior quando cria um novo.
+
+**Benefícios**
+- Evita campos com valores antigos.
+- Deixa o fluxo de criação/edição mais claro para o usuário.
+
+**Checklist**
+- [ ] Resetar state do formulário quando `initialData` mudar.
+- [ ] Usar `useEffect` no modal para sincronizar dados.
+- [ ] Validar criação após edição.
+
+**Plano de execução da melhoria**
+1. Adicionar `useEffect` no `AddressFormModal` para resetar o form.
+2. Testar editar → cancelar → criar novo.
+3. Ajustar se necessário.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 30–60 min
+
+**Risco**
+- Baixo: mudança local no modal.
+
+### 22) Endereços: feedback de loading e estado vazio
+**Descrição**
+- Exibir loading enquanto endereços carregam.
+- Mostrar mensagem amigável quando não houver endereços.
+
+**Benefícios**
+- UX mais clara para o usuário.
+- Evita “tela vazia” sem contexto.
+
+**Checklist**
+- [ ] Adicionar estado `loading` no `useAddresses`.
+- [ ] Renderizar placeholder de carregamento.
+- [ ] Mostrar empty state quando `addresses.length === 0`.
+
+**Plano de execução da melhoria**
+1. Adicionar estado `loading` no hook.
+2. Ajustar `section-end.jsx` para mostrar loading/empty.
+3. Revisar layout da lista.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 1–2 horas
+
+**Risco**
+- Baixo: mudanças simples de UI/estado.
+
 ## Roadmap Visual (ASCII)
 ```
 [Arquitetura] ---> [Footer Responsivo] ---> [Dados Centralizados]
@@ -581,3 +662,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-12: Incluida melhoria de conta do usuario (nav ativo e acessibilidade do formulario).
 - 2026-02-13: Incluida melhoria de padronizacao das rotas de conta (kebab-case).
 - 2026-02-17: Incluidas melhorias de seguranca das rotas de usuario, sincronizacao Supabase/Prisma e UX segura para senha.
+- 2026-02-17: Incluidas melhorias para validacao, reset e UX do fluxo de enderecos.

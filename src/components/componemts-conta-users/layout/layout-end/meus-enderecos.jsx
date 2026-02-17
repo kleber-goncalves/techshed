@@ -1,4 +1,5 @@
 import AvisoTemp from "./avisoTemp";
+import EnderecosPage from "./section-end";
 
 export default function MeusEnderecos() {
     return (
@@ -7,6 +8,7 @@ export default function MeusEnderecos() {
                 <h1 className="text-2xl font-semibold">Meus endereços</h1>
             <p>Adicione e gerencie os endereços que você usa com frequência.</p>
             </div>
+            <EnderecosPage />
             <AvisoTemp/>
         </section>
     );
