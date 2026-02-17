@@ -1,15 +1,22 @@
 "use client";
 
-import { useUsers } from "@/hooks/useAPIs";
+import { useEffect, useState } from "react";
+
+import { supabase } from "@/lib/supabase/supabaseClient";
 
 export default function InfLog() {
 
-    const {data: users, loading, error} = useUsers();
+  const [user, setUser] = useState(null);
 
-    if (loading) return <p>Carregando...</p>;
-    if (error) return <p>Erro ao carregar os usuários</p>;
+  useEffect(() => {
+      async function loadUser() {
+          const { data } = await supabase.auth.getUser();
+          setUser(data.user);
+      }
+      loadUser();
+  }, []);
 
-    const user = users[0];
+  if (!user) return <p>Você não está logado.</p>;
 
     return (
         <section className="flex flex-col gap-7 py-8 pb-7 border-b border-black">
@@ -28,7 +35,7 @@ export default function InfLog() {
                 <p>
                     Senha:
                 </p>
-                <p>********</p>
+                <p>{user.password}</p>
             </div>
         </section>
     );
