@@ -67,6 +67,41 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.13 — 2026-02-17
+**Resumo**
+- Autenticação com Supabase, sincronização de usuários no banco e edição de perfil.
+
+**Motivação**
+- Garantir login/cadastro simples no front e persistência do usuário no banco local.
+- Permitir atualização de dados pessoais com segurança usando o token do Supabase.
+
+**Impacto**
+- Componentes afetados: rotas `src/app/api/users/*` e `src/app/api/syncUser`, tela `/auth`, hooks de usuário, componentes de conta, Prisma (schema + migration).
+- Compatibilidade: sim — novas rotas e ajustes incrementais.
+- Risco: médio — fluxo de autenticação e atualização de dados.
+
+**Mudanças**
+- **Added**
+  - Rota `POST /api/syncUser` para sincronizar usuário do Supabase com o Prisma.
+  - Página `/auth` para login e cadastro com Supabase.
+  - Hook `updateUserProfile` para atualização de dados e senha.
+  - Client do Supabase e client do Prisma com adapter PostgreSQL.
+  - Migration com o campo `phone` na tabela `User`.
+- **Changed**
+  - `PUT /api/users/[id]` agora valida token e impede atualização de IDs diferentes.
+  - Componentes de conta passaram a carregar dados do usuário autenticado.
+- **Removed**
+  - `src/lib/prisma.js` substituído por `src/lib/prisma/prisma.js`.
+- **Security**
+  - Validação de token Supabase e autorização por `id` na rota `PUT /api/users/[id]`.
+
+**Como testar**
+1. Abrir `/auth`, criar conta e confirmar o email (quando aplicável).
+2. Fazer login e confirmar o redirecionamento para `/cnfgContaUsers/minha_conta`.
+3. Validar que `/api/syncUser` retorna o usuário quando recebe `access_token` válido.
+4. Atualizar `name/email/phone` no formulário e verificar persistência via `PUT /api/users/[id]`.
+5. Tentar atualizar outro `id` e confirmar retorno 403.
+
 ### v0.1.12 — 2026-02-12
 **Resumo**
 - Sub-rotas de Configurações da Conta com layout persistente e navegação interna.

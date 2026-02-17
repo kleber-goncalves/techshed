@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-02-13
-Branch: `feat/conta-usuario`
+Última atualização: 2026-02-17
+Branch: `feat/auth-supabase`
 
 ## Visão Geral
 Objetivo: evoluir a estrutura do projeto e a qualidade do UI/UX de forma organizada e rastreável.
@@ -34,6 +34,9 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 14. Favoritos: Testes E2E de Navegação e Persistência — **Impacto:** alto, **Esforço:** médio
 15. Conta do usuário: Nav ativo e acessibilidade do formulário — **Impacto:** médio, **Esforço:** baixo
 16. Conta do usuário: Padronizar rotas (kebab-case) e links do nav — **Impacto:** médio, **Esforço:** baixo
+17. Rotas de usuário: Autenticação e autorização completa — **Impacto:** alto, **Esforço:** médio
+18. Sincronização Supabase/Prisma de perfil — **Impacto:** médio, **Esforço:** médio
+19. Conta do usuário: UX segura para senha — **Impacto:** médio, **Esforço:** baixo
 
 ### 1) Padronização de Pastas e Nomes
 **Descrição**
@@ -470,6 +473,88 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 **Risco**
 - Baixo: mudanças apenas em paths e links.
 
+### 17) Rotas de usuário: Autenticação e autorização completa
+**Descrição**
+- Proteger `GET /api/users`, `POST /api/users` e `DELETE /api/users/[id]`.
+- Evitar que usuários autenticados manipulem dados de terceiros.
+
+**Benefícios**
+- Reduz risco de exposição/alteração indevida de dados.
+- Fluxo de API coerente com o `PUT /api/users/[id]` já protegido.
+
+**Checklist**
+- [ ] Exigir `Authorization: Bearer` nas rotas de usuário.
+- [ ] Validar token com Supabase em todas as rotas.
+- [ ] Restringir o escopo ao `user.id` autenticado.
+- [ ] Adicionar mensagens de erro padronizadas (401/403).
+
+**Plano de execução da melhoria**
+1. Criar helper de validação do token para reutilizar nas rotas.
+2. Aplicar validação em `GET`, `POST` e `DELETE`.
+3. Garantir que o `id` da URL pertença ao usuário autenticado.
+4. Ajustar documentação e testes manuais.
+
+**Estimativa**
+- Esforço: médio
+- Tempo: 0,5–1 dia
+
+**Risco**
+- Médio: pode exigir ajustes em fluxos que hoje assumem API aberta.
+
+### 18) Sincronização Supabase/Prisma de perfil
+**Descrição**
+- Manter `name`, `email` e `phone` consistentes entre Supabase e Prisma.
+- Ao logar, sincronizar `user_metadata` do Supabase com o banco local.
+
+**Benefícios**
+- Evita divergência de dados entre autenticação e perfil.
+- Facilita manutenção do perfil no front.
+
+**Checklist**
+- [ ] Ao `syncUser`, copiar `user_metadata.full_name` e `phone` para o Prisma.
+- [ ] Ao atualizar perfil, atualizar Supabase `user_metadata` junto do Prisma.
+- [ ] Definir regra para atualização de `email` (Supabase primeiro).
+- [ ] Garantir fallback quando `user_metadata` não existir.
+
+**Plano de execução da melhoria**
+1. Ajustar `POST /api/syncUser` para persistir `name` e `phone` quando existir.
+2. Atualizar `updateUserProfile` para escrever também em `supabase.auth.updateUser`.
+3. Tratar atualização de email com fluxo seguro (ex.: confirmação por email).
+4. Atualizar documentação e validar cenário de login + edição.
+
+**Estimativa**
+- Esforço: médio
+- Tempo: 0,5–1 dia
+
+**Risco**
+- Médio: mudança em dados sensíveis (email) exige cautela.
+
+### 19) Conta do usuário: UX segura para senha
+**Descrição**
+- Remover exibição direta de senha na UI.
+- Substituir por texto informativo e ação clara de troca de senha.
+
+**Benefícios**
+- Evita confusão do usuário e exposição indevida.
+- Melhora alinhamento com boas práticas de segurança.
+
+**Checklist**
+- [ ] Remover `user.password` da UI.
+- [ ] Exibir máscara ou texto (“Senha protegida”).
+- [ ] Garantir ação de troca de senha no formulário.
+
+**Plano de execução da melhoria**
+1. Ajustar `inf-log.jsx` para não renderizar `user.password`.
+2. Inserir texto informativo e CTA para “Alterar senha”.
+3. Validar fluxo no formulário de perfil.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 30–60 min
+
+**Risco**
+- Baixo: mudança apenas visual e de UX.
+
 ## Roadmap Visual (ASCII)
 ```
 [Arquitetura] ---> [Footer Responsivo] ---> [Dados Centralizados]
@@ -495,3 +580,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-12: Incluidas melhorias de favoritos (toggle de retorno no header e testes E2E).
 - 2026-02-12: Incluida melhoria de conta do usuario (nav ativo e acessibilidade do formulario).
 - 2026-02-13: Incluida melhoria de padronizacao das rotas de conta (kebab-case).
+- 2026-02-17: Incluidas melhorias de seguranca das rotas de usuario, sincronizacao Supabase/Prisma e UX segura para senha.
