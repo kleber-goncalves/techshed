@@ -1,7 +1,7 @@
 "use client";
 
 
-import AddressFormModal from "@/components/componemts-conta-users/layout/layout-end/modal/AddressFormModal";
+import AddressFormModal from "@/components/componemts-conta-users/modal/AddressFormModal";
 
 
 
@@ -12,7 +12,7 @@ import {
     useDeleteAddress,
 } from "@/hooks/addressHooks";
 import { useState } from "react";
-import DeletAvis from "./modal/DeletAvis";
+import DeletAvis from "../../modal/DeletAvis";
 
 export default function EnderecosPage() {
     const { addresses, setAddresses } = useAddresses();

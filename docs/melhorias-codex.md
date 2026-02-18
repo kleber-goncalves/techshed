@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-02-17
-Branch: `feat/add-api-enderecos`
+Última atualização: 2026-02-18
+Branch: `feat/add-api-cartoes`
 
 ## Visão Geral
 Objetivo: evoluir a estrutura do projeto e a qualidade do UI/UX de forma organizada e rastreável.
@@ -40,6 +40,7 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 20. Endereços: validação e mensagens de erro nas APIs — **Impacto:** médio, **Esforço:** baixo
 21. Endereços: reset de formulário e edição segura — **Impacto:** médio, **Esforço:** baixo
 22. Endereços: feedback de loading e estado vazio — **Impacto:** médio, **Esforço:** baixo
+23. Carteira: segurança e validações completas — **Impacto:** alto, **Esforço:** médio
 
 ### 1) Padronização de Pastas e Nomes
 **Descrição**
@@ -636,6 +637,37 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 **Risco**
 - Baixo: mudanças simples de UI/estado.
 
+### 23) Carteira: segurança e validações completas
+**Descrição**
+- Evitar armazenar número completo do cartão no banco.
+- Validar `expMonth` e `expYear` no backend.
+- Padronizar o endpoint de exclusão com `/api/cards/[id]`.
+
+**Benefícios**
+- Reduz risco de exposição de dados sensíveis.
+- Melhora consistência entre front e API.
+- Evita salvar cartões expirados ou inválidos.
+
+**Checklist**
+- [ ] Armazenar apenas `last4`, `brand` e dados de expiração no banco.
+- [ ] Sanitizar `number` (remover espaços) antes de processar.
+- [ ] Validar `expMonth` (1–12) e `expYear` (>= ano atual).
+- [ ] Ajustar `deleteCard` para usar `DELETE /api/cards/[id]`.
+- [ ] Revisar mensagens de erro e status 400/401.
+
+**Plano de execução da melhoria**
+1. Criar helper de sanitização e extrair `last4` no backend.
+2. Atualizar o modelo Prisma para armazenar `last4` (se necessário) e remover o número completo.
+3. Ajustar API de criação para validar expiração e persistir dados mínimos.
+4. Atualizar o front para consumir `last4` e atualizar o fluxo de exclusão.
+
+**Estimativa**
+- Esforço: médio
+- Tempo: 0,5–1 dia
+
+**Risco**
+- Médio: envolve mudança em schema e ajustes de API/front.
+
 ## Roadmap Visual (ASCII)
 ```
 [Arquitetura] ---> [Footer Responsivo] ---> [Dados Centralizados]
@@ -663,3 +695,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-13: Incluida melhoria de padronizacao das rotas de conta (kebab-case).
 - 2026-02-17: Incluidas melhorias de seguranca das rotas de usuario, sincronizacao Supabase/Prisma e UX segura para senha.
 - 2026-02-17: Incluidas melhorias para validacao, reset e UX do fluxo de enderecos.
+- 2026-02-18: Incluida melhoria de seguranca e validacoes completas para o fluxo de carteira.

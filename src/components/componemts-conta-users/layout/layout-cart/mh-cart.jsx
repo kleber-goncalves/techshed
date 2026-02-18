@@ -1,4 +1,5 @@
 import SecCarts from "./sec-carts";
+import SecCartsll from "./sec-cartsII";
 
 export default function MhCart() {
     return (
@@ -7,7 +8,8 @@ export default function MhCart() {
                 <h1 className="text-2xl font-semibold">Carteira</h1>
                 <p>Salve suas informações de pagamento para um checkout mais rápido.</p>
             </div>
-            <SecCarts/>
+            <SecCarts />
+            <SecCartsll/>
         </section>
     );
 }
