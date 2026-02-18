@@ -67,6 +67,29 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.16 — 2026-02-18
+**Resumo**
+- Endurecimento de segurança no fluxo de cartões (armazenar apenas `last4`) e validações no backend.
+
+**Motivação**
+- Reduzir risco ao lidar com dados sensíveis e garantir consistência das regras no servidor.
+
+**Impacto**
+- Componentes afetados: `src/app/api/cards/*`, `src/lib/helpers/api/cardApi.js`, `src/components/componemts-conta-users/layout/layout-cart/sec-cartsII.jsx`, Prisma (schema + migration) e `docs/sec-cartsII.md`.
+- Compatibilidade: não — exige nova migration e altera o formato dos dados retornados (agora `last4`).
+- Risco: médio — mudança de schema e API.
+
+**Mudanças**
+- **Changed**
+  - Backend agora valida expiração e Luhn, sanitiza número e salva apenas `last4`.
+  - Front passa a consumir `last4` e usar `DELETE /api/cards/[id]`.
+
+**Como testar**
+1. Rodar migrations.
+2. Criar cartão e confirmar que a API retorna `last4` (sem número completo).
+3. Confirmar erro 400 para expiração inválida.
+4. Excluir cartão com `DELETE /api/cards/[id]`.
+
 ### v0.1.15 — 2026-02-18
 **Resumo**
 - CRUD de cartões com API protegida, UI de carteira com validação/formatação e documentação.

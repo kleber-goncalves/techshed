@@ -50,25 +50,11 @@ Importados de `react-svg-credit-card-payment-icons`:
 - `getCardType`  
   Detecta a bandeira usando o número do cartão. Retorna nomes canônicos como `Visa`, `Mastercard`, `AmericanExpress`, etc.
 
-- `detectCardType`  
-  Função legada (deprecated). Não é usada no componente.
-
 - `validateCardNumber`  
   Valida o número do cartão usando o algoritmo de Luhn e tamanho permitido.
 
 - `formatCardNumber`  
   Formata o número do cartão com espaços apropriados.
-
-- `maskCardNumber`  
-  Mascara o número do cartão, mantendo apenas os 4 últimos dígitos visíveis.
-
-- `isCardNumberPotentiallyValid`  
-  Checagem leve de validade. Não é usada no componente.
-
-### Utilitário da aplicação
-
-- `detectCardBrand`  
-  Função local para detectar bandeira por prefixo. É usada para escolher o ícone no render.
 
 ## Estado (useState)
 
@@ -87,9 +73,6 @@ Importados de `react-svg-credit-card-payment-icons`:
   - `expYear`: ano de expiração
 
 ## Valores derivados (calculados a cada render)
-
-- `brand`  
-  `detectCardBrand(form.number || "")`. Usa o número atual para detectar a bandeira do cartão e decidir qual ícone renderizar.
 
 - `numberValid`  
   `validateCardNumber(form.number)`. Retorna `true` se o número for válido.
@@ -140,9 +123,9 @@ Usa um `switch` com valores como `"visa"`, `"mastercard"`, `"amex"` etc.
 
 Para cada cartão, o componente:
 
-- Detecta a bandeira com `detectCardBrand(card.number)`.
+- Usa `card.brand` para escolher o ícone.
 - Renderiza o ícone correspondente.
-- Mostra o número **mascarado** com `maskCardNumber`.
+- Mostra o número apenas com os 4 últimos dígitos (`**** **** **** 1234`).
 - Mostra data de expiração.
 - Exibe botão de excluir, que chama `deleteCardAPI`.
 
@@ -229,23 +212,21 @@ Exibida somente quando `showNumberError` for `true`.
 
 - **Validação no blur:** evita mostrar erro enquanto o usuário ainda está digitando.
 
-- **Mask no display:** `maskCardNumber` é aplicado apenas na lista, não no formulário.
+- **Mask no display:** a string `**** **** ****` é montada com `last4` na lista.
 
 - **Separação de responsabilidades:**  
   O componente lida com UI e interações, enquanto hooks (`useAddCard`, etc.) lidam com a API.
 
+- **Dados sensíveis:** o backend salva apenas `last4`, não o número completo do cartão.
+
 ## Limitações atuais (para estudar)
 
-- O número do cartão é salvo **com espaços** (formatação).  
-  Em sistemas reais, normalmente salva-se sem espaços.
-
-- `detectCardType` e `isCardNumberPotentiallyValid` estão importados, mas não são usados.
-
-- A lista de cartões mostra o número mascarado no front, mas o backend ainda pode estar armazenando o número completo.
+- O input permite qualquer texto para mês/ano; a validação forte está no backend.
+- O cursor pode “pular” durante a formatação do número.
 
 ## Sugestões de exercícios para iniciantes
 
-1. Ajustar para salvar o número sem espaços.
-2. Separar mês e ano com validação de range (`1-12` e ano atual+).
+1. Adicionar validação client-side de mês/ano (range e expiração).
+2. Tratar ano com 2 dígitos no front (ex.: `25` -> `2025`).
 3. Trocar o campo `brand` por um `select`.
 4. Melhorar o layout com classes do Tailwind.

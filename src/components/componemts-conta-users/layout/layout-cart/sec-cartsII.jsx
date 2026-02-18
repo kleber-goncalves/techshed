@@ -19,14 +19,9 @@ import {
 
 import  { 
   getCardType , 
-  detectCardType ,  // obsoleto - use getCardType em vez disso 
   validateCardNumber , 
   formatCardNumber , 
-  maskCardNumber , 
-  isCardNumberPotentiallyValid , 
 }  from  'react-svg-credit-card-payment-icons' ; 
-
-import { detectCardBrand } from "@/lib/cardBrand";
 
 export default function SecCartsll() {
     const { cards, setCards } = useCards();
@@ -42,9 +37,6 @@ export default function SecCartsll() {
         expMonth: "",
         expYear: "",
     });
-
-
-    const brand = detectCardBrand(form.number || "");
 
     const numberValid = validateCardNumber(form.number);
     const showNumberError = numberTouched && !numberValid;
@@ -98,11 +90,14 @@ export default function SecCartsll() {
 
 
       function renderIcon(brand) {
-    switch (brand) {
-      case "visa" || "Visa" : return <VisaIcon />;
+    const normalized = (brand || "").toLowerCase();
+    switch (normalized) {
+      case "visa": return <VisaIcon />;
       case "mastercard": return <MastercardIcon />;
+      case "americanexpress":
       case "amex": return <AmexIcon />;
       case "elo": return <EloIcon />;
+      case "dinersclub":
       case "diners": return <DinersIcon />;
       case "discover": return <DiscoverIcon />;
       case "jcb": return <JcbIcon />;
@@ -124,8 +119,10 @@ export default function SecCartsll() {
 
             <ul>
                 {cards.map((card) => {
-                    const brand = detectCardBrand(card.number);
-                    const Icon = renderIcon(brand);
+                    const Icon = renderIcon(card.brand);
+                    const maskedLast4 = card.last4
+                        ? `**** **** **** ${card.last4}`
+                        : "**** **** ****";
 
                     return (
                         <li
@@ -143,7 +140,7 @@ export default function SecCartsll() {
                             )}{" "}
                             —
                             <span>
-                                {maskCardNumber(card.number)} — Exp:{" "}
+                                {maskedLast4} — Exp:{" "}
                                 {card.expMonth}/{card.expYear}
                             </span>
                             <button

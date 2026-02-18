@@ -37,7 +37,7 @@ model Card {
   id        String    @id @default(uuid())
   userId    String
   holder    String
-  number    String
+  last4     String
   brand     String?
   expMonth  Int
   expYear   Int

@@ -45,15 +45,14 @@ export async function addCard(data) {
  * @throws {Response} - Erro de nao autenticado com status 401.
  */
 
-export async function deleteCard(data) {
+export async function deleteCard(id) {
     const token = await getToken();
-    const res = await fetch("/api/cards", {
+    const res = await fetch(`/api/cards/${id}`, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
     });
 
      
