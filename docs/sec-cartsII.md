@@ -64,6 +64,9 @@ Importados de `react-svg-credit-card-payment-icons`:
 - `numberTouched`  
   Marca se o usuário já saiu do input de número. Serve para mostrar erro só depois do blur.
 
+- `expTouched`  
+  Marca se o usuário já saiu dos inputs de expiração. Serve para mostrar erro apenas após blur.
+
 - `form`  
   Objeto com os valores do formulário:
   - `holder`: titular do cartão
@@ -77,11 +80,17 @@ Importados de `react-svg-credit-card-payment-icons`:
 - `numberValid`  
   `validateCardNumber(form.number)`. Retorna `true` se o número for válido.
 
+- `expValid`  
+  Valida mês/ano e verifica se o cartão não está expirado.
+
 - `showNumberError`  
   `numberTouched && !numberValid`. Só mostra erro depois que o usuário sai do campo e o número é inválido.
 
+- `showExpError`  
+  `expTouched && !expValid`. Só mostra erro depois que o usuário sai dos campos de expiração.
+
 - `canSubmit`  
-  Verifica se todos os campos estão preenchidos e se o número do cartão é válido. Controla o botão "Salvar".
+  Verifica se todos os campos estão preenchidos, se o número é válido e se a expiração é válida. Controla o botão "Salvar".
 
 ## Funções (o que fazem e por quê)
 
@@ -106,6 +115,7 @@ Função executada ao enviar o formulário.
 
 - `e.preventDefault()` impede o reload padrão do form.
 - Se o número é inválido, marca o campo como tocado e interrompe.
+- Se a expiração é inválida, marca os campos como tocados e interrompe.
 - Caso seja válido:
   - Chama `addCardAPI(form)` para salvar.
   - Atualiza a lista local de cartões.
@@ -180,7 +190,7 @@ Exibida somente quando `showNumberError` for `true`.
 - `placeholder="Mês"`
 - `value={form.expMonth}`
 - `onChange={handleChange}`
-- `autoComplete="cc-exp"`
+- `autoComplete="cc-exp-month"`
 - `required`
 
 ### Ano (`expYear`)
@@ -188,8 +198,12 @@ Exibida somente quando `showNumberError` for `true`.
 - `placeholder="Ano"`
 - `value={form.expYear}`
 - `onChange={handleChange}`
-- `autoComplete="cc-exp"`
+- `autoComplete="cc-exp-year"`
 - `required`
+
+### Mensagem de erro da expiração
+
+Exibida somente quando `showExpError` for `true`.
 
 ### Botão "Salvar"
 
@@ -211,6 +225,8 @@ Exibida somente quando `showNumberError` for `true`.
   Isso facilita validação e sincronização com a UI.
 
 - **Validação no blur:** evita mostrar erro enquanto o usuário ainda está digitando.
+
+- **Validação de expiração:** garante mês entre 1–12 e evita cartões já vencidos.
 
 - **Mask no display:** a string `**** **** ****` é montada com `last4` na lista.
 

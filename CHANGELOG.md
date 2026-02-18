@@ -83,6 +83,7 @@ User -> Página A -> Componente X (largura opcional)
 - **Changed**
   - Backend agora valida expiração e Luhn, sanitiza número e salva apenas `last4`.
   - Front passa a consumir `last4` e usar `DELETE /api/cards/[id]`.
+  - Front adiciona validação client-side de expiração (mês/ano).
 
 **Como testar**
 1. Rodar migrations.

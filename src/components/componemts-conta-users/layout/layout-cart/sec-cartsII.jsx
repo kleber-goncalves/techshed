@@ -30,6 +30,7 @@ export default function SecCartsll() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [numberTouched, setNumberTouched] = useState(false);
+    const [expTouched, setExpTouched] = useState(false);
     const [form, setForm] = useState({
         holder: "",
         number: "",
@@ -38,10 +39,32 @@ export default function SecCartsll() {
         expYear: "",
     });
 
+    function parseExpYear(rawYear) {
+        const year = parseInt(rawYear, 10);
+        if (Number.isNaN(year)) return null;
+        if (year < 100) return 2000 + year;
+        return year;
+    }
+
+    function isValidExpiration(expMonth, expYear) {
+        const month = parseInt(expMonth, 10);
+        const year = parseExpYear(expYear);
+        if (!month || month < 1 || month > 12 || !year) return false;
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+        if (year < currentYear) return false;
+        if (year === currentYear && month < currentMonth) return false;
+        return true;
+    }
+
     const numberValid = validateCardNumber(form.number);
     const showNumberError = numberTouched && !numberValid;
+    const expValid = isValidExpiration(form.expMonth, form.expYear);
+    const showExpError = expTouched && !expValid;
     const canSubmit =
         numberValid &&
+        expValid &&
         form.holder &&
         form.number &&
         form.brand &&
@@ -69,8 +92,14 @@ export default function SecCartsll() {
 
     async function handleAdd(e) {
         e.preventDefault();
+        if (!expValid) {
+            setExpTouched(true);
+        }
         if (!numberValid) {
             setNumberTouched(true);
+            return;
+        }
+        if (!expValid) {
             return;
         }
         const newCard = await addCardAPI(form);
@@ -83,6 +112,7 @@ export default function SecCartsll() {
             expYear: "",
         });
         setNumberTouched(false);
+        setExpTouched(false);
         setIsModalOpen(false);
     }
 
@@ -222,7 +252,14 @@ export default function SecCartsll() {
                             placeholder="Mês"
                             value={form.expMonth}
                             onChange={handleChange}
-                            autoComplete="cc-exp"
+                            onBlur={() => setExpTouched(true)}
+                            aria-invalid={showExpError}
+                            aria-describedby={
+                                showExpError ? "card-exp-error" : undefined
+                            }
+                            className={showExpError ? "border border-red-500" : ""}
+                            inputMode="numeric"
+                            autoComplete="cc-exp-month"
                             required
                         />
                         <input
@@ -230,9 +267,21 @@ export default function SecCartsll() {
                             placeholder="Ano"
                             value={form.expYear}
                             onChange={handleChange}
-                            autoComplete="cc-exp"
+                            onBlur={() => setExpTouched(true)}
+                            aria-invalid={showExpError}
+                            aria-describedby={
+                                showExpError ? "card-exp-error" : undefined
+                            }
+                            className={showExpError ? "border border-red-500" : ""}
+                            inputMode="numeric"
+                            autoComplete="cc-exp-year"
                             required
                         />
+                        {showExpError && (
+                            <p id="card-exp-error" className="text-red-600 text-sm">
+                                Data de expiração inválida.
+                            </p>
+                        )}
                         <button
                             type="submit"
                             disabled={!canSubmit}
