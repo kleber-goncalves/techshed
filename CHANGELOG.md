@@ -67,6 +67,37 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.17 — 2026-02-19
+**Resumo**
+- Persistência do catálogo de produtos no Supabase com Prisma (`Produtos` + `ProdutoVariantes`) e seed idempotente a partir de `src/data/produtos.js`.
+
+**Motivação**
+- Tirar o catálogo da dependência exclusiva de arquivo estático e preparar o projeto para leitura centralizada de produtos via banco.
+- Garantir carga inicial reproduzível dos dados de catálogo em qualquer ambiente.
+
+**Impacto**
+- Componentes afetados: `prisma/schema.prisma`, migração `prisma/migrations/20260219175036_add_produtos_catalogo/migration.sql` e `scripts/seed-produtos.js`.
+- Compatibilidade: sim — nenhuma rota/página foi migrada para leitura no banco neste passo.
+- Risco: médio — alteração de schema e processo de seed.
+
+**Mudanças**
+- **Added**
+  - Modelo `Produto` mapeado para tabela `"Produtos"`.
+  - Modelo `ProdutoVariante` mapeado para `"ProdutoVariantes"` com relação `onDelete: Cascade`.
+  - Campos de catálogo para compatibilidade com dados atuais (`category`, `catalogKey`, `features`, `promocao`).
+  - Script `scripts/seed-produtos.js` com parsing de `src/data/produtos.js`.
+  - Seed idempotente com `upsert` e limpeza de variantes órfãs por produto.
+- **Changed**
+  - Banco Supabase atualizado com nova migration de catálogo.
+  - Prisma Client regenerado para incluir os novos modelos.
+
+**Como testar**
+1. Rodar `npx prisma migrate dev --name add_produtos_catalogo`.
+2. Rodar `npx prisma generate`.
+3. Rodar `node scripts/seed-produtos.js`.
+4. Validar contagens: `Produtos = 64` e `ProdutoVariantes = 3`.
+5. Rodar seed novamente e confirmar que as contagens permanecem iguais (idempotência).
+
 ### v0.1.16 — 2026-02-18
 **Resumo**
 - Endurecimento de segurança no fluxo de cartões (armazenar apenas `last4`) e validações no backend.
