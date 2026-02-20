@@ -9,25 +9,11 @@ import {
     useState,
 } from "react";
 
-import { produtos } from "@/data/produtos";
+import { useCatalogo } from "@/contexts/catalog-context";
 
 const STORAGE_KEY = "techshed.favorites.v1";
 
 const FavoriteContext = createContext(null);
-
-const productIndex = buildProductIndex();
-
-function buildProductIndex() {
-    const index = new Map();
-
-    Object.values(produtos)
-        .flat()
-        .forEach((product) => {
-            index.set(product.id, product);
-        });
-
-    return index;
-}
 
 function normalizeProductId(productId) {
     return typeof productId === "string" && productId.trim()
@@ -42,8 +28,14 @@ function toSafeInteger(value, fallback = 0) {
         : fallback;
 }
 
-function sanitizeFavoriteIds(rawFavoriteIds) {
-    if (!Array.isArray(rawFavoriteIds)) return [];
+function sanitizeFavoriteIds(rawFavoriteIds, productIndex) {
+    if (
+        !Array.isArray(rawFavoriteIds) ||
+        !productIndex ||
+        productIndex.size === 0
+    ) {
+        return [];
+    }
 
     const seen = new Set();
     const sanitizedIds = [];
@@ -66,31 +58,45 @@ function parsePersistedFavoriteIds(rawValue) {
     if (!rawValue) return [];
 
     try {
-        return sanitizeFavoriteIds(JSON.parse(rawValue));
+        const parsed = JSON.parse(rawValue);
+        return Array.isArray(parsed) ? parsed : [];
     } catch {
         return [];
     }
 }
 
 export function FavoriteProvider({ children }) {
+    const { productIndex, isReady: isCatalogReady } = useCatalogo();
     const [favoriteIds, setFavoriteIds] = useState(() => {
         if (typeof window === "undefined") return [];
         return parsePersistedFavoriteIds(window.localStorage.getItem(STORAGE_KEY));
     });
 
+    const sanitizedFavoriteIds = useMemo(() => {
+        if (!isCatalogReady) return [];
+        return sanitizeFavoriteIds(favoriteIds, productIndex);
+    }, [favoriteIds, isCatalogReady, productIndex]);
+
     useEffect(() => {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(favoriteIds));
-    }, [favoriteIds]);
+        if (!isCatalogReady) return;
+        window.localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(sanitizedFavoriteIds),
+        );
+    }, [sanitizedFavoriteIds, isCatalogReady]);
 
     const addFavorite = useCallback((productId) => {
         const normalizedId = normalizeProductId(productId);
-        if (!normalizedId || !productIndex.has(normalizedId)) return;
+        if (!normalizedId) return;
 
         setFavoriteIds((previousIds) => {
             if (previousIds.includes(normalizedId)) return previousIds;
-            return [normalizedId, ...previousIds];
+            if (!isCatalogReady) return [normalizedId, ...previousIds];
+            return productIndex.has(normalizedId)
+                ? [normalizedId, ...previousIds]
+                : previousIds;
         });
-    }, []);
+    }, [isCatalogReady, productIndex]);
 
     const removeFavorite = useCallback((productId) => {
         const normalizedId = normalizeProductId(productId);
@@ -103,14 +109,16 @@ export function FavoriteProvider({ children }) {
 
     const toggleFavorite = useCallback((productId) => {
         const normalizedId = normalizeProductId(productId);
-        if (!normalizedId || !productIndex.has(normalizedId)) return;
+        if (!normalizedId) return;
 
         setFavoriteIds((previousIds) =>
             previousIds.includes(normalizedId)
                 ? previousIds.filter((id) => id !== normalizedId)
-                : [normalizedId, ...previousIds],
+                : !isCatalogReady || productIndex.has(normalizedId)
+                  ? [normalizedId, ...previousIds]
+                  : previousIds,
         );
-    }, []);
+    }, [isCatalogReady, productIndex]);
 
     const clearFavorites = useCallback(() => {
         setFavoriteIds([]);
@@ -121,14 +129,14 @@ export function FavoriteProvider({ children }) {
             const normalizedId = normalizeProductId(productId);
             if (!normalizedId) return false;
 
-            return favoriteIds.includes(normalizedId);
+            return sanitizedFavoriteIds.includes(normalizedId);
         },
-        [favoriteIds],
+        [sanitizedFavoriteIds],
     );
 
     const items = useMemo(
         () =>
-            favoriteIds
+            sanitizedFavoriteIds
                 .map((productId) => {
                     const product = productIndex.get(productId);
                     if (!product) return null;
@@ -144,10 +152,10 @@ export function FavoriteProvider({ children }) {
                     };
                 })
                 .filter(Boolean),
-        [favoriteIds],
+        [sanitizedFavoriteIds, productIndex],
     );
 
-    const totalFavorites = favoriteIds.length;
+    const totalFavorites = sanitizedFavoriteIds.length;
     const isEmpty = items.length === 0;
 
     const value = useMemo(
@@ -156,6 +164,7 @@ export function FavoriteProvider({ children }) {
             favoriteIds,
             totalFavorites,
             isEmpty,
+            isReady: isCatalogReady,
             isFavorite,
             addFavorite,
             removeFavorite,
@@ -166,6 +175,7 @@ export function FavoriteProvider({ children }) {
             addFavorite,
             clearFavorites,
             favoriteIds,
+            isCatalogReady,
             isEmpty,
             isFavorite,
             items,

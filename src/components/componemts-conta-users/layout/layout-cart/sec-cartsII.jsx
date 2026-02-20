@@ -167,10 +167,10 @@ export default function SecCartsll() {
                                 <span style={{ width: "32px", height: "32px" }}>
                                     {Icon}
                                 </span>
-                            )}{" "}
+                            )}
                             —
                             <span>
-                                {maskedLast4} — Exp:{" "}
+                                {maskedLast4} — Exp:
                                 {card.expMonth}/{card.expYear}
                             </span>
                             <button

@@ -67,6 +67,64 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.18 - 2026-02-20
+**Resumo**
+- Catalogo passou a ser carregado via API/Contexto a partir do Supabase para paginas e componentes client.
+
+**Motivacao**
+- Remover dependencia do arquivo src/data/produtos.js no runtime e centralizar catalogo via banco.
+
+**Impacto**
+- Componentes afetados: src/app/api/catalogo/*, src/lib/catalogo-db.js, src/contexts/catalog-context.jsx, src/provider/providers.jsx, paginas /loja, /busca, /categoria/[categoria], /produto/[slug], SearchModal, ProductSlider, CartContext, FavoriteContext.
+- Compatibilidade: nao - exige catalogo seedado no banco e API ativa.
+- Risco: medio - mudanca de origem de dados e estados de loading.
+
+**Mudancas**
+- **Added**
+  - Rotas GET /api/catalogo e GET /api/catalogo/flat.
+  - CatalogoProvider com cache client-side e indice de produtos.
+- **Changed**
+  - Paginas e componentes client passaram a consumir catalogo via contexto/API.
+  - Carrinho e favoritos agora dependem do catalogo carregado para resolver itens.
+  - Provider global migrou para src/provider/providers.jsx.
+
+**Como testar**
+1. Rodar npm run dev.
+2. Abrir /api/catalogo e /api/catalogo/flat.
+3. Abrir /loja, /busca, /categoria/... e /produto/... e validar carregamento.
+4. Abrir /favoritos e /carrinho e validar estados de loading e itens.
+
+### v0.1.17 — 2026-02-19
+**Resumo**
+- Persistência do catálogo de produtos no Supabase com Prisma (`Produtos` + `ProdutoVariantes`) e seed idempotente a partir de `src/data/produtos.js`.
+
+**Motivação**
+- Tirar o catálogo da dependência exclusiva de arquivo estático e preparar o projeto para leitura centralizada de produtos via banco.
+- Garantir carga inicial reproduzível dos dados de catálogo em qualquer ambiente.
+
+**Impacto**
+- Componentes afetados: `prisma/schema.prisma`, migração `prisma/migrations/20260219175036_add_produtos_catalogo/migration.sql` e `scripts/seed-produtos.js`.
+- Compatibilidade: sim — nenhuma rota/página foi migrada para leitura no banco neste passo.
+- Risco: médio — alteração de schema e processo de seed.
+
+**Mudanças**
+- **Added**
+  - Modelo `Produto` mapeado para tabela `"Produtos"`.
+  - Modelo `ProdutoVariante` mapeado para `"ProdutoVariantes"` com relação `onDelete: Cascade`.
+  - Campos de catálogo para compatibilidade com dados atuais (`category`, `catalogKey`, `features`, `promocao`).
+  - Script `scripts/seed-produtos.js` com parsing de `src/data/produtos.js`.
+  - Seed idempotente com `upsert` e limpeza de variantes órfãs por produto.
+- **Changed**
+  - Banco Supabase atualizado com nova migration de catálogo.
+  - Prisma Client regenerado para incluir os novos modelos.
+
+**Como testar**
+1. Rodar `npx prisma migrate dev --name add_produtos_catalogo`.
+2. Rodar `npx prisma generate`.
+3. Rodar `node scripts/seed-produtos.js`.
+4. Validar contagens: `Produtos = 64` e `ProdutoVariantes = 3`.
+5. Rodar seed novamente e confirmar que as contagens permanecem iguais (idempotência).
+
 ### v0.1.16 — 2026-02-18
 **Resumo**
 - Endurecimento de segurança no fluxo de cartões (armazenar apenas `last4`) e validações no backend.
@@ -621,3 +679,4 @@ Slider -> ProductCard -> max-w-xs (fixo)
 Depois:
 Slider -> ProductCard -> max-w-xs (opcional)
 ```
+

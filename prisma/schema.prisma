@@ -45,3 +45,40 @@ model Card {
 
   @@index([userId])
 }
+
+model Produto {
+  id         String           @id
+  slug       String           @unique
+  name       String
+  img        String
+  alt        String
+  priceCents Int
+  stock      Int
+  category   String
+  catalogKey String
+  features   String[]
+  promocao   String?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  variantes  ProdutoVariante[]
+
+  @@index([category])
+  @@index([catalogKey])
+  @@map("Produtos")
+}
+
+model ProdutoVariante {
+  id         String  @id
+  produtoId  String
+  name       String
+  img        String
+  alt        String
+  priceCents Int
+  stock      Int
+  hex        String?
+  corName    String?
+  produto    Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  @@index([produtoId])
+  @@map("ProdutoVariantes")
+}

@@ -15,6 +15,7 @@ export default function CarrinhoClient() {
     const {
         items,
         isEmpty,
+        isReady,
         subtotalCents,
         setItemQuantity,
         removeItem,
@@ -23,6 +24,14 @@ export default function CarrinhoClient() {
 
     function handleBack() {
         router.push(getCartBackPath());
+    }
+
+    if (!isReady) {
+        return (
+            <section className="py-25 px-6 md:px-20 min-h-[60vh] dark:bg-black flex items-center justify-center">
+                <p>Carregando carrinho...</p>
+            </section>
+        );
     }
 
     if (isEmpty) {
