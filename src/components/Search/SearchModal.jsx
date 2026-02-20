@@ -3,12 +3,15 @@
 import { useMemo, useState } from "react";
 import SearchInput from "./SearchInput";
 import SearchResults from "./SearchResults";
-import { produtos } from "@/data/produtos";
+import { useCatalogo } from "@/contexts/catalog-context";
 
 export default function SearchModal({ onClose }) {
     const [search, setSearch] = useState("");
 
-    const listaCompleta = useMemo(() => Object.values(produtos).flat(), []);
+    const { products, isReady } = useCatalogo();
+
+    const listaCompleta = useMemo(() => products ?? [], [products]);
+
     const normalizedSearch = search.trim().toLowerCase();
     const showSuggestions = !normalizedSearch;
     const resultados = useMemo(() => {
@@ -19,6 +22,16 @@ export default function SearchModal({ onClose }) {
             produto.name.toLowerCase().includes(normalizedSearch),
         );
     }, [listaCompleta, normalizedSearch, showSuggestions]);
+
+    if (!isReady) {
+        return (
+            <div className="fixed inset-0 bg-black/60 z-50 flex justify-center ">
+                <div className="bg-white dark:bg-black w-full px-40 rounded-lg py-13">
+                    <p>Carregando busca...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="fixed inset-0 bg-black/60 z-50 flex justify-center ">

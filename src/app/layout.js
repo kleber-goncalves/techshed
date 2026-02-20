@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-page-custom-font */
 
 import Footer from "@/components/layout/footer";
-import { Providers } from "../contexts/providers";
+import { Providers } from "../provider/providers";
 
 import "../style/globals.css";
 import Header from "@/components/layout/Header";

@@ -1,13 +1,14 @@
-import { produtos } from "@/data/produtos";
 import SearchPageClient from "./SearchPageClient";
+import { getCatalogoFlat } from "@/lib/catalogo-db";
 
 export default async function Busca({ searchParams }) {
     const resolvedSearchParams = await searchParams;
     const query =
-        typeof resolvedSearchParams?.q === "string"
+        (typeof resolvedSearchParams?.q === "string"
             ? resolvedSearchParams.q
-            : "";
-    const listaCompleta = Object.values(produtos).flat();
+            : "").trim();
+    
+    const listaCompleta = await getCatalogoFlat();
 
     const features = [
         ...new Set(

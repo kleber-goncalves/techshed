@@ -67,6 +67,33 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.18 - 2026-02-20
+**Resumo**
+- Catalogo passou a ser carregado via API/Contexto a partir do Supabase para paginas e componentes client.
+
+**Motivacao**
+- Remover dependencia do arquivo src/data/produtos.js no runtime e centralizar catalogo via banco.
+
+**Impacto**
+- Componentes afetados: src/app/api/catalogo/*, src/lib/catalogo-db.js, src/contexts/catalog-context.jsx, src/provider/providers.jsx, paginas /loja, /busca, /categoria/[categoria], /produto/[slug], SearchModal, ProductSlider, CartContext, FavoriteContext.
+- Compatibilidade: nao - exige catalogo seedado no banco e API ativa.
+- Risco: medio - mudanca de origem de dados e estados de loading.
+
+**Mudancas**
+- **Added**
+  - Rotas GET /api/catalogo e GET /api/catalogo/flat.
+  - CatalogoProvider com cache client-side e indice de produtos.
+- **Changed**
+  - Paginas e componentes client passaram a consumir catalogo via contexto/API.
+  - Carrinho e favoritos agora dependem do catalogo carregado para resolver itens.
+  - Provider global migrou para src/provider/providers.jsx.
+
+**Como testar**
+1. Rodar npm run dev.
+2. Abrir /api/catalogo e /api/catalogo/flat.
+3. Abrir /loja, /busca, /categoria/... e /produto/... e validar carregamento.
+4. Abrir /favoritos e /carrinho e validar estados de loading e itens.
+
 ### v0.1.17 — 2026-02-19
 **Resumo**
 - Persistência do catálogo de produtos no Supabase com Prisma (`Produtos` + `ProdutoVariantes`) e seed idempotente a partir de `src/data/produtos.js`.
@@ -652,3 +679,4 @@ Slider -> ProductCard -> max-w-xs (fixo)
 Depois:
 Slider -> ProductCard -> max-w-xs (opcional)
 ```
+

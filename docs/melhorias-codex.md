@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-02-19
-Branch: `feat/migrar-produtos-banco`
+Última atualização: 2026-02-20
+Branch: `feat/migrar-catalogo-banco`
 
 ## Visão Geral
 Objetivo: evoluir a estrutura do projeto e a qualidade do UI/UX de forma organizada e rastreável.
@@ -30,6 +30,11 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 3. Garantir qualidade do seed com validação automatizada
 - Criar verificação pós-seed para contagens esperadas e produto com `promocao`.
 - Falhar cedo em CI/local quando houver regressão estrutural nos dados de catálogo.
+
+4. Hibrido carrinho/favoritos (localStorage + banco)
+- Criar modelos e APIs para sincronizar carrinho e favoritos por usuario.
+- Fazer merge no login e usar banco como fonte de verdade quando logado.
+- Manter localStorage apenas para usuario deslogado.
 
 ## Prioridade e Esforço (Resumo)
 1. Remover Logs de Debug no Filtro — **Impacto:** médio, **Esforço:** baixo
@@ -710,3 +715,6 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-17: Incluidas melhorias de seguranca das rotas de usuario, sincronizacao Supabase/Prisma e UX segura para senha.
 - 2026-02-17: Incluidas melhorias para validacao, reset e UX do fluxo de enderecos.
 - 2026-02-18: Incluida melhoria de seguranca e validacoes completas para o fluxo de carteira.
+
+
+

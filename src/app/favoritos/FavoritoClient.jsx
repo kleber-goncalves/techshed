@@ -13,7 +13,8 @@ import { formatCurrency } from "@/lib/formatCurrency";
 export default function FavoritoClient() {
     const router = useRouter();
     const { addItem } = useCart();
-    const { items, isEmpty, removeFavorite, clearFavorites } = useFavorite();
+    const { items, isEmpty, isReady, removeFavorite, clearFavorites } =
+        useFavorite();
 
     function handleBack() {
         if (typeof window !== "undefined" && window.history.length > 1) {
@@ -28,6 +29,12 @@ export default function FavoritoClient() {
         addItem({ productId, variantId: null, quantity: 1 });
     }
 
+    // Loading
+    if (!isReady) {
+        return <p>Carregando favoritos...</p>;
+    }
+
+    // se não tiver favoritos
     if (isEmpty) {
         return (
             <section className="py-25 px-6 md:px-20 min-h-[60vh] dark:bg-black flex flex-col items-center justify-center gap-6">
@@ -54,6 +61,8 @@ export default function FavoritoClient() {
 
     return (
         <section className="py-25 px-6 md:px-20 dark:bg-black min-h-[60vh]">
+            
+            {/* Header */}
             <div className="flex items-center justify-between mb-10">
                 <div className="flex items-center gap-2">
                     <Button
@@ -115,7 +124,9 @@ export default function FavoritoClient() {
 
                                 <div className="flex flex-wrap items-center gap-2">
                                     <Link href={`/produto/${item.slug}`}>
-                                        <Button variant="outline">Ver produto</Button>
+                                        <Button variant="outline">
+                                            Ver produto
+                                        </Button>
                                     </Link>
                                     <Button
                                         onClick={() => handleAddToCart(item.id)}

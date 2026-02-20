@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
-
+import { useCatalogo } from "@/contexts/catalog-context";
 import ProductCard from "@/components/components-loja/ProductCard";
-import { produtos } from "@/data/produtos";
-
 import FiltersSidebar from "@/components/components-loja/filtro/FiltersSidebar";
 import { applyFilters } from "@/lib/applyFilters";
 import { applySort } from "@/lib/applySort";
 import SortSelect from "@/components/components-loja/filtro/SortSelect";
 
 export default function Loja() {
-    const listaCompleta = Object.values(produtos).flat();
+
+    const { products, isReady } = useCatalogo();
+
+    const listaCompleta = products ?? [];
+
+ 
     const filtersEnabled = [
         "category",
         "price",
@@ -35,6 +38,10 @@ export default function Loja() {
     const produtosFiltrados = applyFilters(listaCompleta, filters);
 
     const produtosOrdenados = applySort(produtosFiltrados, sort);
+
+         if (!isReady) {
+    return <p>Carregando produtos...</p>;
+  }
 
     return (
         <section className="py-25 flex flex-col items-center gap-14 dark:bg-black">

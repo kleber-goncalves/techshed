@@ -9,34 +9,15 @@ import {
     useState,
 } from "react";
 
-import { produtos } from "@/data/produtos";
+import { useCatalogo } from "./catalog-context";
+
 
 const STORAGE_KEY = "techshed.cart.v1";
 const BASE_VARIANT_ID = "base";
 
 const CartContext = createContext(null);
 
-const productIndex = buildProductIndex();
 
-/**
- * O que faz:
- * - Reune todos os produtos do catalogo em uma unica lista e cria um Map indexado por id.
- * - Retorna uma estrutura de busca rapida, onde cada chave e o id do produto.
- *
- * Por que e importante:
- * - Evita percorrer todo o catalogo sempre que precisamos localizar um produto.
- * - Deixa funcoes como resolveCatalogLine mais simples e performaticas no dia a dia.
- */
-function buildProductIndex() {
-    const allProducts = Object.values(produtos).flat();
-    const index = new Map();
-
-    allProducts.forEach((product) => {
-        index.set(product.id, product);
-    });
-
-    return index;
-}
 
 /**
  * O que faz:
@@ -125,7 +106,7 @@ function parseLineKey(lineKey) {
  * - Concentra em um unico ponto a regra de fallback entre variante e produto principal.
  * - Garante que nome, imagem, preco e estoque fiquem coerentes para renderizacao e calculos.
  */
-function resolveCatalogLine(productId, variantId) {
+function resolveCatalogLine(productIndex, productId, variantId) {
     const product = productIndex.get(productId);
     if (!product) return null;
 
@@ -174,9 +155,7 @@ function resolveCatalogLine(productId, variantId) {
  * - Mantem consistencia no tratamento de produtos sem variacao.
  */
 function normalizeVariantId(variantId) {
-    return typeof variantId === "string" && variantId.trim()
-        ? variantId
-        : null;
+    return typeof variantId === "string" && variantId.trim() ? variantId : null;
 }
 
 /**
@@ -189,8 +168,10 @@ function normalizeVariantId(variantId) {
  * - E a principal barreira de qualidade dos dados do carrinho.
  * - Impede estados quebrados, reduz duplicacoes e garante consistencia antes de persistir/renderizar.
  */
-function sanitizeLines(rawLines) {
-    if (!Array.isArray(rawLines)) return [];
+function sanitizeLines(rawLines, productIndex) {
+    if (!Array.isArray(rawLines) || !productIndex || productIndex.size === 0) {
+        return [];
+    }
 
     const mergedLines = new Map();
 
@@ -200,7 +181,7 @@ function sanitizeLines(rawLines) {
         if (!productId) return;
 
         const variantId = normalizeVariantId(line.variantId);
-        const catalogLine = resolveCatalogLine(productId, variantId);
+        const catalogLine = resolveCatalogLine(productIndex, productId, variantId);
 
         if (!catalogLine || catalogLine.stock <= 0) return;
 
@@ -239,7 +220,8 @@ function parsePersistedLines(rawValue) {
     if (!rawValue) return [];
 
     try {
-        return sanitizeLines(JSON.parse(rawValue));
+        const parsed = JSON.parse(rawValue);
+        return Array.isArray(parsed) ? parsed : [];
     } catch {
         return [];
     }
@@ -255,58 +237,84 @@ function parsePersistedLines(rawValue) {
  * - Evita duplicacao de logica entre paginas/componentes e facilita manutencao para o time.
  */
 export function CartProvider({ children }) {
-    // Estado inicial do carrinho: no browser, tenta restaurar do localStorage; no servidor, usa lista vazia.
+    const { productIndex, isReady: isCatalogReady } = useCatalogo();
     const [lines, setLines] = useState(() => {
         if (typeof window === "undefined") return [];
         return parsePersistedLines(window.localStorage.getItem(STORAGE_KEY));
     });
 
-    // Persistencia: sempre que as linhas mudam, grava a versao atual no localStorage.
+    const sanitizedLines = useMemo(() => {
+        if (!isCatalogReady) return [];
+        return sanitizeLines(lines, productIndex);
+    }, [lines, isCatalogReady, productIndex]);
+
     useEffect(() => {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
-    }, [lines]);
+        if (!isCatalogReady) return;
+        window.localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(sanitizedLines),
+        );
+    }, [sanitizedLines, isCatalogReady]);
 
     // Acao de adicionar item: inclui uma nova linha e reaplica sanitizacao para unificar e validar tudo.
-    const addItem = useCallback(({ productId, variantId = null, quantity = 1 }) => {
-        if (!productId) return;
+    const addItem = useCallback(
+        ({ productId, variantId = null, quantity = 1 }) => {
+            if (!productId) return;
 
-        setLines((previousLines) =>
-            sanitizeLines([
-                ...previousLines,
-                {
-                    productId,
-                    variantId: normalizeVariantId(variantId),
-                    quantity,
-                },
-            ]),
-        );
-    }, []);
+            setLines((previousLines) => {
+                const nextLines = [
+                    ...previousLines,
+                    {
+                        productId,
+                        variantId: normalizeVariantId(variantId),
+                        quantity,
+                    },
+                ];
+
+                return isCatalogReady
+                    ? sanitizeLines(nextLines, productIndex)
+                    : nextLines;
+            });
+        },
+        [isCatalogReady, productIndex],
+    );
 
     // Acao de atualizar quantidade: valida lineKey, altera a linha alvo e sanitiza o resultado.
     // O parse da chave evita atualizacao com identificador invalido, e sanitizeLines reaplica limites/estoque.
-    const setItemQuantity = useCallback(({ lineKey, quantity }) => {
-        const parsedLine = parseLineKey(lineKey);
-        if (!parsedLine) return;
+    const setItemQuantity = useCallback(
+        ({ lineKey, quantity }) => {
+            const parsedLine = parseLineKey(lineKey);
+            if (!parsedLine) return;
 
-        setLines((previousLines) => {
-            let found = false;
-            const nextLines = previousLines.map((line) => {
-                const currentLineKey = getLineKey(line.productId, line.variantId);
-                if (currentLineKey !== lineKey) return line;
+            setLines((previousLines) => {
+                let found = false;
+                const nextLines = previousLines.map((line) => {
+                    const currentLineKey = getLineKey(
+                        line.productId,
+                        line.variantId,
+                    );
+                    if (currentLineKey !== lineKey) return line;
 
-                found = true;
-                return { ...line, quantity };
+                    found = true;
+                    return { ...line, quantity };
+                });
+
+                if (!found) return previousLines;
+
+                return isCatalogReady
+                    ? sanitizeLines(nextLines, productIndex)
+                    : nextLines;
             });
-
-            return found ? sanitizeLines(nextLines) : previousLines;
-        });
-    }, []);
+        },
+        [isCatalogReady, productIndex],
+    );
 
     // Acao de remocao: remove a linha exata identificada pela lineKey.
     const removeItem = useCallback((lineKey) => {
         setLines((previousLines) =>
             previousLines.filter(
-                (line) => getLineKey(line.productId, line.variantId) !== lineKey,
+                (line) =>
+                    getLineKey(line.productId, line.variantId) !== lineKey,
             ),
         );
     }, []);
@@ -317,32 +325,33 @@ export function CartProvider({ children }) {
     }, []);
 
     // Dados derivados para interface: resolve dados do catalogo, valida quantidade e calcula subtotal por linha.
-    const items = useMemo(
-        () =>
-            lines
-                .map((line) => {
-                    const catalogLine = resolveCatalogLine(
-                        line.productId,
-                        line.variantId,
-                    );
-                    if (!catalogLine || catalogLine.stock <= 0) return null;
+    const items = useMemo(() => {
+        if (!isCatalogReady) return [];
 
-                    const quantity = normalizeRequestedQuantity(
-                        line.quantity,
-                        catalogLine.stock,
-                    );
-                    if (quantity <= 0) return null;
+        return sanitizedLines
+            .map((line) => {
+                const catalogLine = resolveCatalogLine(
+                    productIndex,
+                    line.productId,
+                    line.variantId,
+                );
+                if (!catalogLine || catalogLine.stock <= 0) return null;
 
-                    return {
-                        ...catalogLine,
-                        lineKey: getLineKey(line.productId, line.variantId),
-                        quantity,
-                        lineSubtotalCents: catalogLine.unitPriceCents * quantity,
-                    };
-                })
-                .filter(Boolean),
-        [lines],
-    );
+                const quantity = normalizeRequestedQuantity(
+                    line.quantity,
+                    catalogLine.stock,
+                );
+                if (quantity <= 0) return null;
+
+                return {
+                    ...catalogLine,
+                    lineKey: getLineKey(line.productId, line.variantId),
+                    quantity,
+                    lineSubtotalCents: catalogLine.unitPriceCents * quantity,
+                };
+            })
+            .filter(Boolean);
+    }, [sanitizedLines, isCatalogReady, productIndex]);
 
     // Totais derivados para resumo de compra e badge de quantidade.
     const totalItems = useMemo(
@@ -365,6 +374,7 @@ export function CartProvider({ children }) {
             totalItems,
             subtotalCents,
             isEmpty: items.length === 0,
+            isReady: isCatalogReady,
             addItem,
             setItemQuantity,
             removeItem,
@@ -373,6 +383,7 @@ export function CartProvider({ children }) {
         [
             addItem,
             clearCart,
+            isCatalogReady,
             items,
             removeItem,
             setItemQuantity,
@@ -381,7 +392,9 @@ export function CartProvider({ children }) {
         ],
     );
 
-    return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+    return (
+        <CartContext.Provider value={value}>{children}</CartContext.Provider>
+    );
 }
 
 /**
