@@ -26,15 +26,12 @@ export async function addCard(data) {
         body: JSON.stringify(data),
     });
 
-
-        if (!res.ok) {
+    if (!res.ok) {
         console.log("Erro ao adicionar um card");
-        return
+        return;
     }
 
     return res.json();
-
-
 }
 
 /**
@@ -44,7 +41,6 @@ export async function addCard(data) {
  * @returns {Promise} - Resposta com o resultado da operação.
  * @throws {Response} - Erro de nao autenticado com status 401.
  */
-
 export async function deleteCard(id) {
     const token = await getToken();
     const res = await fetch(`/api/cards/${id}`, {
@@ -54,8 +50,6 @@ export async function deleteCard(id) {
             Authorization: `Bearer ${token}`,
         },
     });
-
-     
 
     return res.json();
 }

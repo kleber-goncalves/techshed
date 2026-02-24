@@ -67,6 +67,34 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.19 - 2026-02-24
+**Resumo**
+- Hibrido de carrinho e favoritos com sync no Supabase e fallback no localStorage.
+
+**Motivacao**
+- Manter persistencia para usuario logado sem perder a experiencia de visitante.
+
+**Impacto**
+- Componentes afetados: prisma/schema.prisma, src/app/api/cart, src/app/api/favorites, src/lib/helpers/api/cartApi.js, src/lib/helpers/api/favoriteApi.js, src/contexts/cart-context.jsx, src/contexts/favorit-context.jsx, src/contexts/catalog-context.jsx.
+- Compatibilidade: nao - exige migracao das tabelas CartItems e Favorites e API ativa.
+- Risco: medio - mudanca de persistencia e sincronizacao em login.
+
+**Mudancas**
+- **Added**
+  - Modelos CartItem e Favorite no Prisma.
+  - Rotas /api/cart e /api/favorites.
+  - Helpers de API para sync do carrinho e favoritos.
+- **Changed**
+  - Carrinho e favoritos agora sincronizam com o banco quando o usuario esta logado.
+  - CatalogoProvider limpa erro antes do fetch para evitar isReady travado.
+
+**Como testar**
+1. Rodar migracao do Prisma para CartItems/Favorites.
+2. Rodar npm run dev.
+3. Logar, favoritar produtos e adicionar ao carrinho.
+4. Recarregar a pagina e validar persistencia.
+5. Deslogar e validar fallback no localStorage.
+
 ### v0.1.18 - 2026-02-20
 **Resumo**
 - Catalogo passou a ser carregado via API/Contexto a partir do Supabase para paginas e componentes client.

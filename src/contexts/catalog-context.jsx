@@ -41,10 +41,13 @@ export function CatalogoProvider({ children }) {
         async function load() {
             try {
                 setIsLoading(true);
+                setError(null);
+
                 const res = await fetch("/api/catalogo/flat", { cache: "no-cache" });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
                 if (!active) return;
+                
                 setProducts(Array.isArray(data) ? data : []);
             } catch (err) {
                 if (!active) return;

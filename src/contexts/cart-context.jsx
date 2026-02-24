@@ -7,17 +7,24 @@ import {
     useEffect,
     useMemo,
     useState,
+    useRef,
 } from "react";
 
 import { useCatalogo } from "./catalog-context";
 
+import { supabase } from "@/lib/supabase/supabaseClient";
+import { getCartItems, saveCartItems } from "@/lib/helpers/api/cartApi";
 
 const STORAGE_KEY = "techshed.cart.v1";
 const BASE_VARIANT_ID = "base";
 
 const CartContext = createContext(null);
 
-
+function toDbVariantId(variantId) {
+    return typeof variantId === "string" && variantId.trim()
+        ? variantId.trim()
+        : BASE_VARIANT_ID;
+}
 
 /**
  * O que faz:
@@ -181,7 +188,11 @@ function sanitizeLines(rawLines, productIndex) {
         if (!productId) return;
 
         const variantId = normalizeVariantId(line.variantId);
-        const catalogLine = resolveCatalogLine(productIndex, productId, variantId);
+        const catalogLine = resolveCatalogLine(
+            productIndex,
+            productId,
+            variantId,
+        );
 
         if (!catalogLine || catalogLine.stock <= 0) return;
 
@@ -238,10 +249,53 @@ function parsePersistedLines(rawValue) {
  */
 export function CartProvider({ children }) {
     const { productIndex, isReady: isCatalogReady } = useCatalogo();
+
+    const [authUserId, setAuthUserId] = useState(null);
+    const [isAuthReady, setIsAuthReady] = useState(false);
+    const [hasSynced, setHasSynced] = useState(false);
+    const syncRef = useRef(false);
+
     const [lines, setLines] = useState(() => {
         if (typeof window === "undefined") return [];
         return parsePersistedLines(window.localStorage.getItem(STORAGE_KEY));
     });
+
+    
+    useEffect(() => {
+        let alive = true;
+
+        (async () => {
+            try {
+                const { data } = await supabase.auth.getSession();
+                if (!alive) return;
+                setAuthUserId(data.session?.user?.id ?? null);
+            } catch (error) {
+                if (!alive) return;
+                setAuthUserId(null);
+            } finally {
+                if (alive) setIsAuthReady(true);
+            }
+        })();
+
+        const { data: listener } = supabase.auth.onAuthStateChange(
+            (_event, session) => {
+                 const nextUserId = session?.user?.id ?? null;
+
+                 setAuthUserId((prev) => {
+                     if (prev !== nextUserId) {
+                         setHasSynced(false);
+                     }
+                     return nextUserId;
+                 });
+                 setIsAuthReady(true);
+            },
+        );
+
+        return () => {
+            alive = false;
+            listener?.subscription?.unsubscribe?.();
+        };
+    }, []);
 
     const sanitizedLines = useMemo(() => {
         if (!isCatalogReady) return [];
@@ -255,6 +309,83 @@ export function CartProvider({ children }) {
             JSON.stringify(sanitizedLines),
         );
     }, [sanitizedLines, isCatalogReady]);
+
+
+
+
+    useEffect(() => {
+        if (!isAuthReady || !isCatalogReady) return;
+        if (!authUserId) return;
+        if (hasSynced || syncRef.current) return;
+
+        syncRef.current = true;
+        let canceled = false;
+
+        (async () => {
+            try {
+                const serverItems = await getCartItems();
+                const serverLines = Array.isArray(serverItems)
+                    ? serverItems
+                    : [];
+                const normalizedServerLines = serverLines.map((item) => ({
+                    productId: item.productId,
+                    variantId:
+                        item.variantId === BASE_VARIANT_ID ? null : item.variantId,
+                    quantity: item.quantity,
+                }));
+
+                const merged = sanitizeLines(
+                    [...normalizedServerLines, ...lines],
+                    productIndex,
+                );
+
+                if (canceled) return;
+
+                // Libera a UI antes de qualquer await
+                setHasSynced(true);
+                setLines(merged);
+
+                await saveCartItems(
+                    merged.map((line) => ({
+                        productId: line.productId,
+                        variantId: toDbVariantId(line.variantId),
+                        quantity: line.quantity,
+                    })),
+                );
+            } catch (error) {
+                console.error("Erro ao sincronizar carrinho", error);
+                if (!canceled) setHasSynced(true);
+            } finally {
+                syncRef.current = false;
+            }
+        })();
+
+        return () => {
+            canceled = true;
+        };
+    }, [
+        authUserId,
+        hasSynced,
+        isAuthReady,
+        isCatalogReady,
+        lines,
+        productIndex,
+    ]);
+
+
+    useEffect(() => {
+        if (!isAuthReady || !isCatalogReady) return;
+        if (!authUserId) return;
+        if (!hasSynced) return;
+
+        saveCartItems(
+            sanitizedLines.map((line) => ({
+                productId: line.productId,
+                variantId: toDbVariantId(line.variantId),
+                quantity: line.quantity,
+            })),
+        );
+    }, [sanitizedLines, authUserId, hasSynced, isAuthReady, isCatalogReady]);
 
     // Acao de adicionar item: inclui uma nova linha e reaplica sanitizacao para unificar e validar tudo.
     const addItem = useCallback(
@@ -367,6 +498,9 @@ export function CartProvider({ children }) {
         [items],
     );
 
+    const isReady = isCatalogReady && isAuthReady && (!authUserId || hasSynced);
+
+
     // Valor unico do contexto: expoe estado pronto para consumo e todas as acoes publicas do carrinho.
     const value = useMemo(
         () => ({
@@ -374,7 +508,7 @@ export function CartProvider({ children }) {
             totalItems,
             subtotalCents,
             isEmpty: items.length === 0,
-            isReady: isCatalogReady,
+            isReady,
             addItem,
             setItemQuantity,
             removeItem,
@@ -383,7 +517,7 @@ export function CartProvider({ children }) {
         [
             addItem,
             clearCart,
-            isCatalogReady,
+            isReady,
             items,
             removeItem,
             setItemQuantity,

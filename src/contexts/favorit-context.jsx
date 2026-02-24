@@ -7,9 +7,12 @@ import {
     useEffect,
     useMemo,
     useState,
+    useRef,
 } from "react";
 
 import { useCatalogo } from "@/contexts/catalog-context";
+import { supabase } from "@/lib/supabase/supabaseClient";
+import { getFavorites, saveFavorites } from "@/lib/helpers/api/favoriteApi";
 
 const STORAGE_KEY = "techshed.favorites.v1";
 
@@ -67,36 +70,150 @@ function parsePersistedFavoriteIds(rawValue) {
 
 export function FavoriteProvider({ children }) {
     const { productIndex, isReady: isCatalogReady } = useCatalogo();
+
+    const [authUserId, setAuthUserId] = useState(null);
+    const [isAuthReady, setIsAuthReady] = useState(false);
+    const [hasSynced, setHasSynced] = useState(false);
+    const syncRef = useRef(false);
+
     const [favoriteIds, setFavoriteIds] = useState(() => {
         if (typeof window === "undefined") return [];
-        return parsePersistedFavoriteIds(window.localStorage.getItem(STORAGE_KEY));
+        return parsePersistedFavoriteIds(
+            window.localStorage.getItem(STORAGE_KEY),
+        );
     });
+
+    // (useEffect de autenticação) Sincroniza os favoritos com o banco de dados de favoritos do supabase se o usuario estiver autenticado e o catalogo estiver pronto
+    useEffect(() => {
+        let alive = true;
+
+        (async () => {
+            try {
+                const { data } = await supabase.auth.getSession();
+                if (!alive) return;
+                setAuthUserId(data.session?.user?.id ?? null);
+            } catch (error) {
+                if (!alive) return;
+                setAuthUserId(null);
+            } finally {
+                if (alive) setIsAuthReady(true);
+            }
+        })();
+
+        const { data: listener } = supabase.auth.onAuthStateChange(
+            (_event, session) => {
+                const nextUserId = session?.user?.id ?? null;
+
+                setAuthUserId((prev) => {
+                    if (prev !== nextUserId) {
+                        setHasSynced(false);
+                    }
+                    return nextUserId;
+                });
+
+                setIsAuthReady(true);
+            },
+        );
+
+        return () => {
+            alive = false;
+            listener?.subscription?.unsubscribe?.();
+        };
+    }, []);
 
     const sanitizedFavoriteIds = useMemo(() => {
         if (!isCatalogReady) return [];
         return sanitizeFavoriteIds(favoriteIds, productIndex);
     }, [favoriteIds, isCatalogReady, productIndex]);
 
+    // Persiste os favoritos no localStorage se o catalogo estiver pronto e o usuario estiver autenticado e sincronizado com o banco de dados de favoritos do supabase
     useEffect(() => {
         if (!isCatalogReady) return;
-        window.localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(sanitizedFavoriteIds),
-        );
+        try {
+            window.localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(sanitizedFavoriteIds),
+            );
+        } catch (error) {
+            console.error("Erro ao salvar no localStorage", error);
+        }
     }, [sanitizedFavoriteIds, isCatalogReady]);
 
-    const addFavorite = useCallback((productId) => {
-        const normalizedId = normalizeProductId(productId);
-        if (!normalizedId) return;
+    // (useEffect de sicronização com o banco) Sincroniza os favoritos com o banco de dados de favoritos do supabase se o usuario estiver autenticado e o catalogo estiver pronto
+    useEffect(() => {
+    if (!isAuthReady || !isCatalogReady) return;
+    if (!authUserId) return;
+    if (hasSynced || syncRef.current) return;
 
-        setFavoriteIds((previousIds) => {
-            if (previousIds.includes(normalizedId)) return previousIds;
-            if (!isCatalogReady) return [normalizedId, ...previousIds];
-            return productIndex.has(normalizedId)
-                ? [normalizedId, ...previousIds]
-                : previousIds;
-        });
-    }, [isCatalogReady, productIndex]);
+    syncRef.current = true;
+    let canceled = false;
+
+    (async () => {
+        try {
+            const serverIds = await getFavorites();
+            const merged = sanitizeFavoriteIds(
+                [...serverIds, ...favoriteIds],
+                productIndex,
+            );
+
+            if (canceled) return;
+
+            // Libera a UI antes de qualquer await
+            setHasSynced(true);
+            setFavoriteIds(merged);
+
+            await saveFavorites(merged);
+        } catch (error) {
+            console.error("Erro ao sincronizar favoritos", error);
+            if (!canceled) setHasSynced(true);
+        } finally {
+            syncRef.current = false;
+        }
+    })();
+
+    return () => {
+        canceled = true;
+    };
+}, [
+    authUserId,
+    hasSynced,
+    isAuthReady,
+    isCatalogReady,
+    favoriteIds,
+    productIndex,
+]);
+
+
+    //
+    useEffect(() => {
+        if (!isAuthReady || !isCatalogReady) return;
+        if (!authUserId) return;
+        if (!hasSynced) return;
+
+        saveFavorites(sanitizedFavoriteIds);
+    }, [
+        sanitizedFavoriteIds,
+        authUserId,
+        hasSynced,
+        isAuthReady,
+        isCatalogReady,
+    ]);
+
+    const addFavorite = useCallback(
+        (productId) => {
+            const normalizedId = normalizeProductId(productId);
+            if (!normalizedId) return;
+
+            setFavoriteIds((previousIds) => {
+                if (previousIds.includes(normalizedId)) return previousIds;
+                if (!isCatalogReady) return [normalizedId, ...previousIds];
+                return productIndex.has(normalizedId)
+                    ? [normalizedId, ...previousIds]
+                    : previousIds;
+            });
+        },
+        [isCatalogReady, productIndex],
+    );
 
     const removeFavorite = useCallback((productId) => {
         const normalizedId = normalizeProductId(productId);
@@ -107,18 +224,21 @@ export function FavoriteProvider({ children }) {
         );
     }, []);
 
-    const toggleFavorite = useCallback((productId) => {
-        const normalizedId = normalizeProductId(productId);
-        if (!normalizedId) return;
+    const toggleFavorite = useCallback(
+        (productId) => {
+            const normalizedId = normalizeProductId(productId);
+            if (!normalizedId) return;
 
-        setFavoriteIds((previousIds) =>
-            previousIds.includes(normalizedId)
-                ? previousIds.filter((id) => id !== normalizedId)
-                : !isCatalogReady || productIndex.has(normalizedId)
-                  ? [normalizedId, ...previousIds]
-                  : previousIds,
-        );
-    }, [isCatalogReady, productIndex]);
+            setFavoriteIds((previousIds) =>
+                previousIds.includes(normalizedId)
+                    ? previousIds.filter((id) => id !== normalizedId)
+                    : !isCatalogReady || productIndex.has(normalizedId)
+                      ? [normalizedId, ...previousIds]
+                      : previousIds,
+            );
+        },
+        [isCatalogReady, productIndex],
+    );
 
     const clearFavorites = useCallback(() => {
         setFavoriteIds([]);
@@ -157,6 +277,7 @@ export function FavoriteProvider({ children }) {
 
     const totalFavorites = sanitizedFavoriteIds.length;
     const isEmpty = items.length === 0;
+    const isReady = isCatalogReady && isAuthReady && (!authUserId || hasSynced);
 
     const value = useMemo(
         () => ({
@@ -164,7 +285,7 @@ export function FavoriteProvider({ children }) {
             favoriteIds,
             totalFavorites,
             isEmpty,
-            isReady: isCatalogReady,
+            isReady,
             isFavorite,
             addFavorite,
             removeFavorite,
@@ -175,7 +296,7 @@ export function FavoriteProvider({ children }) {
             addFavorite,
             clearFavorites,
             favoriteIds,
-            isCatalogReady,
+            isReady,
             isEmpty,
             isFavorite,
             items,
@@ -196,9 +317,10 @@ export function useFavorite() {
     const context = useContext(FavoriteContext);
 
     if (!context) {
-        throw new Error("useFavorite precisa ser usado dentro de FavoriteProvider");
+        throw new Error(
+            "useFavorite precisa ser usado dentro de FavoriteProvider",
+        );
     }
 
     return context;
 }
-

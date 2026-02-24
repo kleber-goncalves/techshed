@@ -7,8 +7,14 @@ import { useRouter } from "next/navigation";
 export default function AuthPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-const router = useRouter();
+    const router = useRouter();
 
+
+/**
+ * Tenta criar uma conta no Supabase com o email e senha fornecidos.
+ * Se houver erro, alerta o erro.
+ * Se a conta for criada com sucesso, alerta que a conta foi criada e pede para verificar o email.
+ */
     const handleSignUp = async () => {
         const { data, error } = await supabase.auth.signUp({
             email,
@@ -18,6 +24,14 @@ const router = useRouter();
         if (error) alert("Erro ao criar conta: " + error.message);
         else alert("Conta criada! Verifique seu email.");
     };
+
+
+/**
+ * Tenta fazer login no Supabase com o email e senha fornecidos.
+ * Se houver erro, alerta o erro.
+ * Se o login for feito com sucesso, manda o token do Supabase para o backend
+ * e redireciona para a pagina de perfil.
+ */
 
 async function handleLogin() {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -46,6 +60,7 @@ async function handleLogin() {
         router.push("/cnfgContaUsers/minha_conta");
     }
 }
+
 
     return (
         <div style={{ padding: "20px" }}>
