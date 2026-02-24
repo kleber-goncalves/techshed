@@ -25,5 +25,9 @@ export async function saveCartItems(items) {
         },
         body: JSON.stringify({ items }),
     });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || `HTTP ${res.status}`);
+    }
     return res.json();
 }

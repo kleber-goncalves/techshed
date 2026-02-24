@@ -1,28 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SearchModal from "@/components/Search/SearchModal";
-
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-
-// shadcn/ui components
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-
-// Lucide icons
-import { Search, Heart, ShoppingCart, ChevronDown } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useCart } from "@/contexts/cart-context";
-import { useFavorite } from "@/contexts/favorit-context";
-import { getCartBackPath, saveCartReturnPath } from "@/lib/cartReturnPath";
-import { getFvrtBackPath, saveFvrtReturnPath} from "@/lib/fvrtReturnPath"
+import HeaderBrandSearch from "./header/HeaderBrandSearch";
+import HeaderUserSection from "./header/HeaderUserSection";
+import HeaderQuickActions from "./header/HeaderQuickActions";
 
 const BtnThemas = dynamic(() => import("../btnTema"), {
     ssr: false,
@@ -31,134 +14,16 @@ const BtnThemas = dynamic(() => import("../btnTema"), {
 
 export default function Header() {
     const [openSearch, setOpenSearch] = useState(false);
-    const { totalItems } = useCart();
-    const { totalFavorites } = useFavorite();
-    const router = useRouter();
-    const pathname = usePathname();
-    const currentRoute = pathname || "/";
-
-    useEffect(() => {
-        if (pathname === "/carrinho") return;
-        saveCartReturnPath(currentRoute);
-    }, [currentRoute, pathname]);
-
-
-
-    function handleCartIconClick() {
-        if (pathname === "/carrinho") {
-            router.push(getCartBackPath());
-            return;
-        }
-
-        saveCartReturnPath(currentRoute);
-        router.push("/carrinho");
-    }
-
-
-
-        useEffect(() => {
-            if (pathname === "/favoritos") return;
-           
-        saveFvrtReturnPath(currentRoute);
-    }, [currentRoute, pathname]);
-
-    function handleFvrtIconClick() {
-        if (pathname === "/favoritos") {
-           
-            router.push(getFvrtBackPath());
-            
-            return;
-        }
-
-        saveFvrtReturnPath(currentRoute);
-        router.push("/favoritos");
-    }
-    
-    
 
     return (
         <>
             <header className="flex items-center justify-between px-6 py-4 bg-white dark:bg-black shadow-md">
-                <div className="flex flex-row gap-5">
-                    <Link href="/" className="flex flex-row">
-                        <h1 className="text-[40px] font-semibold">TechShed</h1>
-                    </Link>
-
-                    <Button
-                        variant="ghost"
-                        onClick={() => setOpenSearch(true)}
-                        className="cursor-pointer"
-                    >
-                        <Search className="w-12 h-12" />
-                    </Button>
-                </div>
+                <HeaderBrandSearch onOpenSearch={() => setOpenSearch(true)} />
 
                 <div className="flex items-center gap-4">
                     <BtnThemas />
-                    <div className="flex items-center gap-2">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    className="flex items-center gap-1"
-                                >
-                                    <Avatar className="w-8 h-8">
-                                        <AvatarFallback>SK</AvatarFallback>
-                                    </Avatar>
-                                    <ChevronDown className="w-4 h-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <Link href="/cnfgContaUsers">
-                                    <DropdownMenuItem>
-                                        Configurações da Conta
-                                    </DropdownMenuItem>
-                                </Link>
-
-                                <DropdownMenuItem>
-                                    Meus Pedidos
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>Sair</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-
-                    <Button
-                        variant="ghost"
-                        className="relative cursor-pointer flex items-center gap-1"
-                        onClick={handleFvrtIconClick}
-                        aria-label={
-                            totalFavorites > 0
-                                ? `Favoritos com ${totalFavorites} itens`
-                                : "Favoritos vazio"
-                        }
-                    >
-                        <Heart className="w-6 h-6 text-red-500 size-1" />
-
-                        {totalFavorites > 0 && (
-                            <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[11px] leading-none flex items-center justify-center font-semibold">
-                                {totalFavorites > 99 ? "99+" : totalFavorites}
-                            </span>
-                        )}
-                    </Button>
-
-                    <Button
-                        variant="ghost"
-                        className="relative cursor-pointer"
-                        onClick={handleCartIconClick}
-                        aria-label={
-                            totalItems > 0
-                                ? `Carrinho com ${totalItems} itens`
-                                : "Carrinho vazio"
-                        }
-                    >
-                        <ShoppingCart className="w-5 h-5 size-1" />
-                        {totalItems > 0 && (
-                            <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[11px] leading-none flex items-center justify-center font-semibold">
-                                {totalItems > 99 ? "99+" : totalItems}
-                            </span>
-                        )}
-                    </Button>
+                    <HeaderUserSection />
+                    <HeaderQuickActions />
                 </div>
             </header>
             {openSearch && <SearchModal onClose={() => setOpenSearch(false)} />}
