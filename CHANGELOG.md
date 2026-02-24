@@ -67,6 +67,280 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.20 - 2026-02-24
+**Resumo**
+- Refatoracao modular do Header com auth/logout no Supabase, exibicao de nome do usuario e correcoes de sincronizacao/deduplicacao do carrinho.
+
+**Motivacao**
+- Reduzir complexidade do `Header` (responsabilidades separadas) e melhorar manutencao.
+- Corrigir inconsistencias no carrinho quando havia itens duplicados ou falha de persistencia.
+- Registrar arquitetura backend atual em formato visual e textual.
+
+**Impacto**
+- Componentes afetados: `src/components/layout/Header.jsx`, `src/components/layout/header/*`, `src/lib/helpers/userDisplay.js`, `src/contexts/cart-context.jsx`, `src/app/api/cart/route.js`, `src/lib/helpers/api/cartApi.js`, `docs/arquitetura-backend.*`, `docs/estrutura-pasta-extenção.md`.
+- Compatibilidade: sim - sem quebra de rotas publicas; alteracao estrutural interna no Header.
+- Risco: medio - mudancas em fluxo de auth no client e sincronizacao de carrinho.
+
+**Mudancas**
+- **Added**
+  - `HeaderBrandSearch`, `HeaderUserSection` e `HeaderQuickActions` para dividir responsabilidades do Header.
+  - Hook `useHeaderAuth` para centralizar sessao/auth/logout do Header.
+  - Helper `src/lib/helpers/userDisplay.js` para nome exibido e iniciais do avatar.
+  - Documentacao visual da arquitetura backend (`docs/arquitetura-backend.excalidraw` + PNGs + `docs/arquitetura-backend.md`).
+  - Snapshot de estrutura de pastas em `docs/estrutura-pasta-extenção.md`.
+- **Changed**
+  - `Header.jsx` virou orquestrador enxuto, consumindo subcomponentes.
+  - Menu de usuario passou a exibir nome do usuario logado e opcoes de login para visitante.
+  - Fluxo de logout no Header agora usa `supabase.auth.signOut()`, limpa carrinho/favoritos locais e evita redirecionamento forcado.
+  - Sync do carrinho no contexto prioriza estado do servidor quando existir.
+- **Fixed**
+  - `PUT /api/cart` agora deduplica itens por `productId + variantId` antes de gravar e usa `skipDuplicates`.
+  - `saveCartItems` agora trata `res.ok` e retorna erro explicito em falhas HTTP.
+
+**Como testar**
+1. Fazer login e validar nome do usuario no Header (trigger + menu).
+2. Clicar em `Sair` e confirmar limpeza de carrinho/favoritos sem redirecionamento.
+3. Validar que visitante ve `Criar a sua conta` e `Entre` no Header.
+4. Adicionar itens repetidos no carrinho e confirmar que a API persiste sem duplicidade.
+5. Recarregar com usuario logado e validar sincronizacao do carrinho priorizando servidor.
+
+### v0.1.19 - 2026-02-24
+**Resumo**
+- Hibrido de carrinho e favoritos com sync no Supabase e fallback no localStorage.
+
+**Motivacao**
+- Manter persistencia para usuario logado sem perder a experiencia de visitante.
+
+**Impacto**
+- Componentes afetados: prisma/schema.prisma, src/app/api/cart, src/app/api/favorites, src/lib/helpers/api/cartApi.js, src/lib/helpers/api/favoriteApi.js, src/contexts/cart-context.jsx, src/contexts/favorit-context.jsx, src/contexts/catalog-context.jsx.
+- Compatibilidade: nao - exige migracao das tabelas CartItems e Favorites e API ativa.
+- Risco: medio - mudanca de persistencia e sincronizacao em login.
+
+**Mudancas**
+- **Added**
+  - Modelos CartItem e Favorite no Prisma.
+  - Rotas /api/cart e /api/favorites.
+  - Helpers de API para sync do carrinho e favoritos.
+- **Changed**
+  - Carrinho e favoritos agora sincronizam com o banco quando o usuario esta logado.
+  - CatalogoProvider limpa erro antes do fetch para evitar isReady travado.
+
+**Como testar**
+1. Rodar migracao do Prisma para CartItems/Favorites.
+2. Rodar npm run dev.
+3. Logar, favoritar produtos e adicionar ao carrinho.
+4. Recarregar a pagina e validar persistencia.
+5. Deslogar e validar fallback no localStorage.
+
+### v0.1.18 - 2026-02-20
+**Resumo**
+- Catalogo passou a ser carregado via API/Contexto a partir do Supabase para paginas e componentes client.
+
+**Motivacao**
+- Remover dependencia do arquivo src/data/produtos.js no runtime e centralizar catalogo via banco.
+
+**Impacto**
+- Componentes afetados: src/app/api/catalogo/*, src/lib/catalogo-db.js, src/contexts/catalog-context.jsx, src/provider/providers.jsx, paginas /loja, /busca, /categoria/[categoria], /produto/[slug], SearchModal, ProductSlider, CartContext, FavoriteContext.
+- Compatibilidade: nao - exige catalogo seedado no banco e API ativa.
+- Risco: medio - mudanca de origem de dados e estados de loading.
+
+**Mudancas**
+- **Added**
+  - Rotas GET /api/catalogo e GET /api/catalogo/flat.
+  - CatalogoProvider com cache client-side e indice de produtos.
+- **Changed**
+  - Paginas e componentes client passaram a consumir catalogo via contexto/API.
+  - Carrinho e favoritos agora dependem do catalogo carregado para resolver itens.
+  - Provider global migrou para src/provider/providers.jsx.
+
+**Como testar**
+1. Rodar npm run dev.
+2. Abrir /api/catalogo e /api/catalogo/flat.
+3. Abrir /loja, /busca, /categoria/... e /produto/... e validar carregamento.
+4. Abrir /favoritos e /carrinho e validar estados de loading e itens.
+
+### v0.1.17 — 2026-02-19
+**Resumo**
+- Persistência do catálogo de produtos no Supabase com Prisma (`Produtos` + `ProdutoVariantes`) e seed idempotente a partir de `src/data/produtos.js`.
+
+**Motivação**
+- Tirar o catálogo da dependência exclusiva de arquivo estático e preparar o projeto para leitura centralizada de produtos via banco.
+- Garantir carga inicial reproduzível dos dados de catálogo em qualquer ambiente.
+
+**Impacto**
+- Componentes afetados: `prisma/schema.prisma`, migração `prisma/migrations/20260219175036_add_produtos_catalogo/migration.sql` e `scripts/seed-produtos.js`.
+- Compatibilidade: sim — nenhuma rota/página foi migrada para leitura no banco neste passo.
+- Risco: médio — alteração de schema e processo de seed.
+
+**Mudanças**
+- **Added**
+  - Modelo `Produto` mapeado para tabela `"Produtos"`.
+  - Modelo `ProdutoVariante` mapeado para `"ProdutoVariantes"` com relação `onDelete: Cascade`.
+  - Campos de catálogo para compatibilidade com dados atuais (`category`, `catalogKey`, `features`, `promocao`).
+  - Script `scripts/seed-produtos.js` com parsing de `src/data/produtos.js`.
+  - Seed idempotente com `upsert` e limpeza de variantes órfãs por produto.
+- **Changed**
+  - Banco Supabase atualizado com nova migration de catálogo.
+  - Prisma Client regenerado para incluir os novos modelos.
+
+**Como testar**
+1. Rodar `npx prisma migrate dev --name add_produtos_catalogo`.
+2. Rodar `npx prisma generate`.
+3. Rodar `node scripts/seed-produtos.js`.
+4. Validar contagens: `Produtos = 64` e `ProdutoVariantes = 3`.
+5. Rodar seed novamente e confirmar que as contagens permanecem iguais (idempotência).
+
+### v0.1.16 — 2026-02-18
+**Resumo**
+- Endurecimento de segurança no fluxo de cartões (armazenar apenas `last4`) e validações no backend.
+
+**Motivação**
+- Reduzir risco ao lidar com dados sensíveis e garantir consistência das regras no servidor.
+
+**Impacto**
+- Componentes afetados: `src/app/api/cards/*`, `src/lib/helpers/api/cardApi.js`, `src/components/componemts-conta-users/layout/layout-cart/sec-cartsII.jsx`, Prisma (schema + migration) e `docs/sec-cartsII.md`.
+- Compatibilidade: não — exige nova migration e altera o formato dos dados retornados (agora `last4`).
+- Risco: médio — mudança de schema e API.
+
+**Mudanças**
+- **Changed**
+  - Backend agora valida expiração e Luhn, sanitiza número e salva apenas `last4`.
+  - Front passa a consumir `last4` e usar `DELETE /api/cards/[id]`.
+  - Front adiciona validação client-side de expiração (mês/ano).
+
+**Como testar**
+1. Rodar migrations.
+2. Criar cartão e confirmar que a API retorna `last4` (sem número completo).
+3. Confirmar erro 400 para expiração inválida.
+4. Excluir cartão com `DELETE /api/cards/[id]`.
+
+### v0.1.15 — 2026-02-18
+**Resumo**
+- CRUD de cartões com API protegida, UI de carteira com validação/formatação e documentação.
+
+**Motivação**
+- Permitir que o usuário gerencie cartões com segurança e uma UX guiada (validação, máscara e bandeira).
+
+**Impacto**
+- Componentes afetados: `src/app/api/cards/*`, `src/hooks/cardHooks.js`, `src/lib/helpers/api/cardApi.js`, `src/lib/cardBrand.js`, `src/components/componemts-conta-users/layout/layout-cart/sec-cartsII.jsx`, Prisma (schema + migration) e `docs/sec-cartsII.md`.
+- Compatibilidade: sim — adição de novas rotas e componentes.
+- Risco: médio — envolve CRUD e persistência de dados sensíveis.
+
+**Mudanças**
+- **Added**
+  - Rotas `GET/POST /api/cards` e `DELETE /api/cards/[id]`.
+  - Hook `cardHooks` e helper `cardApi` para consumo das rotas.
+  - Modelo `Card` e migration no Prisma.
+  - Documentação `docs/sec-cartsII.md`.
+- **Changed**
+  - Seção de carteira com modal, validação do número, formatação ao digitar, bandeira auto-preenchida e máscara no display.
+- **Security**
+  - Rotas de cartões exigem token Supabase.
+
+**Como testar**
+1. Estar autenticado (Supabase).
+2. Abrir “Minha Carteira”, adicionar um cartão válido e confirmar que a lista mostra só os 4 últimos dígitos.
+3. Tentar salvar com número inválido e confirmar bloqueio + mensagem de erro.
+4. Excluir um cartão e validar remoção imediata.
+5. Chamar `/api/cards` sem token e validar retorno 401.
+
+### v0.1.14 — 2026-02-17
+**Resumo**
+- CRUD de endereços com API protegida, UI de modais e documentação técnica.
+
+**Motivação**
+- Permitir que o usuário gerencie endereços com segurança e persistência.
+- Centralizar o fluxo de criação/edição/exclusão em uma UI simples.
+
+**Impacto**
+- Componentes afetados: `src/app/api/addresses/*`, `src/hooks/addressHooks.js`, `src/lib/helpers/api/addressApi.js`, modais e seção de endereços, Prisma (schema + migration), documentação.
+- Compatibilidade: sim — adição de novas rotas e componentes.
+- Risco: médio — envolve CRUD e autenticação.
+
+**Mudanças**
+- **Added**
+  - Rotas `GET/POST /api/addresses` e `PUT/DELETE /api/addresses/[id]`.
+  - Hook `addressHooks` e helper `addressApi` para consumo das rotas.
+  - Modais de formulário e confirmação de exclusão de endereço.
+  - Documentação `docs/section-end.md`.
+  - Migration e modelo `Address` no Prisma.
+- **Changed**
+  - Seção de endereços para usar modais e fluxo de CRUD.
+- **Security**
+  - Rotas de endereço exigem token Supabase.
+
+**Como testar**
+1. Estar autenticado (Supabase).
+2. Abrir a seção “Meus endereços” e adicionar um endereço.
+3. Editar e excluir um endereço existente.
+4. Testar chamadas para `/api/addresses` sem token e validar retorno 401.
+
+### v0.1.13 — 2026-02-17
+**Resumo**
+- Autenticação com Supabase, sincronização de usuários no banco e edição de perfil.
+
+**Motivação**
+- Garantir login/cadastro simples no front e persistência do usuário no banco local.
+- Permitir atualização de dados pessoais com segurança usando o token do Supabase.
+
+**Impacto**
+- Componentes afetados: rotas `src/app/api/users/*` e `src/app/api/syncUser`, tela `/auth`, hooks de usuário, componentes de conta, Prisma (schema + migration).
+- Compatibilidade: sim — novas rotas e ajustes incrementais.
+- Risco: médio — fluxo de autenticação e atualização de dados.
+
+**Mudanças**
+- **Added**
+  - Rota `POST /api/syncUser` para sincronizar usuário do Supabase com o Prisma.
+  - Página `/auth` para login e cadastro com Supabase.
+  - Hook `updateUserProfile` para atualização de dados e senha.
+  - Client do Supabase e client do Prisma com adapter PostgreSQL.
+  - Migration com o campo `phone` na tabela `User`.
+- **Changed**
+  - `PUT /api/users/[id]` agora valida token e impede atualização de IDs diferentes.
+  - Componentes de conta passaram a carregar dados do usuário autenticado.
+- **Removed**
+  - `src/lib/prisma.js` substituído por `src/lib/prisma/prisma.js`.
+- **Security**
+  - Validação de token Supabase e autorização por `id` na rota `PUT /api/users/[id]`.
+
+**Como testar**
+1. Abrir `/auth`, criar conta e confirmar o email (quando aplicável).
+2. Fazer login e confirmar o redirecionamento para `/cnfgContaUsers/minha_conta`.
+3. Validar que `/api/syncUser` retorna o usuário quando recebe `access_token` válido.
+4. Atualizar `name/email/phone` no formulário e verificar persistência via `PUT /api/users/[id]`.
+5. Tentar atualizar outro `id` e confirmar retorno 403.
+
+### v0.1.12 — 2026-02-12
+**Resumo**
+- Sub-rotas de Configurações da Conta com layout persistente e navegação interna.
+
+**Motivação**
+- Permitir troca de seções sem perder o header do módulo.
+- Organizar o conteúdo da conta do usuário em rotas claras e diretas.
+
+**Impacto**
+- Componentes afetados: `src/app/cnfgContaUsers/*`, `TopHeader`, `Header`, remoção da rota `src/app/mhCont`.
+- Compatibilidade: não — rota `/mhCont` removida.
+- Risco: médio — mudanças em rotas e navegação interna.
+
+**Mudanças**
+- **Added**
+  - `src/app/cnfgContaUsers/layout.jsx` para manter o header fixo e renderizar conteúdo variável.
+  - Sub-rotas `/cnfgContaUsers/minha-conta`, `/cnfgContaUsers/enderecos`, `/cnfgContaUsers/carteira`.
+  - Componente reutilizável `src/components/componemts-conta-users/layout/minha-conta.jsx`.
+- **Changed**
+  - `src/components/componemts-conta-users/layout/top.jsx` com navegação semântica e links para sub-rotas.
+  - `src/app/cnfgContaUsers/page.jsx` agora renderiza a seção “Minha conta” como padrão.
+  - `src/components/layout/Header.jsx` aponta “Configurações da Conta” para `/cnfgContaUsers`.
+- **Removed**
+  - Rota antiga `/mhCont` (arquivos em `src/app/mhCont/`).
+
+**Como testar**
+1. Abrir `/cnfgContaUsers` e confirmar que o header do módulo aparece.
+2. Clicar em “Minha conta”, “Meus endereços” e “Meus carteira” e validar que só o conteúdo abaixo muda.
+3. Acessar diretamente `/cnfgContaUsers/minha-conta`, `/enderecos`, `/carteira`.
+4. Confirmar que `/mhCont` não existe mais.
+
 ### v0.1.11 — 2026-02-12
 **Resumo**
 - Refinamentos do fluxo de favoritos com retorno pelo ícone do header e ajustes de documentação técnica do carrinho.
@@ -470,3 +744,4 @@ Slider -> ProductCard -> max-w-xs (fixo)
 Depois:
 Slider -> ProductCard -> max-w-xs (opcional)
 ```
+

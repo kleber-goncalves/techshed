@@ -1,0 +1,29 @@
+
+.link {
+    position: relative;
+    display: inline-block;
+}
+
+/* Linha base */
+.link::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    transform: translateX(-50%);
+    width: 0%;
+    height: 2.7px;
+    opacity: 0.5;
+    background-color: currentColor;
+    border-radius: 999px;
+
+    transition:
+        width 0.18s ease-out,
+        box-shadow 0.25s ease-out;
+
+    transition-delay: var(--delay, 0ms);
+}
+
+.link::after {
+   width: 100%;
+}

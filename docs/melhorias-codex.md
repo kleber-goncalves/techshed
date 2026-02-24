@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-02-12
-Branch: `feat/favoritos`
+Última atualização: 2026-02-24
+Branch: `refactor/header-auth-ui-modular`
 
 ## Visão Geral
 Objetivo: evoluir a estrutura do projeto e a qualidade do UI/UX de forma organizada e rastreável.
@@ -16,6 +16,42 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ```
 
 ## Melhorias Prioritárias
+
+### Sugestões Codex (catálogo em banco)
+1. Migrar leitura de catálogo para banco (remover dependência de `src/data/produtos.js` no runtime)
+- Criar camada única de leitura (`src/lib/catalogo-db.js`) e APIs de catálogo (`/api/catalogo` e `/api/catalogo/flat`).
+- Atualizar páginas/contexts que ainda importam `@/data/produtos`.
+- Só remover `src/data/produtos.js` após `rg` sem referências.
+
+2. Padronizar execução de seed no `package.json`
+- Adicionar scripts: `"db:seed:produtos": "node scripts/seed-produtos.js"` e `"db:catalogo:refresh": "npx prisma generate && node scripts/seed-produtos.js"`.
+- Facilitar onboarding e reprocessamento de catálogo.
+
+3. Garantir qualidade do seed com validação automatizada
+- Criar verificação pós-seed para contagens esperadas e produto com `promocao`.
+- Falhar cedo em CI/local quando houver regressão estrutural nos dados de catálogo.
+
+4. Hibrido carrinho/favoritos (localStorage + banco)
+- Criar modelos e APIs para sincronizar carrinho e favoritos por usuario.
+- Fazer merge no login e usar banco como fonte de verdade quando logado.
+- Manter localStorage apenas para usuario deslogado.
+
+### Sugestões Codex (header/auth e qualidade de código)
+1. Consolidar sessão do cliente em um `AuthContext` global
+- Evitar múltiplas assinaturas de `onAuthStateChange` em componentes distintos.
+- Expor `user`, `isAuthReady` e `logout` via contexto para reduzir duplicação.
+
+2. Cobertura de testes para `useHeaderAuth` e carrinho
+- Adicionar testes unitários para `getDisplayName/getInitials` e para o hook de auth.
+- Cobrir deduplicação e fluxo de sync do carrinho para evitar regressões silenciosas.
+
+3. Melhorar UX durante carregamento de autenticação no header
+- Exibir skeleton curto no bloco de usuário enquanto `isAuthReady` for `false`.
+- Reduzir “salto” visual entre estado desconhecido e estado autenticado/deslogado.
+
+4. Enrijecer menu de usuário para acessibilidade
+- Garantir labels explícitos e foco visível no trigger/avatar.
+- Revisar atalhos de teclado e navegação no dropdown para conformidade de UX.
 
 ## Prioridade e Esforço (Resumo)
 1. Remover Logs de Debug no Filtro — **Impacto:** médio, **Esforço:** baixo
@@ -32,6 +68,15 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 12. Carrinho: Testes Automatizados da Regra de Negócio — **Impacto:** alto, **Esforço:** médio
 13. Favoritos: Toggle de Retorno no Header — **Impacto:** alto, **Esforço:** baixo
 14. Favoritos: Testes E2E de Navegação e Persistência — **Impacto:** alto, **Esforço:** médio
+15. Conta do usuário: Nav ativo e acessibilidade do formulário — **Impacto:** médio, **Esforço:** baixo
+16. Conta do usuário: Padronizar rotas (kebab-case) e links do nav — **Impacto:** médio, **Esforço:** baixo
+17. Rotas de usuário: Autenticação e autorização completa — **Impacto:** alto, **Esforço:** médio
+18. Sincronização Supabase/Prisma de perfil — **Impacto:** médio, **Esforço:** médio
+19. Conta do usuário: UX segura para senha — **Impacto:** médio, **Esforço:** baixo
+20. Endereços: validação e mensagens de erro nas APIs — **Impacto:** médio, **Esforço:** baixo
+21. Endereços: reset de formulário e edição segura — **Impacto:** médio, **Esforço:** baixo
+22. Endereços: feedback de loading e estado vazio — **Impacto:** médio, **Esforço:** baixo
+23. Carteira: segurança e validações completas — **Impacto:** alto, **Esforço:** médio
 
 ### 1) Padronização de Pastas e Nomes
 **Descrição**
@@ -412,6 +457,253 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 **Risco**
 - Baixo: adiciona proteção sem alterar lógica de produção.
 
+### 15) Conta do Usuário: Nav ativo e acessibilidade do formulário
+**Descrição**
+- Aplicar estado ativo no menu de configurações da conta.
+- Corrigir acessibilidade do formulário (labels com `htmlFor` + `id`, `type="tel"`, botões dentro do form).
+
+**Benefícios**
+- Usuário entende em qual seção está.
+- Formulário mais acessível e semântico.
+
+**Checklist**
+- [ ] Aplicar classe ativa baseada na rota atual.
+- [ ] Ajustar `label` e `input` para IDs únicos.
+- [ ] Corrigir tipos de input e posição dos botões.
+- [ ] Validar navegação por teclado.
+
+**Plano de execução da melhoria**
+1. Usar `usePathname` no `TopHeader` e aplicar classe ativa no `Link` da rota atual.
+2. Ajustar `SectionInfP` para IDs únicos e `type="tel"`.
+3. Mover botões para dentro do `<form>` e definir `type="submit"`/`type="button"`.
+4. Testar navegação por teclado e foco visível.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 1–2 horas
+
+**Risco**
+- Baixo: mudanças pontuais e isoladas.
+
+### 16) Conta do Usuário: Padronizar rotas (kebab-case) e links do nav
+**Descrição**
+- Definir padrão único para rotas de conta (kebab-case recomendado).
+- Atualizar links e imports para evitar mistura com `snake_case`.
+
+**Benefícios**
+- URLs mais legíveis e consistentes.
+- Menos chance de erro ao digitar rotas.
+
+**Checklist**
+- [ ] Definir padrão (kebab-case).
+- [ ] Renomear pastas de rotas e ajustar links do nav.
+- [ ] Atualizar imports dos componentes ligados às rotas.
+- [ ] Validar navegação direta nas rotas.
+
+**Plano de execução da melhoria**
+1. Mapear rotas atuais em `/cnfgContaUsers/*`.
+2. Renomear para kebab-case e ajustar `TopHeader`.
+3. Revisar imports e links em `Header` e páginas relacionadas.
+4. Testar navegação manual nas rotas.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 1–2 horas
+
+**Risco**
+- Baixo: mudanças apenas em paths e links.
+
+### 17) Rotas de usuário: Autenticação e autorização completa
+**Descrição**
+- Proteger `GET /api/users`, `POST /api/users` e `DELETE /api/users/[id]`.
+- Evitar que usuários autenticados manipulem dados de terceiros.
+
+**Benefícios**
+- Reduz risco de exposição/alteração indevida de dados.
+- Fluxo de API coerente com o `PUT /api/users/[id]` já protegido.
+
+**Checklist**
+- [ ] Exigir `Authorization: Bearer` nas rotas de usuário.
+- [ ] Validar token com Supabase em todas as rotas.
+- [ ] Restringir o escopo ao `user.id` autenticado.
+- [ ] Adicionar mensagens de erro padronizadas (401/403).
+
+**Plano de execução da melhoria**
+1. Criar helper de validação do token para reutilizar nas rotas.
+2. Aplicar validação em `GET`, `POST` e `DELETE`.
+3. Garantir que o `id` da URL pertença ao usuário autenticado.
+4. Ajustar documentação e testes manuais.
+
+**Estimativa**
+- Esforço: médio
+- Tempo: 0,5–1 dia
+
+**Risco**
+- Médio: pode exigir ajustes em fluxos que hoje assumem API aberta.
+
+### 18) Sincronização Supabase/Prisma de perfil
+**Descrição**
+- Manter `name`, `email` e `phone` consistentes entre Supabase e Prisma.
+- Ao logar, sincronizar `user_metadata` do Supabase com o banco local.
+
+**Benefícios**
+- Evita divergência de dados entre autenticação e perfil.
+- Facilita manutenção do perfil no front.
+
+**Checklist**
+- [ ] Ao `syncUser`, copiar `user_metadata.full_name` e `phone` para o Prisma.
+- [ ] Ao atualizar perfil, atualizar Supabase `user_metadata` junto do Prisma.
+- [ ] Definir regra para atualização de `email` (Supabase primeiro).
+- [ ] Garantir fallback quando `user_metadata` não existir.
+
+**Plano de execução da melhoria**
+1. Ajustar `POST /api/syncUser` para persistir `name` e `phone` quando existir.
+2. Atualizar `updateUserProfile` para escrever também em `supabase.auth.updateUser`.
+3. Tratar atualização de email com fluxo seguro (ex.: confirmação por email).
+4. Atualizar documentação e validar cenário de login + edição.
+
+**Estimativa**
+- Esforço: médio
+- Tempo: 0,5–1 dia
+
+**Risco**
+- Médio: mudança em dados sensíveis (email) exige cautela.
+
+### 19) Conta do usuário: UX segura para senha
+**Descrição**
+- Remover exibição direta de senha na UI.
+- Substituir por texto informativo e ação clara de troca de senha.
+
+**Benefícios**
+- Evita confusão do usuário e exposição indevida.
+- Melhora alinhamento com boas práticas de segurança.
+
+**Checklist**
+- [ ] Remover `user.password` da UI.
+- [ ] Exibir máscara ou texto (“Senha protegida”).
+- [ ] Garantir ação de troca de senha no formulário.
+
+**Plano de execução da melhoria**
+1. Ajustar `inf-log.jsx` para não renderizar `user.password`.
+2. Inserir texto informativo e CTA para “Alterar senha”.
+3. Validar fluxo no formulário de perfil.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 30–60 min
+
+**Risco**
+- Baixo: mudança apenas visual e de UX.
+
+### 20) Endereços: validação e mensagens de erro nas APIs
+**Descrição**
+- Validar `label`, `street`, `city`, `state`, `zipCode` no backend.
+- Retornar erros claros (400) quando faltar dados obrigatórios.
+
+**Benefícios**
+- Evita salvar dados incompletos.
+- Facilita debug e melhora a UX.
+
+**Checklist**
+- [ ] Validar payload no `POST /api/addresses`.
+- [ ] Validar payload no `PUT /api/addresses/[id]`.
+- [ ] Retornar mensagens padronizadas por campo.
+
+**Plano de execução da melhoria**
+1. Criar função de validação (schema simples ou manual).
+2. Reutilizar no `POST` e `PUT`.
+3. Ajustar front para exibir erros no modal.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 1–2 horas
+
+**Risco**
+- Baixo: ajustes simples de validação.
+
+### 21) Endereços: reset de formulário e edição segura
+**Descrição**
+- Garantir que o formulário seja resetado ao abrir modal.
+- Evitar reutilizar estado de endereço anterior quando cria um novo.
+
+**Benefícios**
+- Evita campos com valores antigos.
+- Deixa o fluxo de criação/edição mais claro para o usuário.
+
+**Checklist**
+- [ ] Resetar state do formulário quando `initialData` mudar.
+- [ ] Usar `useEffect` no modal para sincronizar dados.
+- [ ] Validar criação após edição.
+
+**Plano de execução da melhoria**
+1. Adicionar `useEffect` no `AddressFormModal` para resetar o form.
+2. Testar editar → cancelar → criar novo.
+3. Ajustar se necessário.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 30–60 min
+
+**Risco**
+- Baixo: mudança local no modal.
+
+### 22) Endereços: feedback de loading e estado vazio
+**Descrição**
+- Exibir loading enquanto endereços carregam.
+- Mostrar mensagem amigável quando não houver endereços.
+
+**Benefícios**
+- UX mais clara para o usuário.
+- Evita “tela vazia” sem contexto.
+
+**Checklist**
+- [ ] Adicionar estado `loading` no `useAddresses`.
+- [ ] Renderizar placeholder de carregamento.
+- [ ] Mostrar empty state quando `addresses.length === 0`.
+
+**Plano de execução da melhoria**
+1. Adicionar estado `loading` no hook.
+2. Ajustar `section-end.jsx` para mostrar loading/empty.
+3. Revisar layout da lista.
+
+**Estimativa**
+- Esforço: baixo
+- Tempo: 1–2 horas
+
+**Risco**
+- Baixo: mudanças simples de UI/estado.
+
+### 23) Carteira: segurança e validações completas
+**Descrição**
+- Evitar armazenar número completo do cartão no banco.
+- Validar `expMonth` e `expYear` no backend.
+- Padronizar o endpoint de exclusão com `/api/cards/[id]`.
+
+**Benefícios**
+- Reduz risco de exposição de dados sensíveis.
+- Melhora consistência entre front e API.
+- Evita salvar cartões expirados ou inválidos.
+
+**Checklist**
+- [ ] Armazenar apenas `last4`, `brand` e dados de expiração no banco.
+- [ ] Sanitizar `number` (remover espaços) antes de processar.
+- [ ] Validar `expMonth` (1–12) e `expYear` (>= ano atual).
+- [ ] Ajustar `deleteCard` para usar `DELETE /api/cards/[id]`.
+- [ ] Revisar mensagens de erro e status 400/401.
+
+**Plano de execução da melhoria**
+1. Criar helper de sanitização e extrair `last4` no backend.
+2. Atualizar o modelo Prisma para armazenar `last4` (se necessário) e remover o número completo.
+3. Ajustar API de criação para validar expiração e persistir dados mínimos.
+4. Atualizar o front para consumir `last4` e atualizar o fluxo de exclusão.
+
+**Estimativa**
+- Esforço: médio
+- Tempo: 0,5–1 dia
+
+**Risco**
+- Médio: envolve mudança em schema e ajustes de API/front.
+
 ## Roadmap Visual (ASCII)
 ```
 [Arquitetura] ---> [Footer Responsivo] ---> [Dados Centralizados]
@@ -435,3 +727,12 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-11: Incluida melhoria de automacao para lock do dev server no Windows.
 - 2026-02-11: Incluidas melhorias de evolucao do carrinho (totais reais e testes automatizados).
 - 2026-02-12: Incluidas melhorias de favoritos (toggle de retorno no header e testes E2E).
+- 2026-02-12: Incluida melhoria de conta do usuario (nav ativo e acessibilidade do formulario).
+- 2026-02-13: Incluida melhoria de padronizacao das rotas de conta (kebab-case).
+- 2026-02-17: Incluidas melhorias de seguranca das rotas de usuario, sincronizacao Supabase/Prisma e UX segura para senha.
+- 2026-02-17: Incluidas melhorias para validacao, reset e UX do fluxo de enderecos.
+- 2026-02-18: Incluida melhoria de seguranca e validacoes completas para o fluxo de carteira.
+- 2026-02-24: Incluidas sugestoes de evolucao para arquitetura de auth global, testes de header/carrinho e UX de carregamento no header.
+
+
+

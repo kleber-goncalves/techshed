@@ -1,7 +1,5 @@
-
-
-import { produtos } from "@/data/produtos";
 import { categorySlugMap, navCategories } from "@/data/categories";
+import { getCatalogoAgrupado } from "@/lib/catalogo-db";
 
 import CategoryPageClient from "./CategoryPageClient";
 
@@ -16,15 +14,8 @@ export default async function Categoria({ params }) {
             (categoria) => categoria.slug === key || categoria.slug === slug,
         )?.label ?? slug;
 
-    const listaCompleta = Object.values(produtos).flat();
-    const listaPorChave = produtos[key];
-
-    const produtosCategoria = Array.isArray(listaPorChave)
-        ? listaPorChave
-        : listaCompleta.filter(
-              (produto) =>
-                  produto.category === slug || produto.category === key,
-          );
+    const catalogo = await getCatalogoAgrupado();
+    const produtosCategoria = Array.isArray(catalogo[key]) ? catalogo[key] : [];
 
     if (produtosCategoria.length === 0) {
         return (

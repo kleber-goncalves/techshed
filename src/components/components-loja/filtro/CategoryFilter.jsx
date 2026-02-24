@@ -33,7 +33,6 @@ export default function CategoryFilter({
 }) {
     const handleSelectCategory = (value) => {
         setFilters({ ...filters, category: value });
-        console.log("Categoria selecionada:", value); // debug: ver no console do navegador
     };
 
     const data = Array.isArray(categories) ? categories : DEFAULT_CATEGORIES;
