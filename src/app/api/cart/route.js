@@ -42,19 +42,32 @@ export async function PUT(request) {
     const rawsItems = Array.isArray(body?.items) ? body.items : [];
 
     const items = rawsItems
-        .filter((item) => typeof item?.productId === "string" && item.productId.trim()).map((item) => ({
+        .filter(
+            (item) =>
+                typeof item?.productId === "string" && item.productId.trim(),
+        )
+        .map((item) => ({
             userId: user.id,
             productId: item.productId.trim(),
             variantId: toDbvariantId(item.variantId),
             quantity: Math.max(1, Math.trunc(Number(item.quantity) || 1)),
         }));
 
+    const unique = new Map();
+    items.forEach((item) => {
+        unique.set(`${item.productId}::${item.variantId}`, item);
+    });
+    const dedupedItems = Array.from(unique.values());
+
     await prisma.$transaction(async (tx) => {
         await tx.cartItem.deleteMany({ where: { userId: user.id } });
-        if (items.length) {
-            await tx.cartItem.createMany({ data: items });
+        if (dedupedItems.length) {
+            await tx.cartItem.createMany({
+                data: dedupedItems,
+                skipDuplicates: true,
+            });
         }
     });
 
-    return Response.json({ success: true, count: items.length });
+    return Response.json({ success: true, count: dedupedItems.length });
 }

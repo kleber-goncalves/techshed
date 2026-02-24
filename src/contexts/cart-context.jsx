@@ -334,10 +334,11 @@ export function CartProvider({ children }) {
                     quantity: item.quantity,
                 }));
 
-                const merged = sanitizeLines(
-                    [...normalizedServerLines, ...lines],
-                    productIndex,
-                );
+                const baseLines =
+                    normalizedServerLines.length > 0
+                        ? normalizedServerLines
+                        : lines;
+                const merged = sanitizeLines(baseLines, productIndex);
 
                 if (canceled) return;
 

@@ -4,7 +4,7 @@ Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
 Última atualização: 2026-02-24
-Branch: `feat/favrt-cart-db-api`
+Branch: `refactor/header-auth-ui-modular`
 
 ## Visão Geral
 Objetivo: evoluir a estrutura do projeto e a qualidade do UI/UX de forma organizada e rastreável.
@@ -35,6 +35,23 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - Criar modelos e APIs para sincronizar carrinho e favoritos por usuario.
 - Fazer merge no login e usar banco como fonte de verdade quando logado.
 - Manter localStorage apenas para usuario deslogado.
+
+### Sugestões Codex (header/auth e qualidade de código)
+1. Consolidar sessão do cliente em um `AuthContext` global
+- Evitar múltiplas assinaturas de `onAuthStateChange` em componentes distintos.
+- Expor `user`, `isAuthReady` e `logout` via contexto para reduzir duplicação.
+
+2. Cobertura de testes para `useHeaderAuth` e carrinho
+- Adicionar testes unitários para `getDisplayName/getInitials` e para o hook de auth.
+- Cobrir deduplicação e fluxo de sync do carrinho para evitar regressões silenciosas.
+
+3. Melhorar UX durante carregamento de autenticação no header
+- Exibir skeleton curto no bloco de usuário enquanto `isAuthReady` for `false`.
+- Reduzir “salto” visual entre estado desconhecido e estado autenticado/deslogado.
+
+4. Enrijecer menu de usuário para acessibilidade
+- Garantir labels explícitos e foco visível no trigger/avatar.
+- Revisar atalhos de teclado e navegação no dropdown para conformidade de UX.
 
 ## Prioridade e Esforço (Resumo)
 1. Remover Logs de Debug no Filtro — **Impacto:** médio, **Esforço:** baixo
@@ -715,6 +732,7 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-17: Incluidas melhorias de seguranca das rotas de usuario, sincronizacao Supabase/Prisma e UX segura para senha.
 - 2026-02-17: Incluidas melhorias para validacao, reset e UX do fluxo de enderecos.
 - 2026-02-18: Incluida melhoria de seguranca e validacoes completas para o fluxo de carteira.
+- 2026-02-24: Incluidas sugestoes de evolucao para arquitetura de auth global, testes de header/carrinho e UX de carregamento no header.
 
 
 

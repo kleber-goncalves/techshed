@@ -67,6 +67,43 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.20 - 2026-02-24
+**Resumo**
+- Refatoracao modular do Header com auth/logout no Supabase, exibicao de nome do usuario e correcoes de sincronizacao/deduplicacao do carrinho.
+
+**Motivacao**
+- Reduzir complexidade do `Header` (responsabilidades separadas) e melhorar manutencao.
+- Corrigir inconsistencias no carrinho quando havia itens duplicados ou falha de persistencia.
+- Registrar arquitetura backend atual em formato visual e textual.
+
+**Impacto**
+- Componentes afetados: `src/components/layout/Header.jsx`, `src/components/layout/header/*`, `src/lib/helpers/userDisplay.js`, `src/contexts/cart-context.jsx`, `src/app/api/cart/route.js`, `src/lib/helpers/api/cartApi.js`, `docs/arquitetura-backend.*`, `docs/estrutura-pasta-extenção.md`.
+- Compatibilidade: sim - sem quebra de rotas publicas; alteracao estrutural interna no Header.
+- Risco: medio - mudancas em fluxo de auth no client e sincronizacao de carrinho.
+
+**Mudancas**
+- **Added**
+  - `HeaderBrandSearch`, `HeaderUserSection` e `HeaderQuickActions` para dividir responsabilidades do Header.
+  - Hook `useHeaderAuth` para centralizar sessao/auth/logout do Header.
+  - Helper `src/lib/helpers/userDisplay.js` para nome exibido e iniciais do avatar.
+  - Documentacao visual da arquitetura backend (`docs/arquitetura-backend.excalidraw` + PNGs + `docs/arquitetura-backend.md`).
+  - Snapshot de estrutura de pastas em `docs/estrutura-pasta-extenção.md`.
+- **Changed**
+  - `Header.jsx` virou orquestrador enxuto, consumindo subcomponentes.
+  - Menu de usuario passou a exibir nome do usuario logado e opcoes de login para visitante.
+  - Fluxo de logout no Header agora usa `supabase.auth.signOut()`, limpa carrinho/favoritos locais e evita redirecionamento forcado.
+  - Sync do carrinho no contexto prioriza estado do servidor quando existir.
+- **Fixed**
+  - `PUT /api/cart` agora deduplica itens por `productId + variantId` antes de gravar e usa `skipDuplicates`.
+  - `saveCartItems` agora trata `res.ok` e retorna erro explicito em falhas HTTP.
+
+**Como testar**
+1. Fazer login e validar nome do usuario no Header (trigger + menu).
+2. Clicar em `Sair` e confirmar limpeza de carrinho/favoritos sem redirecionamento.
+3. Validar que visitante ve `Criar a sua conta` e `Entre` no Header.
+4. Adicionar itens repetidos no carrinho e confirmar que a API persiste sem duplicidade.
+5. Recarregar com usuario logado e validar sincronizacao do carrinho priorizando servidor.
+
 ### v0.1.19 - 2026-02-24
 **Resumo**
 - Hibrido de carrinho e favoritos com sync no Supabase e fallback no localStorage.
