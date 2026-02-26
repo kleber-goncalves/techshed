@@ -244,7 +244,7 @@
 │   │   │   └── 📁 [categoria]
 │   │   │       ├── 📄 CategoryPageClient.jsx
 │   │   │       └── 📄 page.jsx
-│   │   ├── 📁 cnfgContaUsers
+│   │   ├── 📁 account
 │   │   │   ├── 📁 meus_enderecos
 │   │   │   │   └── 📄 page.jsx
 │   │   │   ├── 📁 minha_carteira
