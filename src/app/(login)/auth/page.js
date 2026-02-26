@@ -9,12 +9,11 @@ export default function AuthPage() {
     const [password, setPassword] = useState("");
     const router = useRouter();
 
-
-/**
- * Tenta criar uma conta no Supabase com o email e senha fornecidos.
- * Se houver erro, alerta o erro.
- * Se a conta for criada com sucesso, alerta que a conta foi criada e pede para verificar o email.
- */
+    /**
+     * Tenta criar uma conta no Supabase com o email e senha fornecidos.
+     * Se houver erro, alerta o erro.
+     * Se a conta for criada com sucesso, alerta que a conta foi criada e pede para verificar o email.
+     */
     const handleSignUp = async () => {
         const { data, error } = await supabase.auth.signUp({
             email,
@@ -25,42 +24,40 @@ export default function AuthPage() {
         else alert("Conta criada! Verifique seu email.");
     };
 
+    /**
+     * Tenta fazer login no Supabase com o email e senha fornecidos.
+     * Se houver erro, alerta o erro.
+     * Se o login for feito com sucesso, manda o token do Supabase para o backend
+     * e redireciona para a pagina de perfil.
+     */
 
-/**
- * Tenta fazer login no Supabase com o email e senha fornecidos.
- * Se houver erro, alerta o erro.
- * Se o login for feito com sucesso, manda o token do Supabase para o backend
- * e redireciona para a pagina de perfil.
- */
-
-async function handleLogin() {
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-    });
-
-    if (error) {
-        alert(error.message);
-        return;
-    }
-
-    if (data.session) {
-        // Vai mandar o token pro backend
-        await fetch("/api/syncUser", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                access_token: data.session.access_token,
-            }),
+    async function handleLogin() {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
         });
 
-        // Redireciona logo depois
-        router.push("/cnfgContaUsers/minha_conta");
-    }
-}
+        if (error) {
+            alert(error.message);
+            return;
+        }
 
+        if (data.session) {
+            // Vai mandar o token pro backend
+            await fetch("/api/syncUser", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    access_token: data.session.access_token,
+                }),
+            });
+
+            // Redireciona logo depois
+            router.push("/account/minha_conta");
+        }
+    }
 
     return (
         <div style={{ padding: "20px" }}>
@@ -80,8 +77,10 @@ async function handleLogin() {
                 onChange={(e) => setPassword(e.target.value)}
             />
 
-            <button  onClick={handleSignUp}>Criar Conta</button>
-            <button className="cursor-pointer" onClick={handleLogin}>Entrar</button>
+            <button onClick={handleSignUp}>Criar Conta</button>
+            <button className="cursor-pointer" onClick={handleLogin}>
+                Entrar
+            </button>
         </div>
     );
 }

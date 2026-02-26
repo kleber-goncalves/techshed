@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-page-custom-font */
 
-import Footer from "@/components/layout/footer";
+import Footer from "@/layout/footer";
 import { Providers } from "../provider/providers";
 
 import "../style/globals.css";
-import Header from "@/components/layout/Header";
-import CentralAjuda from "@/components/layout/Central-ajuda";
+import Header from "@/layout/Header";
+import CentralAjuda from "@/layout/Central-ajuda";
 import Nav from "@/components/nav";
 
 export default function RootLayout({ children }) {
@@ -26,10 +26,10 @@ export default function RootLayout({ children }) {
             <body className="min-h-screen bg-gray-50 dark:bg-black transition-colors duration-300 ease-in-out">
                 <Providers>
                     <Header />
-                    <Nav/>
+                    <Nav />
                     <main>{children}</main>
                     <section className="flex flex-col px-7 py-12">
-                       <CentralAjuda/>
+                        <CentralAjuda />
                         <Footer />
                     </section>
                 </Providers>
