@@ -76,6 +76,44 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.23 - 2026-03-06
+
+**Resumo**
+
+- Redesign profissional do painel admin de produtos com `shadcn/ui`, componentização por seções reutilizáveis e correção de persistência de `features` no update.
+
+**Motivação**
+
+- Elevar a qualidade visual e a legibilidade do painel admin para uso real em operação.
+- Reduzir acoplamento no `AdminProdutosClient` com separação clara de responsabilidades.
+- Corrigir inconsistência funcional onde `features` era enviado pelo front mas não persistia no `PUT`.
+
+**Impacto**
+
+- Componentes afetados: `src/app/(privado)/admin/deshboard/_components/AdminProdutosClient.jsx`, `src/app/(privado)/admin/deshboard/_components/AdminAccessGate.jsx`, `src/app/(privado)/admin/deshboard/loading.jsx`, `src/app/(privado)/admin/deshboard/page.jsx`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/*`, `src/components/ui/{badge,card,input,separator,skeleton,switch,table,textarea}.jsx`, `src/app/api/admin/products/[id]/route.js`.
+- Compatibilidade: sim - sem quebra de endpoints/rotas existentes no fluxo atual.
+- Risco: médio - mudança ampla de UI no painel e nova composição de componentes.
+
+**Mudanças**
+
+- **Added**
+    - Novos componentes de UI baseados em `shadcn/ui`: `card`, `input`, `textarea`, `badge`, `table`, `skeleton`, `separator`, `switch`.
+    - Nova pasta modular `admin-produtos` com seções reutilizáveis (`DashboardHeader`, `KpiSection`, `FeedbackBanners`, `ProductsSection`, `ProductFormSection`, `ProductStatusBadge`) e utilitários (`constants`, `utils`).
+- **Changed**
+    - `AdminProdutosClient` refatorado para papel de orquestrador (estado, regras e fluxo), delegando renderização para componentes reutilizáveis.
+    - UX do dashboard modernizada com KPIs, tabela com filtro de status, skeleton, estado vazio e formulário organizado por seções.
+    - `AdminAccessGate` e `loading.jsx` alinhados visualmente com o novo padrão de painel.
+- **Fixed**
+    - `PUT /api/admin/products/[id]` agora aceita e persiste o campo `features`.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard` como admin e validar renderização do novo layout com KPIs, busca/filtro e tabela.
+2. Selecionar produto, editar campos e salvar; confirmar persistência no refresh.
+3. Editar `features` (multilinha), salvar e validar atualização no banco.
+4. Desativar produto via diálogo de confirmação e confirmar status inativo na listagem.
+5. Executar `npm run lint` e `npm run build` e confirmar sucesso.
+
 ### v0.1.22 - 2026-03-06
 
 **Resumo**

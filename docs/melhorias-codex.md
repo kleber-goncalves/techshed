@@ -4,7 +4,7 @@ Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
 Última atualização: 2026-03-06
-Branch: `feat/dashboard-admin`
+Branch: `style/painel-dashboard`
 
 ## Visão Geral
 
@@ -18,6 +18,28 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ```
 
 ## Melhorias Prioritárias
+
+### Sugestões Codex (dashboard admin: evolução pós-componentização)
+
+1. Mover edição de produto para página dedicada (`/admin/deshboard/settingsProduct/[id]`)
+
+- Hoje a lista e o formulário convivem na mesma tela; com crescimento de campos isso reduz foco e escalabilidade.
+- Recomendação: manter `/admin/deshboard` como index (lista/KPIs) e abrir editor em rota própria.
+
+2. Criar fluxo de criação dedicado (`/admin/deshboard/settingsProduct/new`)
+
+- Botão “Novo produto” passaria a abrir uma página de criação com o mesmo `ProductFormSection`.
+- Benefício: reaproveitamento de componente com menor acoplamento e URL compartilhável.
+
+3. Expor `GET /api/admin/products/[id]` para hidratação de editor
+
+- O editor dedicado precisa carregar um produto por ID de forma direta.
+- Isso simplifica cache, reload da página e futura instrumentação de auditoria.
+
+4. Adicionar testes E2E do fluxo admin de produtos
+
+- Cenários mínimos: listar, buscar, criar, editar, atualizar `features`, desativar e validar status na tabela.
+- Objetivo: proteger a nova arquitetura modular contra regressões em deploy.
 
 ### Sugestões Codex (painel admin: segurança e experiência)
 
@@ -960,3 +982,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-17: Incluidas melhorias para validacao, reset e UX do fluxo de enderecos.
 - 2026-02-18: Incluida melhoria de seguranca e validacoes completas para o fluxo de carteira.
 - 2026-02-24: Incluidas sugestoes de evolucao para arquitetura de auth global, testes de header/carrinho e UX de carregamento no header.
+- 2026-03-06: Incluidas sugestoes de evolucao do dashboard admin apos componentizacao (edicao em rota dedicada, GET por id e E2E).

@@ -53,6 +53,13 @@ export async function PUT(request, { params }) {
     if ("catalogKey" in body) data.catalogKey = toText(body.catalogKey);
     if ("promocao" in body) data.promocao = toText(body.promocao) || null;
     if ("isActive" in body) data.isActive = Boolean(body.isActive);
+    if ("features" in body) {
+        const features = toStringArray(body.features);
+        if (features === null) {
+            return Response.json({ error: "features invalido" }, { status: 400 });
+        }
+        data.features = features;
+    }
 
     if ("priceCents" in body) {
         const priceCents = toInt(body.priceCents);
