@@ -76,6 +76,46 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.22 - 2026-03-06
+
+**Resumo**
+
+- Protecao completa do painel admin com verificacao previa de permissao, fallback de 404 para nao-admin e loading customizado no App Router.
+
+**Motivacao**
+
+- Evitar que usuarios sem role admin visualizem o painel ou mensagens de permissao desnecessarias.
+- Melhorar UX durante a verificacao de acesso com feedback de carregamento.
+- Organizar a autorizacao em fluxo claro: check rapido -> gate -> render do painel.
+
+**Impacto**
+
+- Componentes afetados: `src/lib/helpers/server/auth/adminAuth.js`, `src/app/api/admin/check/route.js`, `src/lib/helpers/api/adminProductsApi.js`, `src/app/(privado)/admin/deshboard/_components/AdminAccessGate.jsx`, `src/app/(privado)/admin/deshboard/loading.jsx`, `src/app/(privado)/admin/deshboard/page.jsx`, `src/app/(privado)/admin/deshboard/_components/AdminProdutosClient.jsx`, `docs/admin-dashboard-branch.md`.
+- Compatibilidade: sim - sem quebra de rotas publicas; endurecimento de acesso no painel admin.
+- Risco: medio - alteracao de comportamento de autorizacao (403 textual -> 404 + redirecionamento).
+
+**Mudancas**
+
+- **Added**
+    - Endpoint `GET /api/admin/check` para validar permissao admin antes de montar a tela.
+    - Componente `AdminAccessGate` para bloquear renderizacao ate finalizar verificacao de acesso.
+    - `loading.jsx` no segmento de rota admin com UI de carregamento customizada.
+    - Documentacao didatica da branch em `docs/admin-dashboard-branch.md`.
+- **Changed**
+    - `requireAdmin` passou a retornar `404` para usuarios nao-admin.
+    - `authFetch` no client admin agora propaga `error.status` para tratamento de fluxo.
+    - `page.jsx` do dashboard passou a envolver o painel com `AdminAccessGate`.
+- **Fixed**
+    - Ajuste de URL em `createAdminProduct` para caminho absoluto (`/api/admin/products`).
+    - Fallback no `AdminProdutosClient` para redirecionar `/404` em respostas de autorizacao.
+
+**Como testar**
+
+1. Logar com usuario admin e abrir `/admin/deshboard` (deve exibir loading e depois abrir painel).
+2. Logar com usuario nao-admin e abrir `/admin/deshboard` (deve redirecionar para `/404`).
+3. Forcar sessao expirada e validar bloqueio de acesso nas chamadas do painel.
+4. Executar acoes de CRUD de produtos com admin e confirmar funcionamento normal.
+
 ### v0.1.21 - 2026-02-26
 
 **Resumo**

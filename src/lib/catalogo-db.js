@@ -13,11 +13,13 @@ function mapProdutos(p) {
         id: p.id,
         slug: p.slug,
         name: p.name,
+        description: p.description ?? "",
         img: p.img,
         alt: p.alt,
         priceCents: p.priceCents,
         stock: p.stock,
         category: p.category,
+        isActive: p.isActive,
         features: p.features ?? [],
         promocao: p.promocao ?? undefined,
         colors: (p.variantes ?? []).map((v) => ({
@@ -33,8 +35,9 @@ function mapProdutos(p) {
     };
 }
 
-export async function getCatalogoAgrupado() {
+export async function getCatalogoAgrupado({ includeInactive = false } = {}) {
     const rows = await prisma.produto.findMany({
+        where: includeInactive ? undefined : { isActive: true },
         include: { variantes: true },
         orderBy: { category: "asc" },
     });
@@ -46,6 +49,7 @@ export async function getCatalogoAgrupado() {
     }
     return grouped;
 }
+
 
 export async function getCatalogoFlat() {
     const grouped = await getCatalogoAgrupado();

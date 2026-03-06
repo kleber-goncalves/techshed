@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-02-26
-Branch: `refactor/arquitetura-pastas`
+Última atualização: 2026-03-06
+Branch: `feat/dashboard-admin`
 
 ## Visão Geral
 
@@ -18,6 +18,33 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ```
 
 ## Melhorias Prioritárias
+
+### Sugestões Codex (painel admin: segurança e experiência)
+
+1. Migrar a checagem de admin para fluxo server-side completo
+
+- Hoje a verificação principal acontece no client (`AdminAccessGate`) com endpoint de check.
+- Evolução recomendada: usar `@supabase/ssr` + cookies no servidor para bloquear mais cedo (layout/page server) e reduzir flicker.
+
+2. Criar guard reutilizável por papel de acesso (RBAC)
+
+- Generalizar o gate para `AccessGate` com suporte a roles (`ADMIN`, `CUSTOMER`, futuras roles).
+- Evitar duplicação ao proteger futuras áreas administrativas.
+
+3. Padronizar a rota `/admin/deshboard` para `/admin/dashboard`
+
+- Corrigir typo para melhorar legibilidade e consistência de URLs.
+- Incluir redirect temporário para manter compatibilidade e evitar links quebrados.
+
+4. Cobrir fluxo de autorização admin com testes E2E
+
+- Cenários mínimos: admin entra, não-admin recebe 404, sessão expirada bloqueia acesso.
+- Garantir que regressões de permissão sejam detectadas automaticamente no CI.
+
+5. Observabilidade para falhas de autorização
+
+- Adicionar logs estruturados no backend (`admin/check` e `requireAdmin`) com motivo de bloqueio.
+- Facilitar diagnóstico de problemas de role/token em produção.
 
 ### Sugestões Codex (pós-refatoração de arquitetura)
 
