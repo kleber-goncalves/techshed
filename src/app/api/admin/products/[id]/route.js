@@ -32,6 +32,25 @@ function slugify(value) {
         .replace(/(^-|-$)/g, "");
 }
 
+export async function GET(request, { params }) {
+    const auth = await requireAdmin(request);
+    if (auth.error) return auth.error;
+    
+    const { id } = await params;
+
+    const product = await prisma.produto.findUnique({
+        where: { id },
+        include: { variantes: true },
+    });
+
+    if (!product) {
+        return Response.json({ error: "Produto não encontrado" }, { status: 404 });
+    }
+
+    return Response.json(product);
+}
+
+
 export async function PUT(request, { params }) {
     const auth = await requireAdmin(request);
     if (auth.error) return auth.error;

@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-03-06
-Branch: `style/painel-dashboard`
+Última atualização: 2026-03-07
+Branch: `refactor/painel-dashboard`
 
 ## Visão Geral
 
@@ -18,6 +18,28 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ```
 
 ## Melhorias Prioritárias
+
+### Sugestões Codex (editor dedicado `settingsProduct`)
+
+1. Adicionar botão de “Voltar com contexto” para manter busca/filtro do painel
+
+- Hoje o retorno vai para `/admin/deshboard` sem preservar estado anterior.
+- Recomendo salvar `q` e `statusFilter` na URL (ou `sessionStorage`) e restaurar ao voltar.
+
+2. Criar estado de carregamento visual no editor (`Skeleton`)
+
+- A tela de edição já mostra texto de loading; evoluir para skeleton melhora percepção de desempenho.
+- Reduz salto visual quando o produto é carregado por ID.
+
+3. Proteger saída com alterações não salvas
+
+- Detectar dirty state no formulário e confirmar navegação antes de sair da tela.
+- Evita perda de edição acidental em fluxos longos.
+
+4. Cobertura E2E do fluxo completo de edição por rota
+
+- Cenários: listagem -> editar -> salvar -> voltar, listagem -> novo -> criar -> redirecionar para `[id]`, desativar produto.
+- Garante estabilidade da nova arquitetura baseada em rota dedicada.
 
 ### Sugestões Codex (dashboard admin: evolução pós-componentização)
 
@@ -983,3 +1005,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-18: Incluida melhoria de seguranca e validacoes completas para o fluxo de carteira.
 - 2026-02-24: Incluidas sugestoes de evolucao para arquitetura de auth global, testes de header/carrinho e UX de carregamento no header.
 - 2026-03-06: Incluidas sugestoes de evolucao do dashboard admin apos componentizacao (edicao em rota dedicada, GET por id e E2E).
+- 2026-03-07: Incluidas sugestoes de evolucao para o editor dedicado settingsProduct (contexto de retorno, skeleton, dirty state e E2E).

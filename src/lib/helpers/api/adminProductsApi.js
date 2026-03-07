@@ -7,6 +7,10 @@ async function getToken() {
     return session?.access_token;
 }
 
+export function getAdminProduct(id) {
+    return authFetch(`/api/admin/products/${id}`);
+}
+
 async function authFetch(url, init = {}) {
     const token = await getToken();
     if (!token) {

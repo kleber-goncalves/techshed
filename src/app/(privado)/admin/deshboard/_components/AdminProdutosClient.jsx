@@ -3,22 +3,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-    archiveAdminProduct,
-    createAdminProduct,
     listAdminProducts,
-    updateAdminProduct,
 } from "@/lib/helpers/api/adminProductsApi";
 import DashboardHeader from "./admin-produtos/DashboardHeader";
 import KpiSection from "./admin-produtos/KpiSection";
 import FeedbackBanners from "./admin-produtos/FeedbackBanners";
 import ProductsSection from "./admin-produtos/ProductsSection";
-import ProductFormSection from "./admin-produtos/ProductFormSection";
-import { createEmptyProductForm } from "./admin-produtos/constants";
 import {
     buildMetrics,
     filterProductsByStatus,
-    toForm,
-    toPayload,
+
 } from "./admin-produtos/utils";
 
 export default function AdminProdutosClient() {
@@ -27,18 +21,11 @@ export default function AdminProdutosClient() {
     const [products, setProducts] = useState([]);
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
-    const [selectedId, setSelectedId] = useState(null);
-    const [form, setForm] = useState(() => createEmptyProductForm());
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
-    const selectedProduct = useMemo(
-        () => products.find((product) => product.id === selectedId) ?? null,
-        [products, selectedId],
-    );
+
 
     const filteredProducts = useMemo(
         () => filterProductsByStatus(products, statusFilter),
@@ -72,87 +59,17 @@ export default function AdminProdutosClient() {
         loadProducts("");
     }, [loadProducts]);
 
-    useEffect(() => {
-        if (selectedId && !products.some((product) => product.id === selectedId)) {
-            setSelectedId(null);
-            setForm(createEmptyProductForm());
-        }
-    }, [products, selectedId]);
-
-    const handleSelect = useCallback((product) => {
-        setSelectedId(product.id);
-        setForm(toForm(product));
-        setSuccess("");
-    }, []);
-
-    const handleNew = useCallback(() => {
-        setSelectedId(null);
-        setForm(createEmptyProductForm());
-        setSuccess("");
-        setError("");
-    }, []);
-
-    const handleFieldChange = useCallback((field, value) => {
-        setForm((prev) => ({ ...prev, [field]: value }));
-    }, []);
-
-    const handleSubmit = useCallback(
-        async (event) => {
-            event.preventDefault();
-            setSaving(true);
-            setError("");
-            setSuccess("");
-
-            try {
-                const payload = toPayload(form);
-
-                if (selectedId) {
-                    await updateAdminProduct(selectedId, payload);
-                    setSuccess("Produto atualizado com sucesso.");
-                } else {
-                    const created = await createAdminProduct(payload);
-                    setSelectedId(created.id);
-                    setSuccess("Produto criado com sucesso.");
-                }
-
-                await loadProducts(search);
-            } catch (err) {
-                if (err?.status === 404) {
-                    router.replace("/404");
-                    return;
-                }
-                setError(err.message || "Erro ao salvar produto.");
-            } finally {
-                setSaving(false);
-            }
+    const handleSelect = useCallback(
+        (product) => {
+            router.push(`/admin/deshboard/settingsProduct/${product.id}`);
         },
-        [form, loadProducts, router, search, selectedId],
+        [router],
     );
 
-    const handleArchive = useCallback(async () => {
-        if (!selectedId) return;
+    const handleNew = useCallback(() => {
+        router.push("/admin/deshboard/settingsProduct/new");
+    }, [router]);
 
-        setSaving(true);
-        setError("");
-        setSuccess("");
-
-        try {
-            await archiveAdminProduct(selectedId);
-            setSuccess("Produto desativado com sucesso.");
-            setSelectedId(null);
-            setForm(createEmptyProductForm());
-            setArchiveDialogOpen(false);
-            await loadProducts(search);
-        } catch (err) {
-            if (err?.status === 404) {
-                router.replace("/404");
-                return;
-            }
-            setError(err.message || "Erro ao desativar produto.");
-        } finally {
-            setSaving(false);
-        }
-    }, [loadProducts, router, search, selectedId]);
 
     const handleSearch = useCallback(
         async (event) => {
@@ -177,20 +94,7 @@ export default function AdminProdutosClient() {
                     onStatusFilterChange={setStatusFilter}
                     loading={loading}
                     products={filteredProducts}
-                    selectedId={selectedId}
                     onSelectProduct={handleSelect}
-                />
-
-                <ProductFormSection
-                    selectedProduct={selectedProduct}
-                    form={form}
-                    onFieldChange={handleFieldChange}
-                    onSubmit={handleSubmit}
-                    saving={saving}
-                    selectedId={selectedId}
-                    archiveDialogOpen={archiveDialogOpen}
-                    onArchiveDialogOpenChange={setArchiveDialogOpen}
-                    onArchive={handleArchive}
                 />
             </div>
         </section>
