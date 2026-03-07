@@ -76,6 +76,46 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.24 - 2026-03-07
+
+**Resumo**
+
+- Migração do fluxo admin para editor dedicado por rota (`settingsProduct`) com limpeza da listagem principal e suporte backend/frontend para carregamento por ID.
+
+**Motivação**
+
+- Separar responsabilidades entre tela de listagem e tela de edição para melhorar manutenção e escalar o painel.
+- Evitar acoplamento de estados de formulário dentro do `AdminProdutosClient`.
+- Permitir deep-link de edição de produto por URL.
+
+**Impacto**
+
+- Componentes afetados: `src/app/(privado)/admin/deshboard/_components/AdminProdutosClient.jsx`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/ProductEditorClient.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/new/page.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/[id]/page.jsx`, `src/lib/helpers/api/adminProductsApi.js`, `src/app/api/admin/products/[id]/route.js`.
+- Compatibilidade: sim - fluxo antigo de listagem continua, edição foi movida para rota dedicada.
+- Risco: médio - mudança de navegação no painel admin e inclusão de nova superfície de rota.
+
+**Mudanças**
+
+- **Added**
+    - Rotas de edição/criação: `/admin/deshboard/settingsProduct/new` e `/admin/deshboard/settingsProduct/[id]`.
+    - Componente `ProductEditorClient` para centralizar o ciclo de create/update/archive fora da tela de listagem.
+    - Helper `getAdminProduct(id)` no client API admin.
+    - Handler `GET /api/admin/products/[id]` para carregar produto individual no editor.
+- **Changed**
+    - `AdminProdutosClient` passou a atuar como tela de listagem + navegação para o editor dedicado.
+    - Limpeza de estados mortos de formulário na listagem (`selectedId`, `form`, handlers de submit/archive locais).
+- **Fixed**
+    - Correção do fluxo de `saving` no editor para submit/archive.
+    - Correção da importação de router para App Router (`next/navigation`) no editor.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard` e validar listagem, busca e navegação para edição ao clicar no produto.
+2. Clicar em “Novo produto” e validar abertura de `/admin/deshboard/settingsProduct/new`.
+3. Editar um produto em `/admin/deshboard/settingsProduct/[id]` e validar persistência.
+4. Desativar produto no editor e validar retorno para o painel.
+5. Executar `npm run lint` e `npm run build` e confirmar sucesso sem erros.
+
 ### v0.1.23 - 2026-03-06
 
 **Resumo**
