@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-03-07
-Branch: `refactor/painel-dashboard`
+Última atualização: 2026-03-13
+Branch: `style/painel-dashboard`
 
 ## Visão Geral
 
@@ -42,6 +42,21 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - Garante estabilidade da nova arquitetura baseada em rota dedicada.
 
 ### Sugestões Codex (dashboard admin: evolução pós-componentização)
+
+1. Extrair o estado de busca para a URL
+
+- Persistir `q` e `statusFilter` em query params para facilitar compartilhamento e back/forward.
+- Ajuda também a manter o contexto ao voltar do editor para a listagem.
+
+2. Adicionar paginação ou scroll infinito opcional
+
+- Para catálogos maiores, a listagem pode ficar pesada.
+- Sugestão: `limit` + paginação simples no backend e UI opcional (ou “carregar mais”).
+
+3. Padronizar densidade e espaçamento na tabela
+
+- Consolidar tokens de espaçamento para reduzir variações entre linhas/headers.
+- Facilita consistência visual em futuras tabelas do admin.
 
 1. Mover edição de produto para página dedicada (`/admin/deshboard/settingsProduct/[id]`)
 
@@ -1006,3 +1021,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-24: Incluidas sugestoes de evolucao para arquitetura de auth global, testes de header/carrinho e UX de carregamento no header.
 - 2026-03-06: Incluidas sugestoes de evolucao do dashboard admin apos componentizacao (edicao em rota dedicada, GET por id e E2E).
 - 2026-03-07: Incluidas sugestoes de evolucao para o editor dedicado settingsProduct (contexto de retorno, skeleton, dirty state e E2E).
+- 2026-03-13: Atualizadas sugestoes para listagem admin (URL com filtros, paginacao/scroll e padronizacao visual).

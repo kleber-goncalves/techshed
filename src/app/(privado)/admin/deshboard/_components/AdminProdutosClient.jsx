@@ -85,7 +85,7 @@ export default function AdminProdutosClient() {
             <KpiSection loading={loading} metrics={metrics} />
             <FeedbackBanners error={error} success={success} />
 
-            <div className="grid gap-6 xl:grid-cols-[1.05fr_1.45fr]">
+            <div className="grid gap-6 xl:grid-cols-1">
                 <ProductsSection
                     search={search}
                     onSearchChange={(event) => setSearch(event.target.value)}

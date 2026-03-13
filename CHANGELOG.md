@@ -76,6 +76,36 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.25 - 2026-03-13
+
+**Resumo**
+
+- Refinos de layout e legibilidade na listagem de produtos do painel admin, com pequenos ajustes de UI no filtro e na tabela.
+
+**Motivação**
+
+- Melhorar a leitura e o espaçamento dos elementos da tabela e do filtro.
+- Ajustar o comportamento visual do `Select` para evitar altura fixa desnecessária.
+
+**Impacto**
+
+- Componentes afetados: `src/app/(privado)/admin/deshboard/_components/AdminProdutosClient.jsx`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/ProductsSection.jsx`, `src/components/ui/select.jsx`.
+- Compatibilidade: sim - apenas ajustes visuais/estruturais no front.
+- Risco: baixo - sem mudança de lógica.
+
+**Mudanças**
+
+- **Changed**
+    - `ProductsSection` recebeu melhorias de legibilidade e estrutura (quebra de linhas, comentários e layout de células).
+    - `AdminProdutosClient` ajustou a grid para `xl:grid-cols-1` na tela de listagem única.
+    - `SelectTrigger` passou a usar `h-fit` no tamanho default para respeitar o conteúdo.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard` e validar alinhamento do filtro, tabela e estado vazio.
+2. Verificar o `Select` de status com altura adequada em diferentes tamanhos.
+3. Confirmar que a listagem continua navegável e sem regressões.
+
 ### v0.1.24 - 2026-03-07
 
 **Resumo**

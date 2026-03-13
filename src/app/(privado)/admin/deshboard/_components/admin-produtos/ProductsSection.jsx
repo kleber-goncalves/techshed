@@ -47,9 +47,14 @@ export default function ProductsSection({
         <Card className="gap-4">
             <CardHeader className="space-y-1 pb-0">
                 <CardTitle className="text-lg">Lista de produtos</CardTitle>
-                <CardDescription>Selecione um item para editar ou desativar.</CardDescription>
+                <CardDescription>
+                    Selecione um item para editar ou desativar.
+                </CardDescription>
             </CardHeader>
+            
             <CardContent className="space-y-4 pb-6">
+                
+                {/* sessão de pesquisa */}
                 <form
                     onSubmit={onSearchSubmit}
                     className="grid gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-center"
@@ -63,25 +68,41 @@ export default function ProductsSection({
                             className="pl-9"
                         />
                     </div>
-                    <Select value={statusFilter} onValueChange={onStatusFilterChange}>
+                    <Select
+                        value={statusFilter}
+                        onValueChange={onStatusFilterChange}
+                    >
                         <SelectTrigger className="h-10 w-full sm:w-[170px]">
                             <SelectValue placeholder="Filtrar status" />
                         </SelectTrigger>
                         <SelectContent align="end">
                             {STATUS_FILTER_OPTIONS.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
+                                <SelectItem
+                                    key={option.value}
+                                    value={option.value}
+                                >
                                     {option.label}
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
-                    <Button type="submit" variant="outline" className="h-10 min-w-24" disabled={loading}>
-                        {loading ? <Loader2 className="size-4 animate-spin" /> : "Buscar"}
+                    <Button
+                        type="submit"
+                        variant="outline"
+                        className="h-10 min-w-24"
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                            "Buscar"
+                        )}
                     </Button>
                 </form>
 
                 <Separator />
 
+                {/* sessão de todos os produtos */}
                 <div className="rounded-lg border">
                     <Table>
                         <TableHeader>
@@ -90,7 +111,9 @@ export default function ProductsSection({
                                 <TableHead>Categoria</TableHead>
                                 <TableHead>Preço</TableHead>
                                 <TableHead>Estoque</TableHead>
-                                <TableHead className="text-right">Status</TableHead>
+                                <TableHead className="text-right">
+                                    Status
+                                </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -118,10 +141,16 @@ export default function ProductsSection({
 
                             {showTableEmptyState ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="py-10 text-center">
-                                        <p className="font-medium">Nenhum produto encontrado</p>
+                                    <TableCell
+                                        colSpan={5}
+                                        className="py-10 text-center"
+                                    >
+                                        <p className="font-medium">
+                                            Nenhum produto encontrado
+                                        </p>
                                         <p className="text-muted-foreground mt-1 text-xs">
-                                            Ajuste os filtros ou cadastre um novo produto.
+                                            Ajuste os filtros ou cadastre um
+                                            novo produto.
                                         </p>
                                     </TableCell>
                                 </TableRow>
@@ -131,23 +160,39 @@ export default function ProductsSection({
                                 ? products.map((product) => (
                                       <TableRow
                                           key={product.id}
-                                          data-state={selectedId === product.id ? "selected" : undefined}
-                                          onClick={() => onSelectProduct(product)}
+                                          data-state={
+                                              selectedId === product.id
+                                                  ? "selected"
+                                                  : undefined
+                                          }
+                                          onClick={() =>
+                                              onSelectProduct(product)
+                                          }
                                           className="cursor-pointer"
                                       >
                                           <TableCell className="max-w-[240px]">
-                                              <p className="truncate font-medium">{product.name}</p>
+                                              <p className="truncate font-medium">
+                                                  {product.name}
+                                              </p>
                                               <p className="text-muted-foreground truncate text-xs">
                                                   {product.slug}
                                               </p>
                                           </TableCell>
-                                          <TableCell>{product.category}</TableCell>
-                                          <TableCell>{formatCurrency(product.priceCents)}</TableCell>
+                                          <TableCell>
+                                              {product.category}
+                                          </TableCell>
+                                          <TableCell>
+                                              {formatCurrency(
+                                                  product.priceCents,
+                                              )}
+                                          </TableCell>
                                           <TableCell>
                                               <span
                                                   className={cn(
                                                       "font-medium",
-                                                      Number(product.stock ?? 0) <= LOW_STOCK_THRESHOLD
+                                                      Number(
+                                                          product.stock ?? 0,
+                                                      ) <= LOW_STOCK_THRESHOLD
                                                           ? "text-amber-600 dark:text-amber-300"
                                                           : "text-foreground",
                                                   )}
@@ -156,7 +201,11 @@ export default function ProductsSection({
                                               </span>
                                           </TableCell>
                                           <TableCell className="text-right">
-                                              <ProductStatusBadge isActive={Boolean(product.isActive)} />
+                                              <ProductStatusBadge
+                                                  isActive={Boolean(
+                                                      product.isActive,
+                                                  )}
+                                              />
                                           </TableCell>
                                       </TableRow>
                                   ))
