@@ -76,6 +76,44 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.26 - 2026-03-14
+
+**Resumo**
+
+- Implementacao de scroll infinito na listagem admin de produtos com nova documentacao didatica do fluxo.
+
+**Motivacao**
+
+- Melhorar a performance percebida e a usabilidade da listagem com grandes volumes.
+- Registrar o fluxo completo (backend + frontend) para estudo e reuso em outros projetos.
+
+**Impacto**
+
+- Componentes afetados: `src/app/api/admin/products/route.js`, `src/lib/helpers/api/adminProductsApi.js`, `src/app/(privado)/admin/deshboard/_components/AdminProdutosClient.jsx`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/ProductsSection.jsx`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/hooks/useInfiniteAdminProducts.js`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/hooks/useInfiniteTrigger.js`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/components/InfiniteScrollSentinel.jsx`, `docs/scroll-infinito-admin.md`.
+- Compatibilidade: sim - mantendo o endpoint e adicionando paginação.
+- Risco: baixo - mudancas focadas na listagem e no fluxo de carregamento incremental.
+
+**Mudancas**
+
+- **Added**
+    - Hook `useInfiniteAdminProducts` para paginação incremental e estado de carregamento.
+    - Hook `useInfiniteTrigger` com `IntersectionObserver` para acionar carregamento.
+    - Componente `InfiniteScrollSentinel` para estados "carregando mais" e "fim da lista".
+    - Documentacao didatica do scroll infinito em `docs/scroll-infinito-admin.md`.
+- **Changed**
+    - `GET /api/admin/products` passou a aceitar `page` e `limit` e retornar `items`, `hasMore` e `summary`.
+    - `AdminProdutosClient` e `ProductsSection` atualizados para consumir paginação e renderizar sentinel.
+    - Helper `listAdminProducts` atualizado para suportar paginação no client.
+- **Fixed**
+    - Deduplicacao por `id` ao mesclar paginas na listagem do admin.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard` e validar carregamento inicial com skeleton.
+2. Rolar a lista e confirmar carregamento incremental sem duplicar itens.
+3. Aplicar busca/filtro e validar reinicio correto da lista.
+4. Validar exibição de "Fim da lista" quando `hasMore` for `false`.
+
 ### v0.1.25 - 2026-03-13
 
 **Resumo**

@@ -3,7 +3,7 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-03-13
+Última atualização: 2026-03-14
 Branch: `style/painel-dashboard`
 
 ## Visão Geral
@@ -57,6 +57,23 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 
 - Consolidar tokens de espaçamento para reduzir variações entre linhas/headers.
 - Facilita consistência visual em futuras tabelas do admin.
+
+### Sugestões Codex (scroll infinito admin)
+
+1. Adicionar fallback manual de "Carregar mais"
+
+- Garante acessibilidade quando o `IntersectionObserver` falhar ou for desativado.
+- Serve como alternativa para usuarios que preferem controle manual.
+
+2. Persistir posicao de scroll e pagina ao voltar do editor
+
+- Salvar `scrollY` e pagina atual em `sessionStorage` ao navegar para o editor.
+- Ao voltar, restaurar a posicao para evitar perder o contexto.
+
+3. Avaliar virtualizacao da lista
+
+- Para listas muito grandes, `react-virtual` ou semelhante reduz custo de render.
+- Mantem a UI fluida sem perder o scroll infinito.
 
 1. Mover edição de produto para página dedicada (`/admin/deshboard/settingsProduct/[id]`)
 
@@ -1022,3 +1039,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-03-06: Incluidas sugestoes de evolucao do dashboard admin apos componentizacao (edicao em rota dedicada, GET por id e E2E).
 - 2026-03-07: Incluidas sugestoes de evolucao para o editor dedicado settingsProduct (contexto de retorno, skeleton, dirty state e E2E).
 - 2026-03-13: Atualizadas sugestoes para listagem admin (URL com filtros, paginacao/scroll e padronizacao visual).
+- 2026-03-14: Incluidas sugestoes de evolucao para scroll infinito (fallback manual, persistencia de scroll e virtualizacao).

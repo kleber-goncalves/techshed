@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/table";
 import { LOW_STOCK_THRESHOLD, STATUS_FILTER_OPTIONS } from "./constants";
 import ProductStatusBadge from "./ProductStatusBadge";
+import InfiniteScrollSentinel from "./components/InfiniteScrollSentinel";
+
 
 export default function ProductsSection({
     search,
@@ -36,12 +38,14 @@ export default function ProductsSection({
     onSearchSubmit,
     statusFilter,
     onStatusFilterChange,
-    loading,
+    loadingInitial,
+    loadingMore,
+    hasMore,
+    sentinelRef,
     products,
-    selectedId,
     onSelectProduct,
 }) {
-    const showTableEmptyState = !loading && products.length === 0;
+    const showTableEmptyState = !loadingInitial && products.length === 0;
 
     return (
         <Card className="gap-4">
@@ -51,9 +55,8 @@ export default function ProductsSection({
                     Selecione um item para editar ou desativar.
                 </CardDescription>
             </CardHeader>
-            
+
             <CardContent className="space-y-4 pb-6">
-                
                 {/* sessão de pesquisa */}
                 <form
                     onSubmit={onSearchSubmit}
@@ -90,9 +93,9 @@ export default function ProductsSection({
                         type="submit"
                         variant="outline"
                         className="h-10 min-w-24"
-                        disabled={loading}
+                        disabled={loadingInitial}
                     >
-                        {loading ? (
+                        {loadingInitial ? (
                             <Loader2 className="size-4 animate-spin" />
                         ) : (
                             "Buscar"
@@ -117,7 +120,7 @@ export default function ProductsSection({
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {loading
+                            {loadingInitial
                                 ? Array.from({ length: 6 }).map((_, index) => (
                                       <TableRow key={`skeleton-${index}`}>
                                           <TableCell>
@@ -156,15 +159,10 @@ export default function ProductsSection({
                                 </TableRow>
                             ) : null}
 
-                            {!loading
+                            {!loadingInitial
                                 ? products.map((product) => (
                                       <TableRow
                                           key={product.id}
-                                          data-state={
-                                              selectedId === product.id
-                                                  ? "selected"
-                                                  : undefined
-                                          }
                                           onClick={() =>
                                               onSelectProduct(product)
                                           }
@@ -210,6 +208,18 @@ export default function ProductsSection({
                                       </TableRow>
                                   ))
                                 : null}
+
+                            {!loadingInitial && products.length > 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="p-0">
+                                        <InfiniteScrollSentinel
+                                            sentinelRef={sentinelRef}
+                                            loadingMore={loadingMore}
+                                            hasMore={hasMore}
+                                        />
+                                    </TableCell>
+                                </TableRow>
+                            ) : null}
                         </TableBody>
                     </Table>
                 </div>

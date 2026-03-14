@@ -1,63 +1,41 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-    listAdminProducts,
-} from "@/lib/helpers/api/adminProductsApi";
 import DashboardHeader from "./admin-produtos/DashboardHeader";
 import KpiSection from "./admin-produtos/KpiSection";
 import FeedbackBanners from "./admin-produtos/FeedbackBanners";
 import ProductsSection from "./admin-produtos/ProductsSection";
-import {
-    buildMetrics,
-    filterProductsByStatus,
-
-} from "./admin-produtos/utils";
+import { useInfiniteAdminProducts } from "./admin-produtos/hooks/useInfiniteAdminProducts";
+import { useInfiniteTrigger } from "./admin-produtos/hooks/useInfiniteTrigger";
 
 export default function AdminProdutosClient() {
     const router = useRouter();
 
-    const [products, setProducts] = useState([]);
-    const [search, setSearch] = useState("");
+
     const [statusFilter, setStatusFilter] = useState("all");
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
+    const [searchInput, setSearchInput] = useState("");
+    const [appliedSearch, setAppliedSearch] = useState("");
+    const success = "";
 
+    const {
+        items: products,
+        summary,
+        hasMore,
+        loadingInitial,
+        loadingMore,
+        error,
+        loadNext,
+    } = useInfiniteAdminProducts({
+        search: appliedSearch,
+        status: statusFilter,
+        pageSize: 20,
+    });
 
-
-    const filteredProducts = useMemo(
-        () => filterProductsByStatus(products, statusFilter),
-        [products, statusFilter],
-    );
-
-    const metrics = useMemo(() => buildMetrics(products), [products]);
-
-    const loadProducts = useCallback(
-        async (currentSearch = "") => {
-            setLoading(true);
-            setError("");
-
-            try {
-                const data = await listAdminProducts(currentSearch);
-                setProducts(Array.isArray(data.items) ? data.items : []);
-            } catch (err) {
-                if (err?.status === 404) {
-                    router.replace("/404");
-                    return;
-                }
-                setError(err.message || "Erro ao carregar produtos.");
-            } finally {
-                setLoading(false);
-            }
-        },
-        [router],
-    );
-
-    useEffect(() => {
-        loadProducts("");
-    }, [loadProducts]);
+    const sentinelRef = useInfiniteTrigger({
+        enabled: hasMore && !loadingInitial && !loadingMore,
+        onLoadMore: loadNext,
+    });
 
     const handleSelect = useCallback(
         (product) => {
@@ -72,28 +50,33 @@ export default function AdminProdutosClient() {
 
 
     const handleSearch = useCallback(
-        async (event) => {
+        (event) => {
             event.preventDefault();
-            await loadProducts(search);
+            setAppliedSearch(searchInput);
         },
-        [loadProducts, search],
+        [searchInput],
     );
+
+    
 
     return (
         <section className="mx-auto w-full max-w-7xl space-y-6">
             <DashboardHeader onNewProduct={handleNew} />
-            <KpiSection loading={loading} metrics={metrics} />
+            <KpiSection loading={loadingInitial} metrics={summary} />
             <FeedbackBanners error={error} success={success} />
 
             <div className="grid gap-6 xl:grid-cols-1">
                 <ProductsSection
-                    search={search}
-                    onSearchChange={(event) => setSearch(event.target.value)}
+                    search={searchInput}
+                    onSearchChange={(event) => setSearchInput(event.target.value)}
                     onSearchSubmit={handleSearch}
                     statusFilter={statusFilter}
                     onStatusFilterChange={setStatusFilter}
-                    loading={loading}
-                    products={filteredProducts}
+                    loadingInitial={loadingInitial}
+                    loadingMore={loadingMore}
+                    hasMore={hasMore}
+                    sentinelRef={sentinelRef}
+                    products={products}
                     onSelectProduct={handleSelect}
                 />
             </div>
