@@ -6,14 +6,19 @@ import {
     CardHeader,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LOW_STOCK_THRESHOLD } from "./constants";
+import { LOW_STOCK_THRESHOLD } from "../_utils/constants";
 
 function KpiCard({ title, value, description, icon: Icon }) {
     return (
         <Card className="gap-3">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
-                <CardDescription className="text-xs uppercase tracking-wide">{title}</CardDescription>
-                <Icon className="text-muted-foreground size-4" aria-hidden="true" />
+                <CardDescription className="text-xs uppercase tracking-wide">
+                    {title}
+                </CardDescription>
+                <Icon
+                    className="text-muted-foreground size-4"
+                    aria-hidden="true"
+                />
             </CardHeader>
             <CardContent className="space-y-1 pb-5">
                 <p className="text-2xl font-semibold tracking-tight">{value}</p>

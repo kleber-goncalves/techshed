@@ -27,10 +27,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { LOW_STOCK_THRESHOLD, STATUS_FILTER_OPTIONS } from "./constants";
-import ProductStatusBadge from "./ProductStatusBadge";
-import InfiniteScrollSentinel from "./components/InfiniteScrollSentinel";
-
+import {
+    LOW_STOCK_THRESHOLD,
+    STATUS_FILTER_OPTIONS,
+} from "../_utils/constants";
+import ProductStatusBadge from "../_components/ProductStatusBadge";
+import InfiniteScrollSentinel from "../_components/InfiniteScrollSentinel";
 
 export default function ProductsSection({
     search,

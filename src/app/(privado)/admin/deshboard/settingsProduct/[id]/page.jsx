@@ -1,5 +1,5 @@
 import AdminAccessGate from "../../_components/AdminAccessGate";
-import ProductEditorClient from "../../_components/admin-produtos/ProductEditorClient";
+import ProductEditorClient from "../_layout/ProductEditorClient";
 
 export default async function EditProductPage({ params }) {
     const { id } = await params;
@@ -10,5 +10,5 @@ export default async function EditProductPage({ params }) {
                 <ProductEditorClient productId={id} />
             </AdminAccessGate>
         </section>
-    )
+    );
 }

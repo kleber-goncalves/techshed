@@ -2,16 +2,15 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import DashboardHeader from "./admin-produtos/DashboardHeader";
-import KpiSection from "./admin-produtos/KpiSection";
-import FeedbackBanners from "./admin-produtos/FeedbackBanners";
-import ProductsSection from "./admin-produtos/ProductsSection";
-import { useInfiniteAdminProducts } from "./admin-produtos/hooks/useInfiniteAdminProducts";
-import { useInfiniteTrigger } from "./admin-produtos/hooks/useInfiniteTrigger";
+import DashboardHeader from "./DashboardHeader";
+import KpiSection from "../_components/KpiSection";
+import FeedbackBanners from "../_components/FeedbackBanners";
+import ProductsSection from "./ProductsSection";
+import { useInfiniteAdminProducts } from "../_hooks/useInfiniteAdminProducts";
+import { useInfiniteTrigger } from "../_hooks/useInfiniteTrigger";
 
 export default function AdminProdutosClient() {
     const router = useRouter();
-
 
     const [statusFilter, setStatusFilter] = useState("all");
     const [searchInput, setSearchInput] = useState("");
@@ -48,7 +47,6 @@ export default function AdminProdutosClient() {
         router.push("/admin/deshboard/settingsProduct/new");
     }, [router]);
 
-
     const handleSearch = useCallback(
         (event) => {
             event.preventDefault();
@@ -56,8 +54,6 @@ export default function AdminProdutosClient() {
         },
         [searchInput],
     );
-
-    
 
     return (
         <section className="mx-auto w-full max-w-7xl space-y-6">
@@ -68,7 +64,9 @@ export default function AdminProdutosClient() {
             <div className="grid gap-6 xl:grid-cols-1">
                 <ProductsSection
                     search={searchInput}
-                    onSearchChange={(event) => setSearchInput(event.target.value)}
+                    onSearchChange={(event) =>
+                        setSearchInput(event.target.value)
+                    }
                     onSearchSubmit={handleSearch}
                     statusFilter={statusFilter}
                     onStatusFilterChange={setStatusFilter}

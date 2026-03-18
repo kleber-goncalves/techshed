@@ -10,11 +10,10 @@ import {
     updateAdminProduct,
 } from "@/lib/helpers/api/adminProductsApi";
 import { Button } from "@/components/ui/button";
-import FeedbackBanners from "./FeedbackBanners";
+import FeedbackBanners from "../../_components/FeedbackBanners";
 import ProductFormSection from "./ProductFormSection";
-import { createEmptyProductForm } from "./constants";
-import { toForm, toPayload } from "./utils";
-
+import { createEmptyProductForm } from "../../_utils/constants";
+import { toForm, toPayload } from "../../_utils/utils";
 
 export default function ProductEditorClient({ productId }) {
     const router = useRouter();
@@ -51,28 +50,33 @@ export default function ProductEditorClient({ productId }) {
         loadProduct();
     }, [loadProduct]);
 
-    const handleSubmit = useCallback(async (event) => {
-        event.preventDefault();
-        setSaving(true);
-        setError("");
-        setSuccess("");
+    const handleSubmit = useCallback(
+        async (event) => {
+            event.preventDefault();
+            setSaving(true);
+            setError("");
+            setSuccess("");
 
-        try {
-            const payload = toPayload(form);
-            if (isCreate) {
-                const created = await createAdminProduct(payload);
-                router.replace(`/admin/deshboard/settingsProduct/${created.id}`);
-                return;
+            try {
+                const payload = toPayload(form);
+                if (isCreate) {
+                    const created = await createAdminProduct(payload);
+                    router.replace(
+                        `/admin/deshboard/settingsProduct/${created.id}`,
+                    );
+                    return;
+                }
+                await updateAdminProduct(productId, payload);
+                setSuccess("Produto atualizado com sucesso.");
+                await loadProduct();
+            } catch (err) {
+                setError(err.message || "Erro ao salvar produto.");
+            } finally {
+                setSaving(false);
             }
-            await updateAdminProduct(productId, payload);
-            setSuccess("Produto atualizado com sucesso.");
-            await loadProduct();
-        } catch (err) {
-            setError(err.message || "Erro ao salvar produto.");
-        } finally {
-            setSaving(false);
-        }
-    }, [form, isCreate, loadProduct, productId, router]);
+        },
+        [form, isCreate, loadProduct, productId, router],
+    );
 
     const handleArchive = useCallback(async () => {
         if (!productId) return;
@@ -87,7 +91,6 @@ export default function ProductEditorClient({ productId }) {
             setSaving(false);
         }
     }, [productId, router]);
-
 
     return (
         <section className="mx-auto w-full max-w-5xl space-y-4">
