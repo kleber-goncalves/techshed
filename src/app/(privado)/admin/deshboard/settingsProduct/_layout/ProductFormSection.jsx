@@ -22,7 +22,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { formatDate } from "./utils";
+import { formatDate } from "../../_utils/utils";
 
 export default function ProductFormSection({
     selectedProduct,
@@ -50,52 +50,86 @@ export default function ProductFormSection({
             <CardContent className="pb-6">
                 <form onSubmit={onSubmit} className="space-y-5">
                     <section className="space-y-3">
-                        <h2 className="text-sm font-semibold tracking-tight">Dados básicos</h2>
+                        <h2 className="text-sm font-semibold tracking-tight">
+                            Dados básicos
+                        </h2>
                         <div className="grid gap-3 md:grid-cols-2">
                             <div className="space-y-2 md:col-span-2">
-                                <label htmlFor="admin-prod-name" className="text-sm font-medium">
+                                <label
+                                    htmlFor="admin-prod-name"
+                                    className="text-sm font-medium"
+                                >
                                     Nome
                                 </label>
                                 <Input
                                     id="admin-prod-name"
                                     placeholder="Nome do produto"
                                     value={form.name}
-                                    onChange={(event) => onFieldChange("name", event.target.value)}
+                                    onChange={(event) =>
+                                        onFieldChange(
+                                            "name",
+                                            event.target.value,
+                                        )
+                                    }
                                     required
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label htmlFor="admin-prod-slug" className="text-sm font-medium">
+                                <label
+                                    htmlFor="admin-prod-slug"
+                                    className="text-sm font-medium"
+                                >
                                     Slug
                                 </label>
                                 <Input
                                     id="admin-prod-slug"
                                     placeholder="slug-opcional"
                                     value={form.slug}
-                                    onChange={(event) => onFieldChange("slug", event.target.value)}
+                                    onChange={(event) =>
+                                        onFieldChange(
+                                            "slug",
+                                            event.target.value,
+                                        )
+                                    }
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label htmlFor="admin-prod-category" className="text-sm font-medium">
+                                <label
+                                    htmlFor="admin-prod-category"
+                                    className="text-sm font-medium"
+                                >
                                     Categoria
                                 </label>
                                 <Input
                                     id="admin-prod-category"
                                     placeholder="Categoria"
                                     value={form.category}
-                                    onChange={(event) => onFieldChange("category", event.target.value)}
+                                    onChange={(event) =>
+                                        onFieldChange(
+                                            "category",
+                                            event.target.value,
+                                        )
+                                    }
                                     required
                                 />
                             </div>
                             <div className="space-y-2 md:col-span-2">
-                                <label htmlFor="admin-prod-catalog-key" className="text-sm font-medium">
+                                <label
+                                    htmlFor="admin-prod-catalog-key"
+                                    className="text-sm font-medium"
+                                >
                                     Catalog key
                                 </label>
                                 <Input
                                     id="admin-prod-catalog-key"
                                     placeholder="Ex.: celulares"
                                     value={form.catalogKey}
-                                    onChange={(event) => onFieldChange("catalogKey", event.target.value)}
+                                    onChange={(event) =>
+                                        onFieldChange(
+                                            "catalogKey",
+                                            event.target.value,
+                                        )
+                                    }
                                     required
                                 />
                             </div>
@@ -105,10 +139,15 @@ export default function ProductFormSection({
                     <Separator />
 
                     <section className="space-y-3">
-                        <h2 className="text-sm font-semibold tracking-tight">Preço e estoque</h2>
+                        <h2 className="text-sm font-semibold tracking-tight">
+                            Preço e estoque
+                        </h2>
                         <div className="grid gap-3 md:grid-cols-2">
                             <div className="space-y-2">
-                                <label htmlFor="admin-prod-price" className="text-sm font-medium">
+                                <label
+                                    htmlFor="admin-prod-price"
+                                    className="text-sm font-medium"
+                                >
                                     Preço (centavos)
                                 </label>
                                 <Input
@@ -117,11 +156,19 @@ export default function ProductFormSection({
                                     placeholder="0"
                                     min={0}
                                     value={form.priceCents}
-                                    onChange={(event) => onFieldChange("priceCents", event.target.value)}
+                                    onChange={(event) =>
+                                        onFieldChange(
+                                            "priceCents",
+                                            event.target.value,
+                                        )
+                                    }
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label htmlFor="admin-prod-stock" className="text-sm font-medium">
+                                <label
+                                    htmlFor="admin-prod-stock"
+                                    className="text-sm font-medium"
+                                >
                                     Estoque
                                 </label>
                                 <Input
@@ -130,7 +177,12 @@ export default function ProductFormSection({
                                     placeholder="0"
                                     min={0}
                                     value={form.stock}
-                                    onChange={(event) => onFieldChange("stock", event.target.value)}
+                                    onChange={(event) =>
+                                        onFieldChange(
+                                            "stock",
+                                            event.target.value,
+                                        )
+                                    }
                                 />
                             </div>
                         </div>
@@ -139,43 +191,66 @@ export default function ProductFormSection({
                     <Separator />
 
                     <section className="space-y-3">
-                        <h2 className="text-sm font-semibold tracking-tight">Mídia e texto</h2>
+                        <h2 className="text-sm font-semibold tracking-tight">
+                            Mídia e texto
+                        </h2>
                         <div className="space-y-3">
                             <div className="space-y-2">
-                                <label htmlFor="admin-prod-img" className="text-sm font-medium">
+                                <label
+                                    htmlFor="admin-prod-img"
+                                    className="text-sm font-medium"
+                                >
                                     URL da imagem
                                 </label>
                                 <Input
                                     id="admin-prod-img"
                                     placeholder="https://..."
                                     value={form.img}
-                                    onChange={(event) => onFieldChange("img", event.target.value)}
+                                    onChange={(event) =>
+                                        onFieldChange("img", event.target.value)
+                                    }
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label htmlFor="admin-prod-alt" className="text-sm font-medium">
+                                <label
+                                    htmlFor="admin-prod-alt"
+                                    className="text-sm font-medium"
+                                >
                                     Texto alternativo
                                 </label>
                                 <Input
                                     id="admin-prod-alt"
                                     placeholder="Descrição breve da imagem"
                                     value={form.alt}
-                                    onChange={(event) => onFieldChange("alt", event.target.value)}
+                                    onChange={(event) =>
+                                        onFieldChange("alt", event.target.value)
+                                    }
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label htmlFor="admin-prod-promocao" className="text-sm font-medium">
+                                <label
+                                    htmlFor="admin-prod-promocao"
+                                    className="text-sm font-medium"
+                                >
                                     Promoção
                                 </label>
                                 <Input
                                     id="admin-prod-promocao"
                                     placeholder="Opcional"
                                     value={form.promocao}
-                                    onChange={(event) => onFieldChange("promocao", event.target.value)}
+                                    onChange={(event) =>
+                                        onFieldChange(
+                                            "promocao",
+                                            event.target.value,
+                                        )
+                                    }
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label htmlFor="admin-prod-description" className="text-sm font-medium">
+                                <label
+                                    htmlFor="admin-prod-description"
+                                    className="text-sm font-medium"
+                                >
                                     Descrição
                                 </label>
                                 <Textarea
@@ -183,19 +258,34 @@ export default function ProductFormSection({
                                     className="min-h-24"
                                     placeholder="Descrição do produto"
                                     value={form.description}
-                                    onChange={(event) => onFieldChange("description", event.target.value)}
+                                    onChange={(event) =>
+                                        onFieldChange(
+                                            "description",
+                                            event.target.value,
+                                        )
+                                    }
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label htmlFor="admin-prod-features" className="text-sm font-medium">
+                                <label
+                                    htmlFor="admin-prod-features"
+                                    className="text-sm font-medium"
+                                >
                                     Features (uma por linha)
                                 </label>
                                 <Textarea
                                     id="admin-prod-features"
                                     className="min-h-28"
-                                    placeholder={"Ex.:\nTela OLED\n5G\nBateria 5000mAh"}
+                                    placeholder={
+                                        "Ex.:\nTela OLED\n5G\nBateria 5000mAh"
+                                    }
                                     value={form.featuresText}
-                                    onChange={(event) => onFieldChange("featuresText", event.target.value)}
+                                    onChange={(event) =>
+                                        onFieldChange(
+                                            "featuresText",
+                                            event.target.value,
+                                        )
+                                    }
                                 />
                             </div>
                         </div>
@@ -204,23 +294,34 @@ export default function ProductFormSection({
                     <Separator />
 
                     <section className="space-y-3">
-                        <h2 className="text-sm font-semibold tracking-tight">Status</h2>
+                        <h2 className="text-sm font-semibold tracking-tight">
+                            Status
+                        </h2>
                         <div className="flex items-center justify-between rounded-lg border p-3">
                             <div>
-                                <p className="text-sm font-medium">Produto ativo</p>
+                                <p className="text-sm font-medium">
+                                    Produto ativo
+                                </p>
                                 <p className="text-muted-foreground text-xs">
-                                    Quando desativado, o item sai do catálogo público.
+                                    Quando desativado, o item sai do catálogo
+                                    público.
                                 </p>
                             </div>
                             <Switch
                                 checked={Boolean(form.isActive)}
-                                onCheckedChange={(checked) => onFieldChange("isActive", checked)}
+                                onCheckedChange={(checked) =>
+                                    onFieldChange("isActive", checked)
+                                }
                             />
                         </div>
                     </section>
 
                     <div className="flex flex-wrap gap-2 pt-2">
-                        <Button type="submit" disabled={saving} className="min-w-40">
+                        <Button
+                            type="submit"
+                            disabled={saving}
+                            className="min-w-40"
+                        >
                             {saving ? (
                                 <>
                                     <Loader2 className="size-4 animate-spin" />
@@ -232,22 +333,34 @@ export default function ProductFormSection({
                         </Button>
 
                         {selectedId ? (
-                            <AlertDialog open={archiveDialogOpen} onOpenChange={onArchiveDialogOpenChange}>
+                            <AlertDialog
+                                open={archiveDialogOpen}
+                                onOpenChange={onArchiveDialogOpenChange}
+                            >
                                 <AlertDialogTrigger asChild>
-                                    <Button type="button" variant="destructive" disabled={saving}>
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        disabled={saving}
+                                    >
                                         Desativar produto
                                     </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
-                                        <AlertDialogTitle>Confirmar desativação</AlertDialogTitle>
+                                        <AlertDialogTitle>
+                                            Confirmar desativação
+                                        </AlertDialogTitle>
                                         <AlertDialogDescription>
-                                            Esse produto ficará inativo e não será exibido no catálogo
-                                            público.
+                                            Esse produto ficará inativo e não
+                                            será exibido no catálogo público.
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                        <AlertDialogCancel type="button" disabled={saving}>
+                                        <AlertDialogCancel
+                                            type="button"
+                                            disabled={saving}
+                                        >
                                             Cancelar
                                         </AlertDialogCancel>
                                         <AlertDialogAction
@@ -256,7 +369,9 @@ export default function ProductFormSection({
                                             disabled={saving}
                                             onClick={onArchive}
                                         >
-                                            {saving ? "Desativando..." : "Confirmar desativação"}
+                                            {saving
+                                                ? "Desativando..."
+                                                : "Confirmar desativação"}
                                         </AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>

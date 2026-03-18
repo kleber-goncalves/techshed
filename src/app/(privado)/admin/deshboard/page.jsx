@@ -1,4 +1,4 @@
-import AdminProdutosClient from "./_components/AdminProdutosClient";
+import AdminProdutosClient from "./_layout/AdminProdutosClient";
 import AdminAccessGate from "./_components/AdminAccessGate";
 
 export default function AdminProdutosPages() {

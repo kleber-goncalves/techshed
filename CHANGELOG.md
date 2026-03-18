@@ -76,6 +76,38 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.27 - 2026-03-18
+
+**Resumo**
+
+- Refatoracao da estrutura do dashboard admin de produtos, reorganizando componentes, hooks, utilitarios e layouts.
+
+**Motivacao**
+
+- Simplificar a organizacao do painel e reduzir acoplamento entre listagem e editor.
+- Facilitar manutencao futura separando responsabilidades por pastas.
+
+**Impacto**
+
+- Componentes afetados: `src/app/(privado)/admin/deshboard/_components/*`, `src/app/(privado)/admin/deshboard/_hooks/*`, `src/app/(privado)/admin/deshboard/_utils/*`, `src/app/(privado)/admin/deshboard/_layout/*`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/*`, paginas `src/app/(privado)/admin/deshboard/page.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/new/page.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/[id]/page.jsx`.
+- Compatibilidade: sim - nao altera rotas nem contratos de API.
+- Risco: baixo - mudanca estrutural de organizacao e imports.
+
+**Mudancas**
+
+- **Changed**
+    - Componentes do painel admin reorganizados para `_components`, `_hooks`, `_utils` e `_layout`, substituindo a pasta `_components/admin-produtos`.
+    - Editor de produto passa a ser importado via `settingsProduct/_layout` nas paginas de criacao/edicao.
+    - Pagina principal do dashboard agora importa `AdminProdutosClient` do novo `_layout`.
+- **Removed**
+    - Estrutura antiga `src/app/(privado)/admin/deshboard/_components/admin-produtos/*`.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard` e validar listagem/KPIs e interacao.
+2. Abrir `/admin/deshboard/settingsProduct/new` e confirmar editor de criacao.
+3. Abrir `/admin/deshboard/settingsProduct/[id]` e confirmar carregamento do editor com o produto.
+
 ### v0.1.26 - 2026-03-14
 
 **Resumo**

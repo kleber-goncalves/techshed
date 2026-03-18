@@ -1,5 +1,5 @@
 import AdminAccessGate from "../../_components/AdminAccessGate";
-import ProductEditorClient from "../../_components/admin-produtos/ProductEditorClient";
+import ProductEditorClient from "../_layout/ProductEditorClient";
 
 export default function NewProductPage() {
     return (
@@ -8,5 +8,5 @@ export default function NewProductPage() {
                 <ProductEditorClient />
             </AdminAccessGate>
         </section>
-    )
+    );
 }

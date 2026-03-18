@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-03-14
-Branch: `style/painel-dashboard`
+Última atualização: 2026-03-18
+Branch: `refactor/estrutura-pasta`
 
 ## Visão Geral
 
@@ -74,6 +74,23 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 
 - Para listas muito grandes, `react-virtual` ou semelhante reduz custo de render.
 - Mantem a UI fluida sem perder o scroll infinito.
+
+### Sugestões Codex (refatoracao da estrutura do dashboard admin)
+
+1. Documentar a nova convencao de pastas do painel
+
+- Registrar o proposito de `_layout`, `_components`, `_hooks` e `_utils` para o admin.
+- Facilita onboarding e reduz risco de imports fora do padrao.
+
+2. Criar barreira contra imports legados
+
+- Adicionar verificacao no CI (ou script local) para bloquear `/_components/admin-produtos/`.
+- Garante que o caminho antigo nao volte em novos commits.
+
+3. Centralizar exports do painel admin
+
+- Criar barrels (ex.: `index.js`) para reduzir paths longos e facilitar futuros moves.
+- Melhora legibilidade dos imports ao longo do painel.
 
 1. Mover edição de produto para página dedicada (`/admin/deshboard/settingsProduct/[id]`)
 
@@ -1040,3 +1057,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-03-07: Incluidas sugestoes de evolucao para o editor dedicado settingsProduct (contexto de retorno, skeleton, dirty state e E2E).
 - 2026-03-13: Atualizadas sugestoes para listagem admin (URL com filtros, paginacao/scroll e padronizacao visual).
 - 2026-03-14: Incluidas sugestoes de evolucao para scroll infinito (fallback manual, persistencia de scroll e virtualizacao).
+- 2026-03-18: Incluidas sugestoes para consolidacao e documentacao da nova estrutura do dashboard admin.
