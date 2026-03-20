@@ -4,7 +4,7 @@ Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
 Última atualização: 2026-03-20
-Branch: `feat/add-img-products`
+Branch: `style/component-add-img`
 
 ## Visão Geral
 
@@ -18,6 +18,33 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ```
 
 ## Melhorias Prioritárias
+
+### Sugestões Codex (galerias por variante e galeria pública)
+
+1. Adicionar upload múltiplo com fila e progresso por imagem
+
+- Hoje o fluxo funciona bem por imagem, mas o cadastro de variantes com muitas fotos pode ficar lento.
+- Sugestão: permitir selecionar varias imagens de uma vez e exibir progresso individual por card.
+
+2. Criar testes automatizados para o fallback da galeria pública
+
+- Cenarios minimos: variante com galeria propria, variante sem galeria caindo para `produto.images`, e fallback final para `img`.
+- Isso protege o comportamento mais importante da vitrine apos a mudanca de arquitetura.
+
+3. Gerar miniaturas otimizadas para o admin e para a vitrine
+
+- Hoje a mesma imagem pode servir tanto para preview quanto para exibicao maior.
+- Sugestao: gerar thumbs menores ou usar estrategia de transformacao para reduzir custo de carregamento.
+
+4. Melhorar acessibilidade e navegacao por teclado na galeria
+
+- Permitir reorder e troca de foco sem depender apenas de mouse ou drag and drop.
+- Isso ajuda acessibilidade e tambem reduz atrito operacional no painel.
+
+5. Adicionar validacao de consistencia entre capa e galeria
+
+- Criar uma verificacao visual ou automatica para mostrar quando `img/alt` divergir da primeira imagem da galeria.
+- Isso facilita manutencao de produtos legados durante o periodo de transicao.
 
 ### Sugestões Codex (galeria híbrida de imagens de produto)
 
@@ -1081,3 +1108,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-03-14: Incluidas sugestoes de evolucao para scroll infinito (fallback manual, persistencia de scroll e virtualizacao).
 - 2026-03-18: Incluidas sugestoes para consolidacao e documentacao da nova estrutura do dashboard admin.
 - 2026-03-20: Incluidas sugestoes de evolucao para a galeria hibrida de imagens de produto.
+- 2026-03-20: Incluidas sugestoes de evolucao para galerias por variante e fallback da pagina publica do produto.

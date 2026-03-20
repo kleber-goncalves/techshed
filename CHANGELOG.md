@@ -76,6 +76,53 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.29 - 2026-03-20
+
+**Resumo**
+
+- Implementacao completa da galeria por variante no painel admin e na pagina publica do produto, com fallback entre imagens da variante e do produto base, alem de documentacao didatica aprofundada para estudo.
+
+**Motivacao**
+
+- Permitir o comportamento de ecommerce em que cada cor/variante mostra suas proprias fotos.
+- Evoluir o editor admin para cadastrar galerias tanto no produto base quanto em cada variante.
+- Manter compatibilidade com produtos legados que ainda dependem de `img/alt`.
+- Registrar a arquitetura nova em documentacao voltada para estudo de front-end e back-end.
+
+**Impacto**
+
+- Componentes afetados: `prisma/schema.prisma`, `prisma/migrations/20260320163000_add_produto_variante_imagens/migration.sql`, `src/app/api/admin/products/route.js`, `src/app/api/admin/products/[id]/route.js`, `src/app/(privado)/admin/deshboard/_utils/constants.js`, `src/app/(privado)/admin/deshboard/_utils/utils.js`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductFormSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductImagesField.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductVariantsField.jsx`, `src/lib/catalogo-db.js`, `src/app/(publico)/produto/[slug]/page.js`, `src/app/(publico)/produto/[slug]/ProdutoClient.jsx`, `src/components/components-page-produto/variants-btn.jsx`, `src/components/components-page-produto/variants-img.jsx`, `src/app/(privado)/admin/deshboard/_components/AdminAccessGate.jsx`, `docs/estudo-sistema-imagens-produto-e-variantes.md`, `docs/estudo-linha-por-linha-sistema-imagens.md`, `docs/estudo-linha-por-linha-sistema-imagens-produto-e-variantes.md`.
+- Compatibilidade: sim - produtos e variantes legados continuam funcionando por fallback para `img/alt` quando nao houver galeria completa.
+- Risco: medio - envolve migration, writes aninhados no Prisma, sincronizacao entre banco e storage e mudanca de comportamento visual na pagina do produto.
+
+**Mudancas**
+
+- **Added**
+    - Modelo `ProdutoVarianteImagem` no Prisma para persistir galerias especificas de cada variante.
+    - Componente `ProductVariantsField` no painel admin para editar nome, cor, preco, estoque e galeria de cada variante.
+    - Loader detalhado no catalogo para buscar produto por `slug` com galerias completas.
+    - Documentacao didatica em `docs/estudo-sistema-imagens-produto-e-variantes.md`, `docs/estudo-linha-por-linha-sistema-imagens.md` e `docs/estudo-linha-por-linha-sistema-imagens-produto-e-variantes.md`.
+- **Changed**
+    - `ProductImagesField` ficou reutilizavel para produto base e variantes, com titulo e descricoes customizaveis.
+    - `toForm` e `toPayload` passaram a suportar `variants[].images`, inclusive com fallback para dados antigos.
+    - `POST /api/admin/products` e `PUT /api/admin/products/[id]` agora criam, atualizam e sincronizam galerias de variantes.
+    - `ProdutoClient` passou a resolver a galeria ativa com base na variante selecionada e em fallbacks progressivos.
+    - `variants-btn.jsx` e `variants-img.jsx` foram separados por responsabilidade: selecao de cor e selecao de miniatura.
+    - `AdminAccessGate` agora diferencia melhor falhas de permissao, autenticacao e erros temporarios, evitando 404 falso em alguns cenarios.
+- **Fixed**
+    - A pagina publica passou a trocar a galeria inteira ao selecionar outra cor, em vez de apenas trocar uma imagem unica.
+    - Variantes antigas com apenas `img` nao quebram o editor nem a vitrine publica.
+    - Abertura do editor admin ficou mais resiliente a falhas transitórias de check de acesso.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard/settingsProduct/[id]`, confirmar que o editor carrega e que o produto base mostra sua galeria.
+2. Adicionar ao menos duas variantes, subir imagens diferentes para cada uma e salvar.
+3. Recarregar o editor e validar persistencia de `variants[].images`.
+4. Abrir `/produto/[slug]`, trocar de cor e confirmar que a galeria muda junto com a variante.
+5. Validar fallback com produto ou variante legado que ainda tenha apenas `img/alt`.
+6. Executar `npm run db:generate`, `npm run lint`, `npm run build` e `npx prisma migrate deploy`.
+
 ### v0.1.28 - 2026-03-20
 
 **Resumo**

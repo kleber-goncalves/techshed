@@ -4,9 +4,8 @@ import { useState } from "react";
 
 export default function VariantsButton({
     produto,
-    setImagemAtiva,
     corAtiva,
-    setCorAtiva,
+    onSelectVariant,
     ClassBaseButton,
     ClassBase,
 }) {
@@ -42,10 +41,7 @@ export default function VariantsButton({
                     <button
                         key={cor.id}
                         type="button"
-                        onClick={() => {
-                            setImagemAtiva(cor.img);
-                            setCorAtiva(cor.id);
-                        }}
+                        onClick={() => onSelectVariant(cor.id)}
                         onMouseEnter={() => setHoveredId(cor.id)}
                         onMouseLeave={() => setHoveredId(null)}
                         onFocus={() => setHoveredId(cor.id)}

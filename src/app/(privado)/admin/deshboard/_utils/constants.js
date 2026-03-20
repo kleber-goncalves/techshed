@@ -12,6 +12,7 @@ export function createEmptyProductForm() {
         slug: "",
         description: "",
         images: [],
+        variants: [],
         priceCents: 0,
         stock: 0,
         category: "",
