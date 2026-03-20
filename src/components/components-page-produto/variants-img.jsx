@@ -1,33 +1,30 @@
-'use client';
+"use client";
 
 import Image from "next/image";
 
 export default function VariantsImg({
-    produto,
-    setImagemAtiva,
-    corAtiva,
-    setCorAtiva,
-    ClassBase
+    images = [],
+    activeIndex = 0,
+    onSelect,
+    productName,
+    ClassBase,
 }) {
     return (
         <div className={`flex gap-2 ${ClassBase}`}>
-            {produto.colors.map((cor) => (
+            {images.map((image, index) => (
                 <button
-                    key={cor.id}
-                    onClick={() => {
-                        setImagemAtiva(cor.img);
-                        setCorAtiva(cor.id);
-                    }}
+                    key={image.id ?? `${image.url}-${index}`}
+                    type="button"
+                    onClick={() => onSelect(index)}
                     className={`border-2 rounded-lg transition
-
-        ${corAtiva === cor.id ? "border-black dark:border-white dark:border-2" : "border-transparent"}
+        ${activeIndex === index ? "border-black dark:border-white dark:border-2" : "border-transparent"}
       `}
                 >
-                    <Image 
+                    <Image
                         width={900}
                         height={900}
-                        src={cor.img}
-                        alt={cor.alt || produto.name}
+                        src={image.url}
+                        alt={image.alt || productName}
                         className="w-16 h-16 object-cover rounded-md cursor-pointer"
                     />
                 </button>

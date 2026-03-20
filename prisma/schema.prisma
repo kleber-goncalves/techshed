@@ -99,10 +99,24 @@ model ProdutoVariante {
   stock      Int
   hex        String?
   corName    String?
+  images     ProdutoVarianteImagem[]
   produto    Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
 
   @@index([produtoId])
   @@map("ProdutoVariantes")
+}
+
+model ProdutoVarianteImagem {
+  id          String          @id @default(cuid())
+  varianteId  String
+  url         String
+  alt         String
+  position    Int             @default(0)
+  storagePath String?
+  variante    ProdutoVariante @relation(fields: [varianteId], references: [id], onDelete: Cascade)
+
+  @@index([varianteId, position])
+  @@map("ProdutoVarianteImagens")
 }
 
 

@@ -1,33 +1,66 @@
 import { LOW_STOCK_THRESHOLD } from "./constants";
 
-export function toForm(product) {
-    const fallbackImages = product.img
+function normalizeImages(images, fallbackImage = null, legacyIdPrefix = "img") {
+    const fallbackImages = fallbackImage?.url
         ? [
             {
-                id: "legacy-cover",
-                url: product.img,
-                alt: product.alt ?? "",
+                id: `${legacyIdPrefix}-cover`,
+                url: fallbackImage.url,
+                alt: fallbackImage.alt ?? "",
                 position: 0,
                 storagePath: null,
             },
         ]
         : [];
 
-    const images = (product.images?.length ? product.images : fallbackImages).map(
-        (image, index) => ({
-            id: image.id ?? `img-${index}`,
-            url: image.url,
-            alt: image.alt ?? "",
-            position: index,
-            storagePath: image.storagePath ?? null,
-        }),
+    const source = images?.length ? images : fallbackImages;
+
+    return source.map((image, index) => ({
+        id: image.id ?? `${legacyIdPrefix}-${index}`,
+        url: image.url,
+        alt: image.alt ?? "",
+        position: index,
+        storagePath: image.storagePath ?? null,
+    }));
+}
+
+export function toForm(product) {
+    const images = normalizeImages(
+        product.images,
+        product.img
+            ? {
+                url: product.img,
+                alt: product.alt ?? "",
+            }
+            : null,
+        "legacy",
     );
+
+    const variants = (product.variantes ?? []).map((variant, index) => ({
+        id: variant.id ?? `variant-${index}`,
+        name: variant.name ?? "",
+        corName: variant.corName ?? "",
+        hex: variant.hex ?? "",
+        priceCents: variant.priceCents ?? 0,
+        stock: variant.stock ?? 0,
+        images: normalizeImages(
+            variant.images,
+            variant.img
+                ? {
+                    url: variant.img,
+                    alt: variant.alt ?? "",
+                }
+                : null,
+            `variant-${variant.id ?? index}`,
+        ),
+    }));
 
     return {
         name: product.name ?? "",
         slug: product.slug ?? "",
         description: product.description ?? "",
         images,
+        variants,
         priceCents: product.priceCents ?? 0,
         stock: product.stock ?? 0,
         category: product.category ?? "",
@@ -49,6 +82,21 @@ export function toPayload(form) {
             alt: image.alt,
             position: index,
             storagePath: image.storagePath ?? null,
+        })),
+        variants: (form.variants ?? []).map((variant) => ({
+            id: variant.id,
+            name: variant.name,
+            corName: variant.corName,
+            hex: variant.hex,
+            priceCents: Number(variant.priceCents) || 0,
+            stock: Number(variant.stock) || 0,
+            images: (variant.images ?? []).map((image, index) => ({
+                id: image.id,
+                url: image.url,
+                alt: image.alt,
+                position: index,
+                storagePath: image.storagePath ?? null,
+            })),
         })),
         priceCents: Number(form.priceCents) || 0,
         stock: Number(form.stock) || 0,

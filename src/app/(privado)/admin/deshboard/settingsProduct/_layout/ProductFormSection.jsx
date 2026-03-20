@@ -25,6 +25,7 @@ import {
 import { formatDate } from "../../_utils/utils";
 
 import ProductImagesField from "./ProductImagesField";
+import ProductVariantsField from "./ProductVariantsField";
 
 export default function ProductFormSection({
     selectedProduct,
@@ -188,6 +189,21 @@ export default function ProductFormSection({
                                 />
                             </div>
                         </div>
+                    </section>
+
+                    <Separator />
+
+                    <section className="space-y-3">
+                        <h2 className="text-sm font-semibold tracking-tight">
+                            Variantes
+                        </h2>
+                        <ProductVariantsField
+                            productId={selectedProduct?.id ?? selectedId}
+                            value={form.variants}
+                            onChange={(variants) =>
+                                onFieldChange("variants", variants)
+                            }
+                        />
                     </section>
 
                     <Separator />
