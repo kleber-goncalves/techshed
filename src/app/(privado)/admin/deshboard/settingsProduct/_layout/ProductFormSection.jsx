@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { formatDate } from "../../_utils/utils";
 
+import ProductImagesField from "./ProductImagesField";
+
 export default function ProductFormSection({
     selectedProduct,
     form,
@@ -195,38 +197,23 @@ export default function ProductFormSection({
                             Mídia e texto
                         </h2>
                         <div className="space-y-3">
-                            <div className="space-y-2">
-                                <label
-                                    htmlFor="admin-prod-img"
-                                    className="text-sm font-medium"
-                                >
-                                    URL da imagem
-                                </label>
-                                <Input
-                                    id="admin-prod-img"
-                                    placeholder="https://..."
-                                    value={form.img}
-                                    onChange={(event) =>
-                                        onFieldChange("img", event.target.value)
+                            {selectedId ? (
+                                <ProductImagesField
+                                    productId={
+                                        selectedProduct?.id ?? selectedId
+                                    }
+                                    value={form.images}
+                                    onChange={(images) =>
+                                        onFieldChange("images", images)
                                     }
                                 />
-                            </div>
-                            <div className="space-y-2">
-                                <label
-                                    htmlFor="admin-prod-alt"
-                                    className="text-sm font-medium"
-                                >
-                                    Texto alternativo
-                                </label>
-                                <Input
-                                    id="admin-prod-alt"
-                                    placeholder="Descrição breve da imagem"
-                                    value={form.alt}
-                                    onChange={(event) =>
-                                        onFieldChange("alt", event.target.value)
-                                    }
-                                />
-                            </div>
+                            ) : (
+                                <p className="text-sm text-muted-foreground">
+                                    Salve o produto primeiro para adicionar
+                                    fotos.
+                                </p>
+                            )}
+
                             <div className="space-y-2">
                                 <label
                                     htmlFor="admin-prod-promocao"

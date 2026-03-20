@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-03-18
-Branch: `refactor/estrutura-pasta`
+Última atualização: 2026-03-20
+Branch: `feat/add-img-products`
 
 ## Visão Geral
 
@@ -18,6 +18,28 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ```
 
 ## Melhorias Prioritárias
+
+### Sugestões Codex (galeria híbrida de imagens de produto)
+
+1. Criar limpeza de uploads órfãos no Supabase Storage
+
+- Hoje o upload acontece antes do save final do produto; se o admin abandonar a edição, o arquivo pode ficar sem vínculo no banco.
+- Sugestão: criar rotina de limpeza por `storagePath` órfão ou endpoint de rollback para uploads descartados.
+
+2. Adicionar validação e compressão de imagem antes do upload
+
+- Validar tipo MIME, tamanho máximo e dimensões mínimas antes de enviar para o bucket.
+- Opcionalmente comprimir imagens grandes no client para reduzir tempo de upload e custo de storage.
+
+3. Melhorar feedback visual do upload na galeria
+
+- Exibir loading por card, erro por imagem e confirmação visual quando o upload terminar.
+- Isso reduz ansiedade do usuário e facilita entender qual foto falhou.
+
+4. Cobrir o fluxo híbrido com testes E2E
+
+- Cenários mínimos: produto legado abre com fallback local, upload autenticado funciona, reorder persiste e remoção apaga vínculo corretamente.
+- Isso protege a integração entre editor, API, Prisma e Supabase Storage.
 
 ### Sugestões Codex (editor dedicado `settingsProduct`)
 
@@ -1058,3 +1080,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-03-13: Atualizadas sugestoes para listagem admin (URL com filtros, paginacao/scroll e padronizacao visual).
 - 2026-03-14: Incluidas sugestoes de evolucao para scroll infinito (fallback manual, persistencia de scroll e virtualizacao).
 - 2026-03-18: Incluidas sugestoes para consolidacao e documentacao da nova estrutura do dashboard admin.
+- 2026-03-20: Incluidas sugestoes de evolucao para a galeria hibrida de imagens de produto.

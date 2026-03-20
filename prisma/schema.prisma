@@ -69,10 +69,24 @@ model Produto {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   variantes   ProdutoVariante[]
+  images      ProdutoImagem[]
 
   @@index([category])
   @@index([catalogKey])
   @@map("Produtos")
+}
+
+model ProdutoImagem {
+  id          String  @id @default(cuid())
+  produtoId   String
+  url         String
+  alt         String
+  position    Int     @default(0)
+  storagePath String?
+  produto     Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  @@index([produtoId, position])
+  @@map("ProdutoImagens")
 }
 
 model ProdutoVariante {

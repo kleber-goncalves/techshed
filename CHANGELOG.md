@@ -76,6 +76,49 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.28 - 2026-03-20
+
+**Resumo**
+
+- Implementacao da galeria hibrida de imagens no editor de produtos: imagens legadas locais continuam funcionando e novas imagens do painel passam a subir para o Supabase Storage.
+
+**Motivacao**
+
+- Substituir o campo manual de URL por uma experiencia visual de edicao de imagens no painel admin.
+- Permitir adicionar, trocar, remover e reordenar fotos sem migrar imediatamente todo o acervo legado em `public/`.
+- Preparar o projeto para um fluxo mais profissional de upload mantendo compatibilidade com o catalogo atual.
+
+**Impacto**
+
+- Componentes afetados: `prisma/schema.prisma`, `prisma/migrations/20260318181845_add_produto_imagens/migration.sql`, `next.config.mjs`, `src/lib/supabase/supabaseAdmin.js`, `src/app/api/admin/uploads/route.js`, `src/app/api/admin/products/[id]/route.js`, `src/app/(privado)/admin/deshboard/_utils/constants.js`, `src/app/(privado)/admin/deshboard/_utils/utils.js`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductFormSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductImagesField.jsx`.
+- Compatibilidade: sim - produtos antigos com `img/alt` local continuam abrindo no editor via fallback.
+- Risco: medio - envolve migration, autenticacao no upload, integracao com Supabase Storage e sincronizacao da capa do produto.
+
+**Mudancas**
+
+- **Added**
+    - Modelo `ProdutoImagem` no Prisma para armazenar galeria, ordenacao e `storagePath`.
+    - Rota `POST /api/admin/uploads` protegida por `requireAdmin` para upload de imagens no bucket `product-images`.
+    - Client server-side `src/lib/supabase/supabaseAdmin.js` para operacoes administrativas no Supabase Storage.
+    - Componente `ProductImagesField` com preview, upload, troca, remocao e reordenacao por drag and drop.
+- **Changed**
+    - `ProductFormSection` trocou os campos de URL/alt por uma galeria visual e bloqueia upload antes do produto existir.
+    - `toForm` e `toPayload` passaram a trabalhar com `images[]`, preservando fallback para produtos legados com imagem local.
+    - `PUT /api/admin/products/[id]` agora persiste galeria, sincroniza `img/alt` com a imagem principal e remove arquivos apagados do bucket.
+    - `next.config.mjs` passou a permitir imagens remotas do domínio do Supabase no `next/image`.
+- **Fixed**
+    - Upload do editor agora envia o token de sessao no header `Authorization`, corrigindo o erro `401 Unauthorized`.
+    - Guards adicionados no componente para evitar erro ao cancelar a selecao de arquivos.
+    - Sincronizacao do `alt` principal ajustada para nao sobrescrever indevidamente o valor da imagem de capa.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard/settingsProduct/[id]` com um produto legado e confirmar que a imagem local continua aparecendo.
+2. Adicionar uma nova foto no editor e validar upload para o Supabase Storage sem erro `401`.
+3. Reordenar, trocar e remover fotos; salvar o produto; recarregar a pagina e confirmar persistencia.
+4. Verificar que a primeira foto da galeria vira a capa usada em `img/alt`.
+5. Executar `npm run lint` e `npm run build` e confirmar sucesso.
+
 ### v0.1.27 - 2026-03-18
 
 **Resumo**
