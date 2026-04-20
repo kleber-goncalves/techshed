@@ -100,7 +100,7 @@ function AddImageTile({ disabled, isUploading, onClick }) {
             onClick={onClick}
             disabled={disabled}
             className={cn(
-                "flex aspect-square w-full items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 transition-all",
+                "flex aspect-square w-full cursor-pointer items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 transition-all",
                 "hover:border-primary/60 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 "disabled:cursor-not-allowed disabled:opacity-60",
             )}
@@ -169,7 +169,7 @@ function ImageCard({
                             {isCover ? "Imagem principal" : `Foto ${index + 1}`}
                         </Badge>
 
-                        <div className="rounded-full bg-background/90 p-2 text-muted-foreground shadow-sm">
+                        <div className="cursor-grab rounded-full bg-background/90 p-2 text-muted-foreground shadow-sm">
                             <GripVertical className="size-4" />
                         </div>
                     </div>
@@ -202,7 +202,7 @@ function ImageCard({
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="flex-1"
+                            className="flex-1 cursor-pointer"
                             disabled={isBusy}
                             onClick={() => onReplaceClick(image.id)}
                         >
@@ -218,7 +218,7 @@ function ImageCard({
                             type="button"
                             variant="destructive"
                             size="sm"
-                            className="flex-1"
+                            className="flex-1 cursor-pointer"
                             disabled={isBusy}
                             onClick={() => onRemove(image.id)}
                         >
@@ -240,6 +240,7 @@ export default function ProductImagesField({
     description = "A imagem principal fica em destaque e as demais podem ser adicionadas, reordenadas, trocadas ou removidas.",
     emptyTitle = "Adicione a primeira imagem do produto",
     emptyDescription = "A primeira foto enviada vira a capa principal automaticamente.",
+    cardClassName,
 }) {
     const addInputRef = useRef(null);
     const replaceInputRefs = useRef({});
@@ -349,7 +350,7 @@ export default function ProductImagesField({
     }
 
     return (
-        <Card className="border-dashed">
+        <Card className={cn("border-dashed", cardClassName)}>
             <CardHeader className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
                     <CardTitle>{title}</CardTitle>
@@ -438,8 +439,6 @@ export default function ProductImagesField({
                         </div>
 
                         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-2">
-
-
                             {galleryImages.map((image, index) => (
                                 <ImageCard
                                     key={image.id}
@@ -455,7 +454,7 @@ export default function ProductImagesField({
                                 />
                             ))}
 
-                                                        <AddImageTile
+                            <AddImageTile
                                 disabled={isAdding}
                                 isUploading={isAdding}
                                 onClick={openAddDialog}

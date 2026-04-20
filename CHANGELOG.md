@@ -76,6 +76,46 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.30 - 2026-04-20
+
+**Resumo**
+
+- Refatoracao visual e estrutural do editor admin de produtos, com layout em duas colunas, seções em cards independentes e componentizacao do formulario em arquivos menores.
+
+**Motivacao**
+
+- Melhorar a leitura e o foco do editor, separando o formulario em blocos visuais mais claros.
+- Destacar `Dados avancados` em uma coluna lateral para reduzir ruido na coluna principal.
+- Facilitar manutencao futura com componentes menores e responsabilidades mais bem definidas.
+
+**Impacto**
+
+- Componentes afetados: `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductEditorClient.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductFormSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductImagesField.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductVariantsField.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/SectionCard.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/ProductFormHeaderCard.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/ProductBasicInfoSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/ProductPricingSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/ProductAdvancedInfoSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/ProductStatusSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/ProductFormActions.jsx`.
+- Compatibilidade: sim - sem alteracao de rotas ou contratos de API.
+- Risco: baixo - mudancas concentradas na organizacao do editor e no layout do painel admin.
+
+**Mudancas**
+
+- **Added**
+    - Nova pasta `settingsProduct/_components` com componentes dedicados para cabecalho, secoes do formulario, card base e acoes finais.
+- **Changed**
+    - `ProductEditorClient` ampliado para `max-w-7xl`, dando mais respiro ao editor.
+    - `ProductFormSection` reorganizado em grid de duas colunas no desktop, com `Dados avancados` na direita e as demais secoes na esquerda.
+    - Secoes do formulario agora aparecem como cards separados, com espacamento entre blocos para exibir o fundo da pagina.
+    - `ProductVariantsField` e `ProductImagesField` ficaram mais reutilizaveis no editor, aceitando configuracoes visuais adicionais.
+- **Fixed**
+    - Padronizacao visual entre cards do editor, incluindo a galeria de imagens.
+    - Limpeza de estrutura e formatação em arquivos do editor para reduzir ruido de manutencao.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard/settingsProduct/new` e confirmar que o editor aparece em cards separados.
+2. Abrir `/admin/deshboard/settingsProduct/[id]` em desktop e validar `Dados avancados` na coluna da direita.
+3. Confirmar que `Dados basicos`, `Preco e estoque`, `Variantes`, `Midia e texto`, `Status` e acoes permanecem na coluna da esquerda.
+4. Verificar que o espacamento entre cards deixa o fundo da pagina visivel.
+5. Testar galeria do produto, variantes, salvar e desativar para garantir que os fluxos continuam funcionando.
+6. Executar `npm run lint -- 'src/app/(privado)/admin/deshboard/settingsProduct'` e confirmar sucesso.
+
 ### v0.1.29 - 2026-03-20
 
 **Resumo**

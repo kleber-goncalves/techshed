@@ -93,11 +93,11 @@ export default function ProductEditorClient({ productId }) {
     }, [productId, router]);
 
     return (
-        <section className="mx-auto w-full max-w-5xl space-y-4">
+        <section className="mx-auto w-full max-w-7xl space-y-4">
             <Button
                 variant="outline"
                 onClick={() => router.push("/admin/deshboard")}
-                className="gap-2"
+                className="gap-2 cursor-pointer"
             >
                 <ArrowLeft className="size-4" />
                 Voltar para painel
