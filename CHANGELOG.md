@@ -76,6 +76,314 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.30 - 2026-04-20
+
+**Resumo**
+
+- Refatoracao visual e estrutural do editor admin de produtos, com layout em duas colunas, seções em cards independentes e componentizacao do formulario em arquivos menores.
+
+**Motivacao**
+
+- Melhorar a leitura e o foco do editor, separando o formulario em blocos visuais mais claros.
+- Destacar `Dados avancados` em uma coluna lateral para reduzir ruido na coluna principal.
+- Facilitar manutencao futura com componentes menores e responsabilidades mais bem definidas.
+
+**Impacto**
+
+- Componentes afetados: `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductEditorClient.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductFormSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductImagesField.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductVariantsField.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/SectionCard.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/ProductFormHeaderCard.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/ProductBasicInfoSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/ProductPricingSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/ProductAdvancedInfoSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/ProductStatusSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_components/ProductFormActions.jsx`.
+- Compatibilidade: sim - sem alteracao de rotas ou contratos de API.
+- Risco: baixo - mudancas concentradas na organizacao do editor e no layout do painel admin.
+
+**Mudancas**
+
+- **Added**
+    - Nova pasta `settingsProduct/_components` com componentes dedicados para cabecalho, secoes do formulario, card base e acoes finais.
+- **Changed**
+    - `ProductEditorClient` ampliado para `max-w-7xl`, dando mais respiro ao editor.
+    - `ProductFormSection` reorganizado em grid de duas colunas no desktop, com `Dados avancados` na direita e as demais secoes na esquerda.
+    - Secoes do formulario agora aparecem como cards separados, com espacamento entre blocos para exibir o fundo da pagina.
+    - `ProductVariantsField` e `ProductImagesField` ficaram mais reutilizaveis no editor, aceitando configuracoes visuais adicionais.
+- **Fixed**
+    - Padronizacao visual entre cards do editor, incluindo a galeria de imagens.
+    - Limpeza de estrutura e formatação em arquivos do editor para reduzir ruido de manutencao.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard/settingsProduct/new` e confirmar que o editor aparece em cards separados.
+2. Abrir `/admin/deshboard/settingsProduct/[id]` em desktop e validar `Dados avancados` na coluna da direita.
+3. Confirmar que `Dados basicos`, `Preco e estoque`, `Variantes`, `Midia e texto`, `Status` e acoes permanecem na coluna da esquerda.
+4. Verificar que o espacamento entre cards deixa o fundo da pagina visivel.
+5. Testar galeria do produto, variantes, salvar e desativar para garantir que os fluxos continuam funcionando.
+6. Executar `npm run lint -- 'src/app/(privado)/admin/deshboard/settingsProduct'` e confirmar sucesso.
+
+### v0.1.29 - 2026-03-20
+
+**Resumo**
+
+- Implementacao completa da galeria por variante no painel admin e na pagina publica do produto, com fallback entre imagens da variante e do produto base, alem de documentacao didatica aprofundada para estudo.
+
+**Motivacao**
+
+- Permitir o comportamento de ecommerce em que cada cor/variante mostra suas proprias fotos.
+- Evoluir o editor admin para cadastrar galerias tanto no produto base quanto em cada variante.
+- Manter compatibilidade com produtos legados que ainda dependem de `img/alt`.
+- Registrar a arquitetura nova em documentacao voltada para estudo de front-end e back-end.
+
+**Impacto**
+
+- Componentes afetados: `prisma/schema.prisma`, `prisma/migrations/20260320163000_add_produto_variante_imagens/migration.sql`, `src/app/api/admin/products/route.js`, `src/app/api/admin/products/[id]/route.js`, `src/app/(privado)/admin/deshboard/_utils/constants.js`, `src/app/(privado)/admin/deshboard/_utils/utils.js`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductFormSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductImagesField.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductVariantsField.jsx`, `src/lib/catalogo-db.js`, `src/app/(publico)/produto/[slug]/page.js`, `src/app/(publico)/produto/[slug]/ProdutoClient.jsx`, `src/components/components-page-produto/variants-btn.jsx`, `src/components/components-page-produto/variants-img.jsx`, `src/app/(privado)/admin/deshboard/_components/AdminAccessGate.jsx`, `docs/estudo-sistema-imagens-produto-e-variantes.md`, `docs/estudo-linha-por-linha-sistema-imagens.md`, `docs/estudo-linha-por-linha-sistema-imagens-produto-e-variantes.md`.
+- Compatibilidade: sim - produtos e variantes legados continuam funcionando por fallback para `img/alt` quando nao houver galeria completa.
+- Risco: medio - envolve migration, writes aninhados no Prisma, sincronizacao entre banco e storage e mudanca de comportamento visual na pagina do produto.
+
+**Mudancas**
+
+- **Added**
+    - Modelo `ProdutoVarianteImagem` no Prisma para persistir galerias especificas de cada variante.
+    - Componente `ProductVariantsField` no painel admin para editar nome, cor, preco, estoque e galeria de cada variante.
+    - Loader detalhado no catalogo para buscar produto por `slug` com galerias completas.
+    - Documentacao didatica em `docs/estudo-sistema-imagens-produto-e-variantes.md`, `docs/estudo-linha-por-linha-sistema-imagens.md` e `docs/estudo-linha-por-linha-sistema-imagens-produto-e-variantes.md`.
+- **Changed**
+    - `ProductImagesField` ficou reutilizavel para produto base e variantes, com titulo e descricoes customizaveis.
+    - `toForm` e `toPayload` passaram a suportar `variants[].images`, inclusive com fallback para dados antigos.
+    - `POST /api/admin/products` e `PUT /api/admin/products/[id]` agora criam, atualizam e sincronizam galerias de variantes.
+    - `ProdutoClient` passou a resolver a galeria ativa com base na variante selecionada e em fallbacks progressivos.
+    - `variants-btn.jsx` e `variants-img.jsx` foram separados por responsabilidade: selecao de cor e selecao de miniatura.
+    - `AdminAccessGate` agora diferencia melhor falhas de permissao, autenticacao e erros temporarios, evitando 404 falso em alguns cenarios.
+- **Fixed**
+    - A pagina publica passou a trocar a galeria inteira ao selecionar outra cor, em vez de apenas trocar uma imagem unica.
+    - Variantes antigas com apenas `img` nao quebram o editor nem a vitrine publica.
+    - Abertura do editor admin ficou mais resiliente a falhas transitórias de check de acesso.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard/settingsProduct/[id]`, confirmar que o editor carrega e que o produto base mostra sua galeria.
+2. Adicionar ao menos duas variantes, subir imagens diferentes para cada uma e salvar.
+3. Recarregar o editor e validar persistencia de `variants[].images`.
+4. Abrir `/produto/[slug]`, trocar de cor e confirmar que a galeria muda junto com a variante.
+5. Validar fallback com produto ou variante legado que ainda tenha apenas `img/alt`.
+6. Executar `npm run db:generate`, `npm run lint`, `npm run build` e `npx prisma migrate deploy`.
+
+### v0.1.28 - 2026-03-20
+
+**Resumo**
+
+- Implementacao da galeria hibrida de imagens no editor de produtos: imagens legadas locais continuam funcionando e novas imagens do painel passam a subir para o Supabase Storage.
+
+**Motivacao**
+
+- Substituir o campo manual de URL por uma experiencia visual de edicao de imagens no painel admin.
+- Permitir adicionar, trocar, remover e reordenar fotos sem migrar imediatamente todo o acervo legado em `public/`.
+- Preparar o projeto para um fluxo mais profissional de upload mantendo compatibilidade com o catalogo atual.
+
+**Impacto**
+
+- Componentes afetados: `prisma/schema.prisma`, `prisma/migrations/20260318181845_add_produto_imagens/migration.sql`, `next.config.mjs`, `src/lib/supabase/supabaseAdmin.js`, `src/app/api/admin/uploads/route.js`, `src/app/api/admin/products/[id]/route.js`, `src/app/(privado)/admin/deshboard/_utils/constants.js`, `src/app/(privado)/admin/deshboard/_utils/utils.js`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductFormSection.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/ProductImagesField.jsx`.
+- Compatibilidade: sim - produtos antigos com `img/alt` local continuam abrindo no editor via fallback.
+- Risco: medio - envolve migration, autenticacao no upload, integracao com Supabase Storage e sincronizacao da capa do produto.
+
+**Mudancas**
+
+- **Added**
+    - Modelo `ProdutoImagem` no Prisma para armazenar galeria, ordenacao e `storagePath`.
+    - Rota `POST /api/admin/uploads` protegida por `requireAdmin` para upload de imagens no bucket `product-images`.
+    - Client server-side `src/lib/supabase/supabaseAdmin.js` para operacoes administrativas no Supabase Storage.
+    - Componente `ProductImagesField` com preview, upload, troca, remocao e reordenacao por drag and drop.
+- **Changed**
+    - `ProductFormSection` trocou os campos de URL/alt por uma galeria visual e bloqueia upload antes do produto existir.
+    - `toForm` e `toPayload` passaram a trabalhar com `images[]`, preservando fallback para produtos legados com imagem local.
+    - `PUT /api/admin/products/[id]` agora persiste galeria, sincroniza `img/alt` com a imagem principal e remove arquivos apagados do bucket.
+    - `next.config.mjs` passou a permitir imagens remotas do domínio do Supabase no `next/image`.
+- **Fixed**
+    - Upload do editor agora envia o token de sessao no header `Authorization`, corrigindo o erro `401 Unauthorized`.
+    - Guards adicionados no componente para evitar erro ao cancelar a selecao de arquivos.
+    - Sincronizacao do `alt` principal ajustada para nao sobrescrever indevidamente o valor da imagem de capa.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard/settingsProduct/[id]` com um produto legado e confirmar que a imagem local continua aparecendo.
+2. Adicionar uma nova foto no editor e validar upload para o Supabase Storage sem erro `401`.
+3. Reordenar, trocar e remover fotos; salvar o produto; recarregar a pagina e confirmar persistencia.
+4. Verificar que a primeira foto da galeria vira a capa usada em `img/alt`.
+5. Executar `npm run lint` e `npm run build` e confirmar sucesso.
+
+### v0.1.27 - 2026-03-18
+
+**Resumo**
+
+- Refatoracao da estrutura do dashboard admin de produtos, reorganizando componentes, hooks, utilitarios e layouts.
+
+**Motivacao**
+
+- Simplificar a organizacao do painel e reduzir acoplamento entre listagem e editor.
+- Facilitar manutencao futura separando responsabilidades por pastas.
+
+**Impacto**
+
+- Componentes afetados: `src/app/(privado)/admin/deshboard/_components/*`, `src/app/(privado)/admin/deshboard/_hooks/*`, `src/app/(privado)/admin/deshboard/_utils/*`, `src/app/(privado)/admin/deshboard/_layout/*`, `src/app/(privado)/admin/deshboard/settingsProduct/_layout/*`, paginas `src/app/(privado)/admin/deshboard/page.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/new/page.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/[id]/page.jsx`.
+- Compatibilidade: sim - nao altera rotas nem contratos de API.
+- Risco: baixo - mudanca estrutural de organizacao e imports.
+
+**Mudancas**
+
+- **Changed**
+    - Componentes do painel admin reorganizados para `_components`, `_hooks`, `_utils` e `_layout`, substituindo a pasta `_components/admin-produtos`.
+    - Editor de produto passa a ser importado via `settingsProduct/_layout` nas paginas de criacao/edicao.
+    - Pagina principal do dashboard agora importa `AdminProdutosClient` do novo `_layout`.
+- **Removed**
+    - Estrutura antiga `src/app/(privado)/admin/deshboard/_components/admin-produtos/*`.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard` e validar listagem/KPIs e interacao.
+2. Abrir `/admin/deshboard/settingsProduct/new` e confirmar editor de criacao.
+3. Abrir `/admin/deshboard/settingsProduct/[id]` e confirmar carregamento do editor com o produto.
+
+### v0.1.26 - 2026-03-14
+
+**Resumo**
+
+- Implementacao de scroll infinito na listagem admin de produtos com nova documentacao didatica do fluxo.
+
+**Motivacao**
+
+- Melhorar a performance percebida e a usabilidade da listagem com grandes volumes.
+- Registrar o fluxo completo (backend + frontend) para estudo e reuso em outros projetos.
+
+**Impacto**
+
+- Componentes afetados: `src/app/api/admin/products/route.js`, `src/lib/helpers/api/adminProductsApi.js`, `src/app/(privado)/admin/deshboard/_components/AdminProdutosClient.jsx`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/ProductsSection.jsx`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/hooks/useInfiniteAdminProducts.js`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/hooks/useInfiniteTrigger.js`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/components/InfiniteScrollSentinel.jsx`, `docs/scroll-infinito-admin.md`.
+- Compatibilidade: sim - mantendo o endpoint e adicionando paginação.
+- Risco: baixo - mudancas focadas na listagem e no fluxo de carregamento incremental.
+
+**Mudancas**
+
+- **Added**
+    - Hook `useInfiniteAdminProducts` para paginação incremental e estado de carregamento.
+    - Hook `useInfiniteTrigger` com `IntersectionObserver` para acionar carregamento.
+    - Componente `InfiniteScrollSentinel` para estados "carregando mais" e "fim da lista".
+    - Documentacao didatica do scroll infinito em `docs/scroll-infinito-admin.md`.
+- **Changed**
+    - `GET /api/admin/products` passou a aceitar `page` e `limit` e retornar `items`, `hasMore` e `summary`.
+    - `AdminProdutosClient` e `ProductsSection` atualizados para consumir paginação e renderizar sentinel.
+    - Helper `listAdminProducts` atualizado para suportar paginação no client.
+- **Fixed**
+    - Deduplicacao por `id` ao mesclar paginas na listagem do admin.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard` e validar carregamento inicial com skeleton.
+2. Rolar a lista e confirmar carregamento incremental sem duplicar itens.
+3. Aplicar busca/filtro e validar reinicio correto da lista.
+4. Validar exibição de "Fim da lista" quando `hasMore` for `false`.
+
+### v0.1.25 - 2026-03-13
+
+**Resumo**
+
+- Refinos de layout e legibilidade na listagem de produtos do painel admin, com pequenos ajustes de UI no filtro e na tabela.
+
+**Motivação**
+
+- Melhorar a leitura e o espaçamento dos elementos da tabela e do filtro.
+- Ajustar o comportamento visual do `Select` para evitar altura fixa desnecessária.
+
+**Impacto**
+
+- Componentes afetados: `src/app/(privado)/admin/deshboard/_components/AdminProdutosClient.jsx`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/ProductsSection.jsx`, `src/components/ui/select.jsx`.
+- Compatibilidade: sim - apenas ajustes visuais/estruturais no front.
+- Risco: baixo - sem mudança de lógica.
+
+**Mudanças**
+
+- **Changed**
+    - `ProductsSection` recebeu melhorias de legibilidade e estrutura (quebra de linhas, comentários e layout de células).
+    - `AdminProdutosClient` ajustou a grid para `xl:grid-cols-1` na tela de listagem única.
+    - `SelectTrigger` passou a usar `h-fit` no tamanho default para respeitar o conteúdo.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard` e validar alinhamento do filtro, tabela e estado vazio.
+2. Verificar o `Select` de status com altura adequada em diferentes tamanhos.
+3. Confirmar que a listagem continua navegável e sem regressões.
+
+### v0.1.24 - 2026-03-07
+
+**Resumo**
+
+- Migração do fluxo admin para editor dedicado por rota (`settingsProduct`) com limpeza da listagem principal e suporte backend/frontend para carregamento por ID.
+
+**Motivação**
+
+- Separar responsabilidades entre tela de listagem e tela de edição para melhorar manutenção e escalar o painel.
+- Evitar acoplamento de estados de formulário dentro do `AdminProdutosClient`.
+- Permitir deep-link de edição de produto por URL.
+
+**Impacto**
+
+- Componentes afetados: `src/app/(privado)/admin/deshboard/_components/AdminProdutosClient.jsx`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/ProductEditorClient.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/new/page.jsx`, `src/app/(privado)/admin/deshboard/settingsProduct/[id]/page.jsx`, `src/lib/helpers/api/adminProductsApi.js`, `src/app/api/admin/products/[id]/route.js`.
+- Compatibilidade: sim - fluxo antigo de listagem continua, edição foi movida para rota dedicada.
+- Risco: médio - mudança de navegação no painel admin e inclusão de nova superfície de rota.
+
+**Mudanças**
+
+- **Added**
+    - Rotas de edição/criação: `/admin/deshboard/settingsProduct/new` e `/admin/deshboard/settingsProduct/[id]`.
+    - Componente `ProductEditorClient` para centralizar o ciclo de create/update/archive fora da tela de listagem.
+    - Helper `getAdminProduct(id)` no client API admin.
+    - Handler `GET /api/admin/products/[id]` para carregar produto individual no editor.
+- **Changed**
+    - `AdminProdutosClient` passou a atuar como tela de listagem + navegação para o editor dedicado.
+    - Limpeza de estados mortos de formulário na listagem (`selectedId`, `form`, handlers de submit/archive locais).
+- **Fixed**
+    - Correção do fluxo de `saving` no editor para submit/archive.
+    - Correção da importação de router para App Router (`next/navigation`) no editor.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard` e validar listagem, busca e navegação para edição ao clicar no produto.
+2. Clicar em “Novo produto” e validar abertura de `/admin/deshboard/settingsProduct/new`.
+3. Editar um produto em `/admin/deshboard/settingsProduct/[id]` e validar persistência.
+4. Desativar produto no editor e validar retorno para o painel.
+5. Executar `npm run lint` e `npm run build` e confirmar sucesso sem erros.
+
+### v0.1.23 - 2026-03-06
+
+**Resumo**
+
+- Redesign profissional do painel admin de produtos com `shadcn/ui`, componentização por seções reutilizáveis e correção de persistência de `features` no update.
+
+**Motivação**
+
+- Elevar a qualidade visual e a legibilidade do painel admin para uso real em operação.
+- Reduzir acoplamento no `AdminProdutosClient` com separação clara de responsabilidades.
+- Corrigir inconsistência funcional onde `features` era enviado pelo front mas não persistia no `PUT`.
+
+**Impacto**
+
+- Componentes afetados: `src/app/(privado)/admin/deshboard/_components/AdminProdutosClient.jsx`, `src/app/(privado)/admin/deshboard/_components/AdminAccessGate.jsx`, `src/app/(privado)/admin/deshboard/loading.jsx`, `src/app/(privado)/admin/deshboard/page.jsx`, `src/app/(privado)/admin/deshboard/_components/admin-produtos/*`, `src/components/ui/{badge,card,input,separator,skeleton,switch,table,textarea}.jsx`, `src/app/api/admin/products/[id]/route.js`.
+- Compatibilidade: sim - sem quebra de endpoints/rotas existentes no fluxo atual.
+- Risco: médio - mudança ampla de UI no painel e nova composição de componentes.
+
+**Mudanças**
+
+- **Added**
+    - Novos componentes de UI baseados em `shadcn/ui`: `card`, `input`, `textarea`, `badge`, `table`, `skeleton`, `separator`, `switch`.
+    - Nova pasta modular `admin-produtos` com seções reutilizáveis (`DashboardHeader`, `KpiSection`, `FeedbackBanners`, `ProductsSection`, `ProductFormSection`, `ProductStatusBadge`) e utilitários (`constants`, `utils`).
+- **Changed**
+    - `AdminProdutosClient` refatorado para papel de orquestrador (estado, regras e fluxo), delegando renderização para componentes reutilizáveis.
+    - UX do dashboard modernizada com KPIs, tabela com filtro de status, skeleton, estado vazio e formulário organizado por seções.
+    - `AdminAccessGate` e `loading.jsx` alinhados visualmente com o novo padrão de painel.
+- **Fixed**
+    - `PUT /api/admin/products/[id]` agora aceita e persiste o campo `features`.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard` como admin e validar renderização do novo layout com KPIs, busca/filtro e tabela.
+2. Selecionar produto, editar campos e salvar; confirmar persistência no refresh.
+3. Editar `features` (multilinha), salvar e validar atualização no banco.
+4. Desativar produto via diálogo de confirmação e confirmar status inativo na listagem.
+5. Executar `npm run lint` e `npm run build` e confirmar sucesso.
+
 ### v0.1.22 - 2026-03-06
 
 **Resumo**

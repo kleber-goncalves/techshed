@@ -14,22 +14,39 @@ import { useCart } from "@/contexts/cart-context";
 import { formatCurrency } from "@/lib/formatCurrency";
 import IconFavorit from "@/components/components-page-produto/iconFavorito";
 
+function resolveGallery(produto, selectedVariant) {
+    if (selectedVariant?.images?.length) return selectedVariant.images;
+    if (selectedVariant?.img) {
+        return [
+            {
+                id: `${selectedVariant.id}-cover`,
+                url: selectedVariant.img,
+                alt: selectedVariant.alt || produto.name,
+            },
+        ];
+    }
+    if (produto.images?.length) return produto.images;
+    if (produto.img) {
+        return [
+            {
+                id: `${produto.id}-cover`,
+                url: produto.img,
+                alt: produto.alt || produto.name,
+            },
+        ];
+    }
+    return [];
+}
+
 export default function ProdutoClient({ produto }) {
     const router = useRouter();
     const { addItem } = useCart();
 
-    // Verificamos se existem cores definidas no produto
     const hasColors = produto.colors && produto.colors.length > 0;
-
-    // Estado inicial seguro: Se tiver cores, usa a primeira. Se não, usa a imagem principal do produto.
-    const [imagemAtiva, setImagemAtiva] = useState(
-        hasColors ? produto.colors[0].img : produto.img,
-    );
-
-    // Estado da cor ativa (null se não houver cores)
     const [corAtiva, setCorAtiva] = useState(
         hasColors ? produto.colors[0].id : null,
     );
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
 
     const selectedVariant = useMemo(() => {
@@ -39,6 +56,15 @@ export default function ProdutoClient({ produto }) {
             produto.colors[0]
         );
     }, [corAtiva, hasColors, produto.colors]);
+
+    const currentGallery = useMemo(
+        () => resolveGallery(produto, selectedVariant),
+        [produto, selectedVariant],
+    );
+
+    const activeImage =
+        currentGallery[Math.min(activeImageIndex, Math.max(currentGallery.length - 1, 0))] ??
+        null;
 
     const availableStock = useMemo(() => {
         const rawStock = selectedVariant?.stock ?? produto.stock ?? 0;
@@ -51,6 +77,11 @@ export default function ProdutoClient({ produto }) {
 
     const clampedQuantity =
         availableStock > 0 ? Math.min(quantity, availableStock) : 1;
+
+    function handleSelectVariant(variantId) {
+        setCorAtiva(variantId);
+        setActiveImageIndex(0);
+    }
 
     function handleAddToCart() {
         if (availableStock <= 0) return;
@@ -90,25 +121,26 @@ export default function ProdutoClient({ produto }) {
                     <section className="flex flex-col items-end  h-fit gap-4 dark:p-6">
                         <div className="gap-2 flex flex-col">
                             <div className=" bg-gray-400 border  border-black">
-                                {imagemAtiva && (
+                                {activeImage && (
                                     <Image
-                                        src={imagemAtiva}
-                                        alt={produto.name}
+                                        src={activeImage.url}
+                                        alt={activeImage.alt || produto.name}
                                         width={900}
                                         height={900}
                                         className=" border border-black"
                                     />
                                 )}
                             </div>
-                            {/* Só renderiza a galeria de variantes se o produto tiver cores */}
-                            {hasColors && (
+                            {currentGallery.length > 0 && (
                                 <div className="flex flex-row w-full">
                                     <VariantsImg
-                                        produto={produto}
-                                        imagemAtiva={imagemAtiva}
-                                        setImagemAtiva={setImagemAtiva}
-                                        corAtiva={corAtiva}
-                                        setCorAtiva={setCorAtiva}
+                                        images={currentGallery}
+                                        activeIndex={Math.min(
+                                            activeImageIndex,
+                                            Math.max(currentGallery.length - 1, 0),
+                                        )}
+                                        onSelect={setActiveImageIndex}
+                                        productName={produto.name}
                                         ClassBase=""
                                     />
                                 </div>
@@ -116,11 +148,8 @@ export default function ProdutoClient({ produto }) {
                         </div>
                         <div>
                             <p className="text-black dark:text-white">
-                                Sou uma descrição do produto. Este é um ótimo
-                                lugar para vender seu produto e chamar a atenção
-                                dos visitantes. Descreva seu produto de forma
-                                clara e concisa, use palavras-chave exclusivas e
-                                mostre seu diferencial.
+                                {produto.description ||
+                                    "Sou uma descrição do produto. Este é um ótimo lugar para vender seu produto e chamar a atenção dos visitantes. Descreva seu produto de forma clara e concisa, use palavras-chave exclusivas e mostre seu diferencial."}
                             </p>
                         </div>
                     </section>
@@ -144,10 +173,8 @@ export default function ProdutoClient({ produto }) {
                                 <div className="flex flex-col ">
                                     <VariantsButton
                                         produto={produto}
-                                        imagemAtiva={imagemAtiva}
-                                        setImagemAtiva={setImagemAtiva}
                                         corAtiva={corAtiva}
-                                        setCorAtiva={setCorAtiva}
+                                        onSelectVariant={handleSelectVariant}
                                         ClassBase=""
                                     />
                                 </div>
@@ -194,7 +221,13 @@ export default function ProdutoClient({ produto }) {
                                 </Button>
                             </div>
 
-                            <ProductAccordion product={produto} />
+                            <ProductAccordion
+                                product={{
+                                    ...produto,
+                                    priceCents: displayPriceCents,
+                                    stock: availableStock,
+                                }}
+                            />
                         </section>
                     </section>
                 </section>

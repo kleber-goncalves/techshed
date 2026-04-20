@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-03-06
-Branch: `feat/dashboard-admin`
+Última atualização: 2026-04-20
+Branch: `refacter/sec-add-img-product`
 
 ## Visão Geral
 
@@ -18,6 +18,170 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ```
 
 ## Melhorias Prioritárias
+
+### Sugestões Codex (editor settingsProduct: layout e manutencao)
+
+1. Mover `ProductImagesField` e `ProductVariantsField` para `settingsProduct/_components`
+
+- Hoje a branch ja separa boa parte do editor em `_components`, mas esses dois arquivos ainda estao em `_layout`.
+- Padronizar tudo no mesmo dominio reduz duvida sobre onde criar ou procurar novos componentes do editor.
+
+2. Criar um `index.js` de exports para `settingsProduct/_components`
+
+- Os imports do editor ainda estao longos e espalhados.
+- Um barrel local melhora legibilidade e facilita futuras mudancas de pasta.
+
+3. Adicionar protecao de saida com alteracoes nao salvas
+
+- O editor agora esta mais robusto e maior; por isso cresce o risco de perder trabalho ao navegar sem querer.
+- Vale criar um guard de dirty state para confirmar saida antes de trocar de rota.
+
+4. Cobrir o layout em duas colunas com testes E2E ou smoke visual
+
+- O editor ganhou comportamento responsivo e nova hierarquia visual.
+- Recomendo validar pelo menos desktop e mobile para evitar regressoes em futuras mudancas de layout.
+
+### Sugestões Codex (galerias por variante e galeria pública)
+
+1. Adicionar upload múltiplo com fila e progresso por imagem
+
+- Hoje o fluxo funciona bem por imagem, mas o cadastro de variantes com muitas fotos pode ficar lento.
+- Sugestão: permitir selecionar varias imagens de uma vez e exibir progresso individual por card.
+
+2. Criar testes automatizados para o fallback da galeria pública
+
+- Cenarios minimos: variante com galeria propria, variante sem galeria caindo para `produto.images`, e fallback final para `img`.
+- Isso protege o comportamento mais importante da vitrine apos a mudanca de arquitetura.
+
+3. Gerar miniaturas otimizadas para o admin e para a vitrine
+
+- Hoje a mesma imagem pode servir tanto para preview quanto para exibicao maior.
+- Sugestao: gerar thumbs menores ou usar estrategia de transformacao para reduzir custo de carregamento.
+
+4. Melhorar acessibilidade e navegacao por teclado na galeria
+
+- Permitir reorder e troca de foco sem depender apenas de mouse ou drag and drop.
+- Isso ajuda acessibilidade e tambem reduz atrito operacional no painel.
+
+5. Adicionar validacao de consistencia entre capa e galeria
+
+- Criar uma verificacao visual ou automatica para mostrar quando `img/alt` divergir da primeira imagem da galeria.
+- Isso facilita manutencao de produtos legados durante o periodo de transicao.
+
+### Sugestões Codex (galeria híbrida de imagens de produto)
+
+1. Criar limpeza de uploads órfãos no Supabase Storage
+
+- Hoje o upload acontece antes do save final do produto; se o admin abandonar a edição, o arquivo pode ficar sem vínculo no banco.
+- Sugestão: criar rotina de limpeza por `storagePath` órfão ou endpoint de rollback para uploads descartados.
+
+2. Adicionar validação e compressão de imagem antes do upload
+
+- Validar tipo MIME, tamanho máximo e dimensões mínimas antes de enviar para o bucket.
+- Opcionalmente comprimir imagens grandes no client para reduzir tempo de upload e custo de storage.
+
+3. Melhorar feedback visual do upload na galeria
+
+- Exibir loading por card, erro por imagem e confirmação visual quando o upload terminar.
+- Isso reduz ansiedade do usuário e facilita entender qual foto falhou.
+
+4. Cobrir o fluxo híbrido com testes E2E
+
+- Cenários mínimos: produto legado abre com fallback local, upload autenticado funciona, reorder persiste e remoção apaga vínculo corretamente.
+- Isso protege a integração entre editor, API, Prisma e Supabase Storage.
+
+### Sugestões Codex (editor dedicado `settingsProduct`)
+
+1. Adicionar botão de “Voltar com contexto” para manter busca/filtro do painel
+
+- Hoje o retorno vai para `/admin/deshboard` sem preservar estado anterior.
+- Recomendo salvar `q` e `statusFilter` na URL (ou `sessionStorage`) e restaurar ao voltar.
+
+2. Criar estado de carregamento visual no editor (`Skeleton`)
+
+- A tela de edição já mostra texto de loading; evoluir para skeleton melhora percepção de desempenho.
+- Reduz salto visual quando o produto é carregado por ID.
+
+3. Proteger saída com alterações não salvas
+
+- Detectar dirty state no formulário e confirmar navegação antes de sair da tela.
+- Evita perda de edição acidental em fluxos longos.
+
+4. Cobertura E2E do fluxo completo de edição por rota
+
+- Cenários: listagem -> editar -> salvar -> voltar, listagem -> novo -> criar -> redirecionar para `[id]`, desativar produto.
+- Garante estabilidade da nova arquitetura baseada em rota dedicada.
+
+### Sugestões Codex (dashboard admin: evolução pós-componentização)
+
+1. Extrair o estado de busca para a URL
+
+- Persistir `q` e `statusFilter` em query params para facilitar compartilhamento e back/forward.
+- Ajuda também a manter o contexto ao voltar do editor para a listagem.
+
+2. Adicionar paginação ou scroll infinito opcional
+
+- Para catálogos maiores, a listagem pode ficar pesada.
+- Sugestão: `limit` + paginação simples no backend e UI opcional (ou “carregar mais”).
+
+3. Padronizar densidade e espaçamento na tabela
+
+- Consolidar tokens de espaçamento para reduzir variações entre linhas/headers.
+- Facilita consistência visual em futuras tabelas do admin.
+
+### Sugestões Codex (scroll infinito admin)
+
+1. Adicionar fallback manual de "Carregar mais"
+
+- Garante acessibilidade quando o `IntersectionObserver` falhar ou for desativado.
+- Serve como alternativa para usuarios que preferem controle manual.
+
+2. Persistir posicao de scroll e pagina ao voltar do editor
+
+- Salvar `scrollY` e pagina atual em `sessionStorage` ao navegar para o editor.
+- Ao voltar, restaurar a posicao para evitar perder o contexto.
+
+3. Avaliar virtualizacao da lista
+
+- Para listas muito grandes, `react-virtual` ou semelhante reduz custo de render.
+- Mantem a UI fluida sem perder o scroll infinito.
+
+### Sugestões Codex (refatoracao da estrutura do dashboard admin)
+
+1. Documentar a nova convencao de pastas do painel
+
+- Registrar o proposito de `_layout`, `_components`, `_hooks` e `_utils` para o admin.
+- Facilita onboarding e reduz risco de imports fora do padrao.
+
+2. Criar barreira contra imports legados
+
+- Adicionar verificacao no CI (ou script local) para bloquear `/_components/admin-produtos/`.
+- Garante que o caminho antigo nao volte em novos commits.
+
+3. Centralizar exports do painel admin
+
+- Criar barrels (ex.: `index.js`) para reduzir paths longos e facilitar futuros moves.
+- Melhora legibilidade dos imports ao longo do painel.
+
+1. Mover edição de produto para página dedicada (`/admin/deshboard/settingsProduct/[id]`)
+
+- Hoje a lista e o formulário convivem na mesma tela; com crescimento de campos isso reduz foco e escalabilidade.
+- Recomendação: manter `/admin/deshboard` como index (lista/KPIs) e abrir editor em rota própria.
+
+2. Criar fluxo de criação dedicado (`/admin/deshboard/settingsProduct/new`)
+
+- Botão “Novo produto” passaria a abrir uma página de criação com o mesmo `ProductFormSection`.
+- Benefício: reaproveitamento de componente com menor acoplamento e URL compartilhável.
+
+3. Expor `GET /api/admin/products/[id]` para hidratação de editor
+
+- O editor dedicado precisa carregar um produto por ID de forma direta.
+- Isso simplifica cache, reload da página e futura instrumentação de auditoria.
+
+4. Adicionar testes E2E do fluxo admin de produtos
+
+- Cenários mínimos: listar, buscar, criar, editar, atualizar `features`, desativar e validar status na tabela.
+- Objetivo: proteger a nova arquitetura modular contra regressões em deploy.
 
 ### Sugestões Codex (painel admin: segurança e experiência)
 
@@ -960,3 +1124,11 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-02-17: Incluidas melhorias para validacao, reset e UX do fluxo de enderecos.
 - 2026-02-18: Incluida melhoria de seguranca e validacoes completas para o fluxo de carteira.
 - 2026-02-24: Incluidas sugestoes de evolucao para arquitetura de auth global, testes de header/carrinho e UX de carregamento no header.
+- 2026-03-06: Incluidas sugestoes de evolucao do dashboard admin apos componentizacao (edicao em rota dedicada, GET por id e E2E).
+- 2026-03-07: Incluidas sugestoes de evolucao para o editor dedicado settingsProduct (contexto de retorno, skeleton, dirty state e E2E).
+- 2026-03-13: Atualizadas sugestoes para listagem admin (URL com filtros, paginacao/scroll e padronizacao visual).
+- 2026-03-14: Incluidas sugestoes de evolucao para scroll infinito (fallback manual, persistencia de scroll e virtualizacao).
+- 2026-03-18: Incluidas sugestoes para consolidacao e documentacao da nova estrutura do dashboard admin.
+- 2026-03-20: Incluidas sugestoes de evolucao para a galeria hibrida de imagens de produto.
+- 2026-03-20: Incluidas sugestoes de evolucao para galerias por variante e fallback da pagina publica do produto.
+- 2026-04-20: Incluidas sugestoes de evolucao para o novo layout e a manutencao do editor `settingsProduct`.

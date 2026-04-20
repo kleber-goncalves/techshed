@@ -1,11 +1,9 @@
-import { getCatalogoFlat } from "@/lib/catalogo-db";
+import { getProdutoBySlug } from "@/lib/catalogo-db";
 import ProdutoClient from "./ProdutoClient";
 
 export default async function Produto({ params }) {
     const { slug } = await params;
-
-    const listaCompleta = await getCatalogoFlat();
-    const produto = listaCompleta.find((p) => p.slug === slug);
+    const produto = await getProdutoBySlug(slug);
 
     if (!produto) {
         return (

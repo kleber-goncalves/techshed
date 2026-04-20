@@ -7,6 +7,10 @@ async function getToken() {
     return session?.access_token;
 }
 
+export function getAdminProduct(id) {
+    return authFetch(`/api/admin/products/${id}`);
+}
+
 async function authFetch(url, init = {}) {
     const token = await getToken();
     if (!token) {
@@ -37,9 +41,19 @@ async function authFetch(url, init = {}) {
     return res.json();
 }
 
-export function listAdminProducts(search = "") {
-    const q = encodeURIComponent(search);
-    return authFetch(`/api/admin/products?q=${q}`);
+export function listAdminProducts({
+    search = "",
+    status = "all",
+    page = 1,
+    limit = 20,
+} = {}) {
+    const params = new URLSearchParams();
+    if (search) params.set("q", search);
+    if (status && status !== "all") params.set("status", status);
+    params.set("page", String(page));
+    params.set("limit", String(limit));
+
+    return authFetch(`/api/admin/products?${params.toString()}`);
 }
 
 export function createAdminProduct(payload) {
