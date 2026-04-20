@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-03-20
-Branch: `style/component-add-img`
+Última atualização: 2026-04-20
+Branch: `refacter/sec-add-img-product`
 
 ## Visão Geral
 
@@ -18,6 +18,28 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ```
 
 ## Melhorias Prioritárias
+
+### Sugestões Codex (editor settingsProduct: layout e manutencao)
+
+1. Mover `ProductImagesField` e `ProductVariantsField` para `settingsProduct/_components`
+
+- Hoje a branch ja separa boa parte do editor em `_components`, mas esses dois arquivos ainda estao em `_layout`.
+- Padronizar tudo no mesmo dominio reduz duvida sobre onde criar ou procurar novos componentes do editor.
+
+2. Criar um `index.js` de exports para `settingsProduct/_components`
+
+- Os imports do editor ainda estao longos e espalhados.
+- Um barrel local melhora legibilidade e facilita futuras mudancas de pasta.
+
+3. Adicionar protecao de saida com alteracoes nao salvas
+
+- O editor agora esta mais robusto e maior; por isso cresce o risco de perder trabalho ao navegar sem querer.
+- Vale criar um guard de dirty state para confirmar saida antes de trocar de rota.
+
+4. Cobrir o layout em duas colunas com testes E2E ou smoke visual
+
+- O editor ganhou comportamento responsivo e nova hierarquia visual.
+- Recomendo validar pelo menos desktop e mobile para evitar regressoes em futuras mudancas de layout.
 
 ### Sugestões Codex (galerias por variante e galeria pública)
 
@@ -1109,3 +1131,4 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - 2026-03-18: Incluidas sugestoes para consolidacao e documentacao da nova estrutura do dashboard admin.
 - 2026-03-20: Incluidas sugestoes de evolucao para a galeria hibrida de imagens de produto.
 - 2026-03-20: Incluidas sugestoes de evolucao para galerias por variante e fallback da pagina publica do produto.
+- 2026-04-20: Incluidas sugestoes de evolucao para o novo layout e a manutencao do editor `settingsProduct`.

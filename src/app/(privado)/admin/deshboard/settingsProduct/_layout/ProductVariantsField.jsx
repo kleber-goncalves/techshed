@@ -11,6 +11,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import ProductImagesField from "./ProductImagesField";
 
 function createEmptyVariant() {
@@ -26,13 +27,20 @@ function createEmptyVariant() {
 }
 
 function getVariantLabel(variant, index) {
-    return variant.corName?.trim() || variant.name?.trim() || `Variante ${index + 1}`;
+    return (
+        variant.corName?.trim() ||
+        variant.name?.trim() ||
+        `Variante ${index + 1}`
+    );
 }
 
 export default function ProductVariantsField({
     productId,
     value = [],
     onChange,
+    title = "Variantes do produto",
+    description = "Cadastre cores e outras variações com preço, estoque e galeria própria. Quando uma variante tiver imagens, elas passam a ser exibidas na página pública.",
+    cardClassName,
 }) {
     function updateVariant(variantId, updater) {
         onChange(
@@ -58,20 +66,16 @@ export default function ProductVariantsField({
     }
 
     return (
-        <Card className="border-dashed">
+        <Card className={cn("border-dashed", cardClassName)}>
             <CardHeader className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
-                    <CardTitle>Variantes do produto</CardTitle>
+                    <CardTitle>{title}</CardTitle>
                     <Badge variant="outline">
                         {value.length}{" "}
                         {value.length === 1 ? "variante" : "variantes"}
                     </Badge>
                 </div>
-                <CardDescription>
-                    Cadastre cores e outras variações com preço, estoque e
-                    galeria própria. Quando uma variante tiver imagens, elas
-                    passam a ser exibidas na página pública.
-                </CardDescription>
+                <CardDescription>{description}</CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-4">
@@ -96,6 +100,7 @@ export default function ProductVariantsField({
                                     </div>
 
                                     <Button
+                                        className="cursor-pointer"
                                         type="button"
                                         variant="outline"
                                         size="sm"
@@ -230,7 +235,12 @@ export default function ProductVariantsField({
                     </div>
                 )}
 
-                <Button type="button" variant="outline" onClick={addVariant}>
+                <Button
+                    className="mb-4 cursor-pointer"
+                    type="button"
+                    variant="outline"
+                    onClick={addVariant}
+                >
                     <Plus className="size-4" />
                     Adicionar variante
                 </Button>
