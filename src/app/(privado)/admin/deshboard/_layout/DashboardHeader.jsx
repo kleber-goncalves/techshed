@@ -10,7 +10,7 @@ export default function DashboardHeader({ onNewProduct }) {
                     Gerencie catálogo, estoque e disponibilidade com uma visão centralizada.
                 </p>
             </div>
-            <Button type="button" onClick={onNewProduct} className="gap-2">
+            <Button type="button" onClick={onNewProduct} className="gap-2 cursor-pointer">
                 <Plus className="size-4" />
                 Novo produto
             </Button>

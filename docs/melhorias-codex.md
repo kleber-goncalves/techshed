@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-04-20
-Branch: `refacter/sec-add-img-product`
+Última atualização: 2026-05-07
+Branch: `feat/filtro-dashboard`
 
 ## Visão Geral
 
@@ -119,6 +119,11 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - Persistir `q` e `statusFilter` em query params para facilitar compartilhamento e back/forward.
 - Ajuda também a manter o contexto ao voltar do editor para a listagem.
 
+1. Persistir filtro de categoria na URL
+
+- Incluir `category` na querystring junto com `q` e `statusFilter`.
+- Benefícios: refresh preserva estado, link compartilhável e “voltar do editor” recupera filtros.
+
 2. Adicionar paginação ou scroll infinito opcional
 
 - Para catálogos maiores, a listagem pode ficar pesada.
@@ -146,6 +151,12 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 - Para listas muito grandes, `react-virtual` ou semelhante reduz custo de render.
 - Mantem a UI fluida sem perder o scroll infinito.
 
+4. UX do Select de categorias no admin
+
+- Mostrar estado “Carregando categorias...” (item desabilitado) quando `loadingCategories` estiver `true`.
+- Exibir labels amigáveis (ex.: “Celulares” em vez de `celulare`) usando um mapa central ou retornando `{ label, value }` no endpoint.
+- Adicionar busca dentro do Select quando a lista crescer (se o componente de UI suportar).
+
 ### Sugestões Codex (refatoracao da estrutura do dashboard admin)
 
 1. Documentar a nova convencao de pastas do painel
@@ -162,6 +173,11 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 
 - Criar barrels (ex.: `index.js`) para reduzir paths longos e facilitar futuros moves.
 - Melhora legibilidade dos imports ao longo do painel.
+
+4. Padronizar vocabulário de categorias (`category` vs `catalogKey`)
+
+- Hoje o produto tem `category` (ex.: `celulare`) e `catalogKey` (ex.: `celulares`) e o site público agrupa por `catalogKey`.
+- Sugestão: documentar/validar essa regra (ou criar um mapeamento) para reduzir inconsistência no cadastro e em filtros.
 
 1. Mover edição de produto para página dedicada (`/admin/deshboard/settingsProduct/[id]`)
 

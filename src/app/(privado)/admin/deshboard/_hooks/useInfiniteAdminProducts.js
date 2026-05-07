@@ -9,7 +9,12 @@ function mergeById(prev, next) {
     return Array.from(map.values());
 }
 
-export function useInfiniteAdminProducts({ search, status, pageSize = 20 }) {
+export function useInfiniteAdminProducts({
+    search,
+    status,
+    category,
+    pageSize = 20,
+}) {
     const [items, setItems] = useState([]);
     const [summary, setSummary] = useState({
         total: 0,
@@ -37,6 +42,7 @@ export function useInfiniteAdminProducts({ search, status, pageSize = 20 }) {
                 const data = await listAdminProducts({
                     search,
                     status,
+                    category,
                     page: targetPage,
                     limit: pageSize,
                 });
@@ -67,7 +73,7 @@ export function useInfiniteAdminProducts({ search, status, pageSize = 20 }) {
                 }
             }
         },
-        [pageSize, search, status],
+        [category, pageSize, search, status],
     );
 
     useEffect(() => {

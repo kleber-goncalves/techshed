@@ -44,16 +44,22 @@ async function authFetch(url, init = {}) {
 export function listAdminProducts({
     search = "",
     status = "all",
+    category = "all",
     page = 1,
     limit = 20,
 } = {}) {
     const params = new URLSearchParams();
     if (search) params.set("q", search);
     if (status && status !== "all") params.set("status", status);
+    if (category && category !== "all") params.set("category", category);
     params.set("page", String(page));
     params.set("limit", String(limit));
 
     return authFetch(`/api/admin/products?${params.toString()}`);
+}
+
+export function listAdminProductCategories() {
+    return authFetch("/api/admin/products/categories");
 }
 
 export function createAdminProduct(payload) {
