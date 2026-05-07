@@ -1,32 +1,52 @@
 import crypto from "crypto";
+import prisma from "@/lib/prisma/prisma";
 import { supabase } from "@/lib/supabase/supabaseClient";
 import { supabaseAdmin } from "@/lib/supabase/supabaseAdmin";
 
 const BUCKET = "profile-images";
 
+async function getAuthenticatedUser(request) {
+    const authHeader = request.headers.get("Authorization");
+    const token = authHeader?.replace("Bearer ", "");
+
+    if (!token) {
+        return {
+            error: Response.json({ error: "Token ausente." }, { status: 401 }),
+        };
+    }
+
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+        return {
+            error: Response.json(
+                { error: "Usuário não autenticado." },
+                { status: 401 },
+            ),
+        };
+    }
+
+    return { user };
+}
+
 export async function POST(request) {
     try {
-        const authHeader = request.headers.get("Authorization");
-        const token = authHeader?.replace("Bearer ", "");
+        const auth = await getAuthenticatedUser(request);
 
-        if (!token) {
-            return Response.json({ error: "Token ausente." }, { status: 401 });
-        }
+        if (auth.error) return auth.error;
 
-        const {
-            data: { user },
-            error: authError,
-        } = await supabase.auth.getUser(token);
-
-        if (authError || !user) {
-            return Response.json({ error: "Usuário não autenticado." }, { status: 401 });
-        }
-
+        const { user } = auth;
         const formData = await request.formData();
         const file = formData.get("file");
 
         if (!(file instanceof File)) {
-            return Response.json({ error: "Arquivo inválido." }, { status: 400 });
+            return Response.json(
+                { error: "Arquivo inválido." },
+                { status: 400 },
+            );
         }
 
         const ext = file.name.split(".").pop() || "jpg";
@@ -41,10 +61,15 @@ export async function POST(request) {
             });
 
         if (uploadError) {
-            return Response.json({ error: uploadError.message }, { status: 500 });
+            return Response.json(
+                { error: uploadError.message },
+                { status: 500 },
+            );
         }
 
-        const { data } = supabaseAdmin.storage.from(BUCKET).getPublicUrl(storagePath);
+        const { data } = supabaseAdmin.storage
+            .from(BUCKET)
+            .getPublicUrl(storagePath);
 
         return Response.json({
             url: data.publicUrl,
@@ -53,6 +78,45 @@ export async function POST(request) {
     } catch (error) {
         return Response.json(
             { error: error?.message || "Erro interno ao enviar foto." },
+            { status: 500 },
+        );
+    }
+}
+
+export async function DELETE(request) {
+    try {
+        const auth = await getAuthenticatedUser(request);
+        if (auth.error) return auth.error;
+
+        const { user } = auth;
+
+        const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { avatarStoragePath: true },
+        });
+
+        if (!dbUser?.avatarStoragePath) {
+            return Response.json({
+                success: true,
+                message: "Sem foto antiga para remover.",
+            });
+        }
+
+        const { error: removeError } = await supabaseAdmin.storage
+            .from(BUCKET)
+            .remove([dbUser.avatarStoragePath]);
+
+        if (removeError) {
+            return Response.json(
+                { error: removeError.message },
+                { status: 500 },
+            );
+        }
+
+        return Response.json({ success: true });
+    } catch (error) {
+        return Response.json(
+            { error: error?.message || "Erro interno ao remover foto." },
             { status: 500 },
         );
     }

@@ -1,12 +1,5 @@
-// src/lib/api/userUpdate.js
 import { supabase } from "@/lib/supabase/supabaseClient";
 
-/**
- * Atualiza os dados do usuário.
- * @param {string} userId - ID do usuário
- * @param {{name?: string, email?: string, phone?: string, newPassword?: string, avatarUrl?: string, avatarStoragePath?: string}} data
- * @returns {Promise<{ success: boolean, payload?: any, error?: string }>}
- */
 export async function updateUserProfile(userId, data) {
     try {
         // Validação mínima
@@ -111,6 +104,36 @@ export async function uploadProfileAvatar(file) {
 
         const payload = await res.json();
         return { success: true, payload };
+    } catch (error) {
+        return { success: false, error: error?.message || "Erro desconhecido" };
+    }
+}
+
+export async function deleteOldProfileAvatar() {
+    try {
+        const tokenResponse = await supabase.auth.getSession();
+        const accessToken = tokenResponse?.data?.session?.access_token;
+
+        if (!accessToken) {
+            return { success: false, error: "Usuário não autenticado." };
+        }
+
+        const res = await fetch("/api/users/avatar", {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
+
+        if (!res.ok) {
+            const errPayload = await res.json();
+            return {
+                success: false,
+                error: errPayload?.error || "Erro ao remover imagem antiga.",
+            };
+        }
+
+        return { success: true };
     } catch (error) {
         return { success: false, error: error?.message || "Erro desconhecido" };
     }

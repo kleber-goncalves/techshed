@@ -2,118 +2,131 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/supabaseClient";
-import { updateUserProfile, uploadProfileAvatar } from "@/hooks/userUpdate";
+import {
+    updateUserProfile,
+    uploadProfileAvatar,
+    deleteOldProfileAvatar,
+} from "@/hooks/userUpdate";
 import { useRouter } from "next/navigation";
 
 export default function SectionInfP() {
+    const router = useRouter();
+    const [user, setUser] = useState(null);
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        phone: "",
+        newPassword: "",
+    });
+    const [message, setMessage] = useState("");
+    const [avatarFile, setAvatarFile] = useState(null);
+    const [avatarPreview, setAvatarPreview] = useState("");
+    const [isSaving, setIsSaving] = useState(false);
 
+    useEffect(() => {
+        async function loadUser() {
+            const { data: sessionData } = await supabase.auth.getSession();
+            if (!sessionData.session) {
+                router.push("/auth");
+                return;
+            }
 
-      const router = useRouter();
-      const [user, setUser] = useState(null);
-      const [form, setForm] = useState({
-          name: "",
-          email: "",
-          phone: "",
-          newPassword: "",
-      });
-      const [message, setMessage] = useState("");
-      const [avatarFile, setAvatarFile] = useState(null);
-      const [avatarPreview, setAvatarPreview] = useState("");
-      const [isSaving, setIsSaving] = useState(false);
+            const {
+                data: { user: loggedUser },
+            } = await supabase.auth.getUser();
+            const accessToken = sessionData.session.access_token;
 
-      useEffect(() => {
-          async function loadUser() {
-              const { data: sessionData } = await supabase.auth.getSession();
-              if (!sessionData.session) {
-                  router.push("/auth");
-                  return;
-              }
+            setUser(loggedUser);
 
-              const {
-                  data: { user: loggedUser },
-              } = await supabase.auth.getUser();
-              const accessToken = sessionData.session.access_token;
+            let dbUser = null;
+            const dbUserResponse = await fetch(`/api/users/${loggedUser.id}`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
 
-              setUser(loggedUser);
+            if (dbUserResponse.ok) {
+                dbUser = await dbUserResponse.json();
+            }
 
-              let dbUser = null;
-              const dbUserResponse = await fetch(`/api/users/${loggedUser.id}`, {
-                  method: "GET",
-                  headers: {
-                      Authorization: `Bearer ${accessToken}`,
-                  },
-              });
+            setForm({
+                name: dbUser?.name || loggedUser.user_metadata?.full_name || "",
+                email: loggedUser.email,
+                phone: dbUser?.phone || loggedUser.user_metadata?.phone || "",
+                newPassword: "",
+            });
+            setAvatarPreview(
+                dbUser?.avatarUrl || loggedUser.user_metadata?.avatar_url || "",
+            );
+        }
+        loadUser();
+    }, [router]);
 
-              if (dbUserResponse.ok) {
-                  dbUser = await dbUserResponse.json();
-              }
+    async function handleSubmit(e) {
+        e.preventDefault();
 
-              setForm({
-                  name: dbUser?.name || loggedUser.user_metadata?.full_name || "",
-                  email: loggedUser.email,
-                  phone: dbUser?.phone || loggedUser.user_metadata?.phone || "",
-                  newPassword: "",
-              });
-              setAvatarPreview(
-                  dbUser?.avatarUrl || loggedUser.user_metadata?.avatar_url || "",
-              );
-          }
-          loadUser();
-      }, [router]);
+        if (!user) return;
+        setIsSaving(true);
+        setMessage("");
 
-      async function handleSubmit(e) {
-          e.preventDefault();
+        let avatarPayload = {};
 
-          if (!user) return;
-          setIsSaving(true);
-          setMessage("");
+        if (avatarFile) {
+            // Upload da nova
+            const uploadResult = await uploadProfileAvatar(avatarFile);
+            if (!uploadResult.success) {
+                setMessage("Erro no upload da foto: " + uploadResult.error);
+                setIsSaving(false);
+                return;
+            }
 
-          let avatarPayload = {};
+            // Tenta remover a antiga (não bloqueia fluxo se falhar)
+            const deleteResult = await deleteOldProfileAvatar();
+            if (!deleteResult.success) {
+                console.warn(
+                    "Falha ao remover foto antiga:",
+                    deleteResult.error,
+                );
+            }
 
-          if (avatarFile) {
-              const uploadResult = await uploadProfileAvatar(avatarFile);
-              if (!uploadResult.success) {
-                  setMessage("Erro no upload da foto: " + uploadResult.error);
-                  setIsSaving(false);
-                  return;
-              }
-              avatarPayload = {
-                  avatarUrl: uploadResult.payload.url,
-                  avatarStoragePath: uploadResult.payload.storagePath,
-              };
-          }
+            avatarPayload = {
+                avatarUrl: uploadResult.payload.url,
+                avatarStoragePath: uploadResult.payload.storagePath,
+            };
+        }
 
-          const result = await updateUserProfile(user.id, {
-              name: form.name,
-              email: form.email,
-              phone: form.phone,
-              newPassword: form.newPassword,
-              ...avatarPayload,
-          });
+        // Salva dados do perfil + caminho da nova no Prisma
+        const result = await updateUserProfile(user.id, {
+            name: form.name,
+            email: form.email,
+            phone: form.phone,
+            newPassword: form.newPassword,
+            ...avatarPayload,
+        });
 
-          if (result.success) {
-              setMessage("Dados atualizados com sucesso!");
-              setAvatarFile(null);
-              if (avatarPayload.avatarUrl) {
-                  setAvatarPreview(avatarPayload.avatarUrl);
-              }
-          } else {
-              setMessage("Erro: " + result.error);
-          }
-          setIsSaving(false);
-      }
+        if (result.success) {
+            setMessage("Dados atualizados com sucesso!");
+            setAvatarFile(null);
+            if (avatarPayload.avatarUrl) {
+                setAvatarPreview(avatarPayload.avatarUrl);
+            }
+        } else {
+            setMessage("Erro: " + result.error);
+        }
+        setIsSaving(false);
+    }
 
-      function handleChange(e) {
-          setForm({ ...form, [e.target.name]: e.target.value });
-      }
+    function handleChange(e) {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    }
 
-      function handleAvatarChange(e) {
-          const file = e.target.files?.[0];
-          if (!file) return;
-          setAvatarFile(file);
-          setAvatarPreview(URL.createObjectURL(file));
-      }
-
+    function handleAvatarChange(e) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setAvatarFile(file);
+        setAvatarPreview(URL.createObjectURL(file));
+    }
 
     return (
         <section className="flex flex-col gap-7 py-8 pb-12 border-b border-black">
@@ -190,7 +203,11 @@ export default function SectionInfP() {
                             <button className="border border-violet-700 py-2 px-4 text-violet-700">
                                 Descartar
                             </button>
-                            <button disabled={isSaving} type="submit" className="border cursor-pointer border-violet-700 bg-violet-700 py-2 px-4 text-white disabled:opacity-60">
+                            <button
+                                disabled={isSaving}
+                                type="submit"
+                                className="border cursor-pointer border-violet-700 bg-violet-700 py-2 px-4 text-white disabled:opacity-60"
+                            >
                                 {isSaving ? "Salvando..." : "Atualizar"}
                             </button>
                         </div>
