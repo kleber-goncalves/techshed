@@ -22,6 +22,8 @@ model User {
   name      String?
   email     String   @unique
   phone     String?
+  avatarUrl String?
+  avatarStoragePath String?
   role      UserRole @default(CUSTOMER)
   createdAt DateTime @default(now())
 }

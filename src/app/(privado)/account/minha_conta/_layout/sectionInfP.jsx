@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/supabaseClient";
-import { updateUserProfile } from "@/hooks/userUpdate";
+import { updateUserProfile, uploadProfileAvatar } from "@/hooks/userUpdate";
 import { useRouter } from "next/navigation";
 
 export default function SectionInfP() {
@@ -17,6 +17,9 @@ export default function SectionInfP() {
           newPassword: "",
       });
       const [message, setMessage] = useState("");
+      const [avatarFile, setAvatarFile] = useState(null);
+      const [avatarPreview, setAvatarPreview] = useState("");
+      const [isSaving, setIsSaving] = useState(false);
 
       useEffect(() => {
           async function loadUser() {
@@ -29,15 +32,31 @@ export default function SectionInfP() {
               const {
                   data: { user: loggedUser },
               } = await supabase.auth.getUser();
+              const accessToken = sessionData.session.access_token;
 
               setUser(loggedUser);
 
+              let dbUser = null;
+              const dbUserResponse = await fetch(`/api/users/${loggedUser.id}`, {
+                  method: "GET",
+                  headers: {
+                      Authorization: `Bearer ${accessToken}`,
+                  },
+              });
+
+              if (dbUserResponse.ok) {
+                  dbUser = await dbUserResponse.json();
+              }
+
               setForm({
-                  name: loggedUser.user_metadata?.full_name || "",
+                  name: dbUser?.name || loggedUser.user_metadata?.full_name || "",
                   email: loggedUser.email,
-                  phone: loggedUser.user_metadata?.phone || "",
+                  phone: dbUser?.phone || loggedUser.user_metadata?.phone || "",
                   newPassword: "",
               });
+              setAvatarPreview(
+                  dbUser?.avatarUrl || loggedUser.user_metadata?.avatar_url || "",
+              );
           }
           loadUser();
       }, [router]);
@@ -46,25 +65,54 @@ export default function SectionInfP() {
           e.preventDefault();
 
           if (!user) return;
+          setIsSaving(true);
+          setMessage("");
+
+          let avatarPayload = {};
+
+          if (avatarFile) {
+              const uploadResult = await uploadProfileAvatar(avatarFile);
+              if (!uploadResult.success) {
+                  setMessage("Erro no upload da foto: " + uploadResult.error);
+                  setIsSaving(false);
+                  return;
+              }
+              avatarPayload = {
+                  avatarUrl: uploadResult.payload.url,
+                  avatarStoragePath: uploadResult.payload.storagePath,
+              };
+          }
 
           const result = await updateUserProfile(user.id, {
               name: form.name,
               email: form.email,
               phone: form.phone,
               newPassword: form.newPassword,
+              ...avatarPayload,
           });
 
           if (result.success) {
               setMessage("Dados atualizados com sucesso!");
+              setAvatarFile(null);
+              if (avatarPayload.avatarUrl) {
+                  setAvatarPreview(avatarPayload.avatarUrl);
+              }
           } else {
               setMessage("Erro: " + result.error);
           }
+          setIsSaving(false);
       }
 
       function handleChange(e) {
           setForm({ ...form, [e.target.name]: e.target.value });
       }
 
+      function handleAvatarChange(e) {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          setAvatarFile(file);
+          setAvatarPreview(URL.createObjectURL(file));
+      }
 
 
     return (
@@ -80,6 +128,23 @@ export default function SectionInfP() {
                         className="grid grid-cols-2 gap-y-8"
                         onSubmit={handleSubmit}
                     >
+                        <div className="flex flex-col gap-2 col-span-2">
+                            <label htmlFor="avatar">Foto de perfil</label>
+                            <div className="flex items-center gap-4">
+                                <img
+                                    src={avatarPreview || "/semImgPerfil.png"}
+                                    alt="Pré-visualização da foto de perfil"
+                                    className="w-17 h-16 rounded-full object-cover border border-black"
+                                />
+                                <input
+                                    id="avatar"
+                                    name="avatar"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAvatarChange}
+                                />
+                            </div>
+                        </div>
                         <div className="flex flex-col gap-2">
                             <label htmlFor="name">Nome</label>
                             <input
@@ -125,8 +190,8 @@ export default function SectionInfP() {
                             <button className="border border-violet-700 py-2 px-4 text-violet-700">
                                 Descartar
                             </button>
-                            <button type="submit" className="border cursor-pointer border-violet-700 bg-violet-700 py-2 px-4 text-white">
-                                Atualizar
+                            <button disabled={isSaving} type="submit" className="border cursor-pointer border-violet-700 bg-violet-700 py-2 px-4 text-white disabled:opacity-60">
+                                {isSaving ? "Salvando..." : "Atualizar"}
                             </button>
                         </div>
                     </form>
