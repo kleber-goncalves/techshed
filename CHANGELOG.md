@@ -76,6 +76,43 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.31 - 2026-05-07
+
+**Resumo**
+
+- Adicionado filtro por **categoria** no painel de produtos do admin, com Select dinâmico alimentado por categorias distintas do banco e suporte no backend via query param.
+
+**Motivacao**
+
+- Facilitar a operação do admin quando o catálogo cresce, permitindo reduzir rapidamente a lista para uma categoria específica.
+- Evitar dependência de categorias hardcoded no front: as opções passam a refletir o que realmente existe no banco.
+
+**Impacto**
+
+- Componentes afetados: `src/app/(privado)/admin/deshboard/_layout/AdminProdutosClient.jsx`, `src/app/(privado)/admin/deshboard/_layout/ProductsSection.jsx`, `src/app/(privado)/admin/deshboard/_hooks/useInfiniteAdminProducts.js`, `src/lib/helpers/api/adminProductsApi.js`, `src/app/api/admin/products/route.js`.
+- Compatibilidade: sim - mantém comportamento anterior quando `category=all` (default).
+- Risco: baixo - mudança isolada no filtro da listagem e em parâmetros da API.
+
+**Mudancas**
+
+- **Added**
+    - `GET /api/admin/products/categories` para retornar categorias distintas do banco (usado para preencher o Select).
+    - Componente `ProductCategorySelect` para selecionar categoria no dashboard admin.
+    - Hook `useAdminProductCategories` para carregar categorias no client e controlar loading/erro.
+    - Documentação de estudo do componente em `docs/product-category-select.md`.
+- **Changed**
+    - `GET /api/admin/products` agora aceita o query param `category` (quando diferente de `"all"`).
+    - `useInfiniteAdminProducts` passou a aceitar `category` e repassar para a API.
+    - `ProductsSection` ganhou o Select de categoria ao lado do filtro de status.
+
+**Como testar**
+
+1. Abrir `/admin/deshboard` (painel de produtos).
+2. Validar que existe um Select “Todas as categorias” e que ele carrega as categorias do banco.
+3. Selecionar uma categoria e confirmar que a tabela lista apenas produtos daquela categoria.
+4. Voltar para “Todas as categorias” e confirmar que a listagem retorna ao estado geral.
+5. (Opcional) Verificar no Network/DevTools que a listagem chama `/api/admin/products?category=...` quando o filtro estiver ativo.
+
 ### v0.1.30 - 2026-04-20
 
 **Resumo**

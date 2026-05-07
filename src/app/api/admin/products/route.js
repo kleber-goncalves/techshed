@@ -125,6 +125,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const q = toText(searchParams.get("q"));
     const status = toText(searchParams.get("status")); // all | active|inactive
+    const category = toText(searchParams.get("category")); // all | <categoria>
     const page = toPositiveInt(searchParams.get("page"), 1, 1, 9999);
     const limit = toPositiveInt(searchParams.get("limit"), 20, 1, 100);
 
@@ -139,6 +140,9 @@ export async function GET(request) {
 
     if (status === "active") where.isActive = true;
     if (status === "inactive") where.isActive = false;
+    if (category && category !== "all") {
+        where.category = { equals: category, mode: "insensitive" };
+    }
 
     const skip = (page - 1) * limit;
 

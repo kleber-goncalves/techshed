@@ -8,14 +8,22 @@ import FeedbackBanners from "../_components/FeedbackBanners";
 import ProductsSection from "./ProductsSection";
 import { useInfiniteAdminProducts } from "../_hooks/useInfiniteAdminProducts";
 import { useInfiniteTrigger } from "../_hooks/useInfiniteTrigger";
+import { useAdminProductCategories } from "../_hooks/useAdminProductCategories";
 
 export default function AdminProdutosClient() {
     const router = useRouter();
 
     const [statusFilter, setStatusFilter] = useState("all");
+    const [categoryFilter, setCategoryFilter] = useState("all");
     const [searchInput, setSearchInput] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
     const success = "";
+
+    const {
+        items: categories,
+        loading: loadingCategories,
+        error: categoriesError,
+    } = useAdminProductCategories();
 
     const {
         items: products,
@@ -28,6 +36,7 @@ export default function AdminProdutosClient() {
     } = useInfiniteAdminProducts({
         search: appliedSearch,
         status: statusFilter,
+        category: categoryFilter,
         pageSize: 20,
     });
 
@@ -59,7 +68,7 @@ export default function AdminProdutosClient() {
         <section className="mx-auto w-full max-w-7xl space-y-6">
             <DashboardHeader onNewProduct={handleNew} />
             <KpiSection loading={loadingInitial} metrics={summary} />
-            <FeedbackBanners error={error} success={success} />
+            <FeedbackBanners error={error || categoriesError} success={success} />
 
             <div className="grid gap-6 xl:grid-cols-1">
                 <ProductsSection
@@ -70,6 +79,10 @@ export default function AdminProdutosClient() {
                     onSearchSubmit={handleSearch}
                     statusFilter={statusFilter}
                     onStatusFilterChange={setStatusFilter}
+                    categoryFilter={categoryFilter}
+                    onCategoryFilterChange={setCategoryFilter}
+                    categories={categories}
+                    loadingCategories={loadingCategories}
                     loadingInitial={loadingInitial}
                     loadingMore={loadingMore}
                     hasMore={hasMore}

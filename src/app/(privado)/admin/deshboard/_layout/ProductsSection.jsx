@@ -33,6 +33,7 @@ import {
 } from "../_utils/constants";
 import ProductStatusBadge from "../_components/ProductStatusBadge";
 import InfiniteScrollSentinel from "../_components/InfiniteScrollSentinel";
+import ProductCategorySelect from "../_components/ProductCategorySelect";
 
 export default function ProductsSection({
     search,
@@ -40,6 +41,10 @@ export default function ProductsSection({
     onSearchSubmit,
     statusFilter,
     onStatusFilterChange,
+    categoryFilter,
+    onCategoryFilterChange,
+    categories,
+    loadingCategories,
     loadingInitial,
     loadingMore,
     hasMore,
@@ -62,8 +67,10 @@ export default function ProductsSection({
                 {/* sessão de pesquisa */}
                 <form
                     onSubmit={onSearchSubmit}
-                    className="grid gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-center"
+                    className="grid gap-3 sm:grid-cols-[1fr_auto_auto_auto] sm:items-center"
                 >
+                    
+                    {/* componete de search */}
                     <div className="relative">
                         <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
                         <Input
@@ -73,16 +80,20 @@ export default function ProductsSection({
                             className="pl-9"
                         />
                     </div>
+
+
+                    {/*button de busca por ativo ou não*/}
                     <Select
                         value={statusFilter}
                         onValueChange={onStatusFilterChange}
                     >
-                        <SelectTrigger className="h-10 w-full sm:w-[170px]">
+                        <SelectTrigger className="h-10 w-full sm:w-[170px] cursor-pointer">
                             <SelectValue placeholder="Filtrar status" />
                         </SelectTrigger>
-                        <SelectContent align="end">
+                        <SelectContent align="end" >
                             {STATUS_FILTER_OPTIONS.map((option) => (
                                 <SelectItem
+                                    className="cursor-pointer"
                                     key={option.value}
                                     value={option.value}
                                 >
@@ -91,10 +102,19 @@ export default function ProductsSection({
                             ))}
                         </SelectContent>
                     </Select>
+
+                    <ProductCategorySelect
+                        value={categoryFilter}
+                        onValueChange={onCategoryFilterChange}
+                        categories={categories}
+                        disabled={loadingCategories}
+                    />
+                    
+                    {/* button de busca */}
                     <Button
                         type="submit"
                         variant="outline"
-                        className="h-10 min-w-24"
+                        className="h-10 min-w-24 cursor-pointer"
                         disabled={loadingInitial}
                     >
                         {loadingInitial ? (
