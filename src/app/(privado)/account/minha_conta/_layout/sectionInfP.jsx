@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/supabaseClient";
 import {
@@ -21,7 +22,11 @@ export default function SectionInfP() {
     const [message, setMessage] = useState("");
     const [avatarFile, setAvatarFile] = useState(null);
     const [avatarPreview, setAvatarPreview] = useState("");
+    const [savedAvatarPreview, setSavedAvatarPreview] = useState("");
     const [isSaving, setIsSaving] = useState(false);
+
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
     useEffect(() => {
         async function loadUser() {
@@ -56,9 +61,10 @@ export default function SectionInfP() {
                 phone: dbUser?.phone || loggedUser.user_metadata?.phone || "",
                 newPassword: "",
             });
-            setAvatarPreview(
-                dbUser?.avatarUrl || loggedUser.user_metadata?.avatar_url || "",
-            );
+            const initialAvatar =
+                dbUser?.avatarUrl || loggedUser.user_metadata?.avatar_url || "";
+            setAvatarPreview(initialAvatar);
+            setSavedAvatarPreview(initialAvatar);
         }
         loadUser();
     }, [router]);
@@ -110,6 +116,7 @@ export default function SectionInfP() {
             setAvatarFile(null);
             if (avatarPayload.avatarUrl) {
                 setAvatarPreview(avatarPayload.avatarUrl);
+                setSavedAvatarPreview(avatarPayload.avatarUrl);
             }
         } else {
             setMessage("Erro: " + result.error);
@@ -124,12 +131,24 @@ export default function SectionInfP() {
     function handleAvatarChange(e) {
         const file = e.target.files?.[0];
         if (!file) return;
+
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            setMessage("Formato invalido. Use JPG, PNG ou WEBP.");
+            return;
+        }
+
+        if (file.size > MAX_FILE_SIZE) {
+            setMessage("Tamanho do arquivo grande. Máximo de 2MB.");
+            return;
+        }
+
+        setMessage("");
         setAvatarFile(file);
         setAvatarPreview(URL.createObjectURL(file));
     }
 
     return (
-        <section className="flex flex-col gap-7 py-8 pb-12 border-b border-black">
+        <section className="flex flex-col gap-7 py-8 pb-12 border-b border-black dark:border-b-white">
             <div className="flex flex-col gap-3">
                 <h1 className="text-xl font-semibold">Informações pessoais</h1>
                 <p>Atualize suas informações pessoais</p>
@@ -141,27 +160,56 @@ export default function SectionInfP() {
                         className="grid grid-cols-2 gap-y-8"
                         onSubmit={handleSubmit}
                     >
-                        <div className="flex flex-col gap-2 col-span-2">
+                        <div className="flex flex-col gap-2 col-span-2 ">
                             <label htmlFor="avatar">Foto de perfil</label>
                             <div className="flex items-center gap-4">
-                                <img
+                                <Image
                                     src={avatarPreview || "/semImgPerfil.png"}
                                     alt="Pré-visualização da foto de perfil"
-                                    className="w-17 h-16 rounded-full object-cover border border-black"
+                                    width={64}
+                                    height={64}
+                                    className="w-20 h-20 rounded-full object-cover border border-black dark:border-white"
                                 />
                                 <input
                                     id="avatar"
                                     name="avatar"
                                     type="file"
-                                    accept="image/*"
+                                    accept="image/jpeg,image/png,image/webp"
                                     onChange={handleAvatarChange}
+                                    className="hidden"
                                 />
+                                <label
+                                    htmlFor="avatar"
+                                    className="inline-flex cursor-pointer items-center rounded-md border border-violet-700 px-4 py-2 text-sm font-medium text-violet-700 hover:bg-violet-50"
+                                >
+                                    Selecionar foto
+                                </label>
+                                {avatarFile && (
+                                    <p className="max-w-[220px] truncate text-sm text-gray-700">
+                                        {avatarFile.name}
+                                    </p>
+                                )}
+                                {avatarFile && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setAvatarFile(null);
+                                            setAvatarPreview(
+                                                savedAvatarPreview,
+                                            );
+                                            setMessage("");
+                                        }}
+                                        className="rounded-md border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"
+                                    >
+                                        Limpar
+                                    </button>
+                                )}
                             </div>
                         </div>
                         <div className="flex flex-col gap-2">
                             <label htmlFor="name">Nome</label>
                             <input
-                                className="border border-black max-w-3/4 p-2"
+                                className="border border-black dark:border-white max-w-3/4 p-2"
                                 name="name"
                                 type="text"
                                 placeholder="Nome"
@@ -172,7 +220,7 @@ export default function SectionInfP() {
                         <div className="flex flex-col gap-2">
                             <label htmlFor="name">Sobrenome</label>
                             <input
-                                className="border border-black max-w-3/4 p-2"
+                                className="border border-black dark:border-white max-w-3/4 p-2"
                                 type="text"
                                 placeholder="Sobrenome"
                             />
@@ -180,7 +228,7 @@ export default function SectionInfP() {
                         <div className="flex flex-col gap-2">
                             <label htmlFor="name">Telefone</label>
                             <input
-                                className="border border-black max-w-3/4 p-2"
+                                className="border border-black dark:border-white max-w-3/4 p-2"
                                 name="phone"
                                 type="text"
                                 placeholder="Telefone"
@@ -192,7 +240,7 @@ export default function SectionInfP() {
                         <div className="flex flex-col gap-2">
                             <label>Nova senha</label>
                             <input
-                                className="border border-black max-w-3/4 p-2"
+                                className="border border-black dark:border-white max-w-3/4 p-2"
                                 name="newPassword"
                                 type="password"
                                 value={form.newPassword}

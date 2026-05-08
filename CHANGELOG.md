@@ -76,6 +76,66 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.32 - 2026-05-08
+
+**Resumo**
+
+- Implementado fluxo completo de foto de perfil com upload no Supabase Storage, persistência no Prisma e exibição no dropdown do header.
+
+**Motivação**
+
+- Permitir personalização da conta do usuário com avatar persistente em recarregamentos e reutilização da mesma imagem em diferentes áreas da interface.
+
+**Impacto**
+
+- Componentes afetados: conta do usuário (`/account`), API de usuários, API de avatar e header autenticado.
+- Compatibilidade: `sim`.
+- Risco: `médio`, por envolver integração entre autenticação, storage e banco de dados.
+
+**Mudanças**
+
+- **Added**
+    - Campos `avatarUrl` e `avatarStoragePath` no model `User` (Prisma).
+    - Migration para persistir os novos campos de avatar.
+    - Endpoint `POST /api/users/avatar` para upload autenticado de foto de perfil.
+    - Endpoint `DELETE /api/users/avatar` para remoção da foto antiga no bucket.
+    - Endpoint `GET /api/users/[id]` autenticado para leitura do perfil no banco.
+- **Changed**
+    - Formulário `Minha Conta` agora usa `next/image`, valida tipo/tamanho de arquivo e UI de seleção customizada.
+    - Header autenticado passou a carregar avatar persistido no Prisma para o dropdown.
+    - Hook de atualização de usuário passou a suportar upload e remoção de avatar.
+- **Fixed**
+    - Correção da perda de avatar após reload da página de conta.
+    - Correção de chamada incorreta de `fetch` na remoção de imagem antiga.
+- **Deprecated**
+    - Nenhum.
+- **Removed**
+    - Nenhum.
+- **Security**
+    - Validação de sessão/token para operações de leitura e escrita de avatar.
+
+**Como testar**
+
+1. Autenticar usuário e acessar `/account/minha_conta`.
+2. Selecionar uma imagem válida (`jpg/png/webp`, até 2MB) e clicar em `Atualizar`.
+3. Recarregar a página e confirmar que o avatar permanece.
+4. Abrir o dropdown do header e confirmar que a mesma foto é exibida.
+5. Trocar novamente de foto e validar que a imagem anterior é removida do bucket.
+
+**Diagrama**
+
+Antes:
+
+```
+User -> Upload avatar -> Salva URL no banco -> Header usa apenas fallback (iniciais)
+```
+
+Depois:
+
+```
+User -> Upload avatar -> Remove avatar antigo -> Salva URL no banco -> Header busca /api/users/[id] -> Exibe AvatarImage
+```
+
 ### v0.1.31 - 2026-05-07
 
 **Resumo**

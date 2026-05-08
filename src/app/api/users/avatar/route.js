@@ -49,6 +49,27 @@ export async function POST(request) {
             );
         }
 
+        const MAX_FILE_SIZE = 2 * 1024 * 1024;
+        const ALLOWED_TYPES = new Set([
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+        ]);
+
+        if (!ALLOWED_TYPES.has(file.type)) {
+            return Response.json(
+                { error: "Formato inválido." },
+                { status: 400 },
+            );
+        }
+
+        if (file.size > MAX_FILE_SIZE) {
+            return Response.json(
+                { error: "Arquivo acima de 2MB." },
+                { status: 400 },
+            );
+        }
+
         const ext = file.name.split(".").pop() || "jpg";
         const fileName = `${crypto.randomUUID()}.${ext}`;
         const storagePath = `users/${user.id}/${fileName}`;
