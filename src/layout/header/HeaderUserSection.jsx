@@ -9,7 +9,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
 import { useFavorite } from "@/contexts/favorit-context";
@@ -29,6 +29,7 @@ export default function HeaderUserSection() {
         isAuthReady,
         isLoggingOut,
         displayName,
+        avatarUrl,
         userInitials,
         logout,
     } = useHeaderAuth({ onLogoutSuccess: handleLogoutSuccess });
@@ -61,8 +62,15 @@ export default function HeaderUserSection() {
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="flex items-center gap-1">
                         <Avatar className="w-8 h-8">
+                            {avatarUrl ? (
+                                <AvatarImage
+                                    src={avatarUrl}
+                                    alt={displayName || "Avatar"}
+                                />
+                            ) : null}
                             <AvatarFallback>{userInitials}</AvatarFallback>
                         </Avatar>
+
                         <span className="max-w-32 truncate text-sm">
                             {displayName}
                         </span>

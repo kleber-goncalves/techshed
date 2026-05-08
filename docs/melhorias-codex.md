@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-05-07
-Branch: `feat/filtro-dashboard`
+Última atualização: 2026-05-08
+Branch: `feat/add-img-perfil`
 
 ## Visão Geral
 
@@ -18,6 +18,28 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ```
 
 ## Melhorias Prioritárias
+
+### Sugestões Codex (avatar de perfil: robustez e manutenção)
+
+1. Sincronizar avatar também no `user_metadata` do Supabase Auth
+
+- Hoje o avatar principal já está no Prisma e no header.
+- Sincronizar em `user_metadata.avatar_url` ajuda integrações futuras que consumam apenas Auth e reduz divergência entre fontes.
+
+2. Adicionar rollback para upload de avatar quando update do banco falhar
+
+- Fluxo atual faz upload e depois salva no Prisma; se a atualização do banco falhar, o arquivo novo pode ficar órfão.
+- Sugestão: remover imediatamente o upload recém-criado quando `PUT /api/users/[id]` retornar erro.
+
+3. Criar endpoint para remoção manual de avatar (reset para padrão)
+
+- Permitir ao usuário voltar para o avatar padrão sem precisar subir nova foto.
+- Isso melhora usabilidade e reduz suporte manual.
+
+4. Cobrir fluxo com testes E2E de conta + header
+
+- Cenários: upload válido, bloqueio por formato/tamanho, persistência após reload, e propagação da imagem no dropdown.
+- Evita regressões em mudanças futuras de auth, storage e header.
 
 ### Sugestões Codex (editor settingsProduct: layout e manutencao)
 

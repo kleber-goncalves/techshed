@@ -3,6 +3,57 @@ import prisma from "@/lib/prisma/prisma";
 
 import { supabase } from "@/lib/supabase/supabaseClient";
 
+export async function GET(request, { params }) {
+    try {
+        const { id } = await params;
+
+        const authHeader = request.headers.get("Authorization");
+        const token = authHeader?.replace("Bearer ", "");
+
+        if (!token) {
+            return Response.json(
+                { error: "Não autorizado — token faltando" },
+                { status: 401 },
+            );
+        }
+
+        const {
+            data: { user },
+            error: supaError,
+        } = await supabase.auth.getUser(token);
+
+        if (supaError || !user) {
+            return Response.json(
+                { error: "Usuário não autenticado" },
+                { status: 401 },
+            );
+        }
+
+        if (user.id !== id) {
+            return Response.json(
+                { error: "Não permitido — IDs diferentes" },
+                { status: 403 },
+            );
+        }
+
+        const dbUser = await prisma.user.findUnique({
+            where: { id },
+        });
+
+        if (!dbUser) {
+            return Response.json({ error: "Usuário não encontrado" }, { status: 404 });
+        }
+
+        return Response.json(dbUser);
+    } catch (error) {
+        console.error(error);
+        return Response.json(
+            { error: "Erro interno ao buscar usuário" },
+            { status: 500 },
+        );
+    }
+}
+
 export async function PUT(request, { params }) {
     try {
         // "desembrulhar" params
@@ -48,6 +99,8 @@ export async function PUT(request, { params }) {
                 name: body.name,
                 email: body.email,
                 phone: body.phone,
+                avatarUrl: body.avatarUrl,
+                avatarStoragePath: body.avatarStoragePath,
             },
         });
 
