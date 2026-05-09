@@ -76,6 +76,39 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.33 - 2026-05-09
+
+**Resumo**
+
+- Atualizada a página de autenticação para um layout mais moderno usando shadcn/ui, com melhor UX (estados de loading, validação e mensagens inline).
+
+**Motivação**
+
+- Melhorar a percepção de qualidade no primeiro contato (login) e reduzir atrito no fluxo de acesso/cadastro.
+
+**Impacto**
+
+- Componentes afetados: página `/auth` (rota em `src/app/(login)/auth/page.js`).
+- Compatibilidade: `sim`.
+- Risco: `baixo`, por ser mudança predominantemente de UI, com ajustes no tratamento de estados.
+
+**Mudanças**
+
+- **Changed**
+    - Página de login/cadastro migrou para componentes shadcn (`Card`, `Input`, `Button`) e ganhou layout inspirado em marketplace (header destacado + card central).
+    - Substituído `alert()` por mensagens inline com estados `success/error/info`.
+    - Adicionado estado de loading e validação básica do formulário antes de habilitar ações.
+    - Quando já existe sessão Supabase, a página sincroniza com `/api/syncUser` e redireciona para `/account/minha_conta`.
+- **Removed**
+    - Removido o login via Google (OAuth) da UI.
+
+**Como testar**
+
+1. Abrir `/auth` e validar layout (desktop e mobile).
+2. Tentar logar com credenciais inválidas e confirmar mensagem inline de erro.
+3. Criar conta e confirmar mensagem inline de sucesso.
+4. Logar com sucesso e confirmar chamada a `/api/syncUser` e redirect para `/account/minha_conta`.
+
 ### v0.1.32 - 2026-05-08
 
 **Resumo**

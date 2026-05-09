@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-05-08
-Branch: `feat/add-img-perfil`
+Última atualização: 2026-05-09
+Branch: `style/login`
 
 ## Visão Geral
 
@@ -18,6 +18,24 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ```
 
 ## Melhorias Prioritárias
+
+### Sugestões Codex (auth/login: UX, segurança e manutenção)
+
+1. Remover cores hardcoded e centralizar tokens de tema
+
+- A página de login usa cores específicas (ex.: amarelo/azul). Centralizar em um arquivo de tema (Tailwind config ou tokens CSS) evita divergência entre telas e facilita ajustes futuros.
+
+2. Adicionar fluxo de “Esqueci minha senha” (Supabase reset)
+
+- Incluir ação para enviar email de recuperação e uma rota de redefinição melhora conversão e reduz suporte.
+
+3. Evitar redirects apenas no client para rotas protegidas
+
+- Para reduzir “flash” de UI, usar `middleware.js`/guards para redirecionar usuários autenticados para `/account/minha_conta` e bloquear acesso não autenticado às rotas privadas.
+
+4. Padronizar mensagens de erro e mapear erros comuns do Supabase
+
+- Criar um mapper para erros (ex.: credenciais inválidas, email não confirmado) melhora clareza e consistência no app.
 
 ### Sugestões Codex (avatar de perfil: robustez e manutenção)
 
