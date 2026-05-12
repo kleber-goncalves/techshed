@@ -76,6 +76,55 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.34 - 2026-05-12
+
+**Resumo**
+
+- Adicionadas migrations de RLS/Policies no Supabase para proteger dados privados do usuário e leitura pública controlada do catálogo.
+
+**Motivação**
+
+- Reduzir risco de acesso direto indevido via Supabase REST/client.
+- Garantir que dados privados como perfil, endereços, cartões, carrinho e favoritos sejam acessíveis apenas pelo usuário autenticado dono da linha.
+- Manter o catálogo público acessível, mas limitado a produtos ativos e seus relacionamentos.
+
+**Impacto**
+
+- Componentes afetados: migrations Supabase em `supabase/migrations/*_rls.sql`.
+- Compatibilidade: `sim`, desde que as APIs Next.js continuem usando token Supabase e o acesso direto ao Supabase respeite as novas policies.
+- Risco: `médio`, porque RLS pode bloquear consultas diretas se alguma tela ou integração depender de acesso Supabase sem token/policy adequada.
+
+**Mudanças**
+
+- **Added**
+    - RLS e policies para `"Favorites"`, permitindo `select/insert/update/delete` apenas ao dono via `auth.uid()`.
+    - RLS e policies para `"CartItems"`, permitindo acesso apenas ao próprio carrinho e exigindo `quantity >= 1`.
+    - RLS e policies para `"Card"`, restringindo cartões ao usuário autenticado dono da linha.
+    - RLS e policies para `"Address"`, restringindo endereços ao usuário autenticado dono da linha e validando campos obrigatórios não vazios.
+    - RLS e policies para `"User"`, permitindo leitura/atualização do próprio perfil e impedindo promoção direta para `ADMIN`.
+    - RLS e policies de leitura pública para `"Produtos"`, `"ProdutoImagens"`, `"ProdutoVariantes"` e `"ProdutoVarianteImagens"` quando o produto relacionado está ativo.
+- **Security**
+    - Dados privados passam a ter defesa adicional no banco contra acesso direto pelo Supabase client/REST.
+    - Escrita de produtos permanece sem policy pública, preservando o fluxo seguro via API admin com `requireAdmin`.
+    - Policies usam `auth.uid()::text` para comparar com os IDs armazenados como `text/String` no schema atual.
+
+**Como testar**
+
+1. Aplicar as migrations em ambiente de teste/staging.
+2. No Postman, autenticar com Supabase Auth e salvar `access_token` e `user.id`.
+3. Testar `/rest/v1/Favorites`, `/rest/v1/CartItems`, `/rest/v1/Card`, `/rest/v1/Address` e `/rest/v1/User` com `Authorization: Bearer <token>`.
+4. Confirmar que o usuário autenticado acessa apenas seus próprios registros.
+5. Tentar inserir/atualizar registros com `userId` de outro usuário e confirmar bloqueio por RLS.
+6. Testar `/rest/v1/Produtos?select=*` sem token e confirmar que somente produtos ativos aparecem.
+7. Validar que as APIs Next.js (`/api/cart`, `/api/favorites`, `/api/users/[id]`, `/api/admin/products`) continuam funcionando com token válido.
+
+**Diagrama**
+
+```
+Supabase REST/client -> RLS -> somente dono da linha
+Next.js API -> valida token -> Prisma -> regras de backend preservadas
+```
+
 ### v0.1.33 - 2026-05-09
 
 **Resumo**

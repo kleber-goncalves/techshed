@@ -3,7 +3,7 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-05-09
+Última atualização: 2026-05-12
 Branch: `style/login`
 
 ## Visão Geral
@@ -18,6 +18,33 @@ Ideia ──> Planejamento ──> Implementação ──> Revisão ──> PR �
 ```
 
 ## Melhorias Prioritárias
+
+### Sugestões Codex (Supabase RLS: validação e hardening)
+
+1. Criar uma collection Postman dedicada para RLS
+
+- Incluir requests para login Supabase, leitura permitida, escrita permitida e escrita bloqueada em `Favorites`, `CartItems`, `Card`, `Address` e `User`.
+- Salvar `ACCESS_TOKEN` e `USER_ID` automaticamente nos testes do Postman para reduzir erro manual.
+
+2. Rodar as policies primeiro em staging
+
+- Manter um projeto Supabase de teste com as mesmas migrations antes de aplicar em produção.
+- Validar login, carrinho, favoritos, endereços, cartões, perfil e dashboard admin após ativar RLS.
+
+3. Revisar grants gerados no schema remoto
+
+- O schema remoto contém grants amplos para `anon` e `authenticated`; com RLS ativo, as policies filtram o acesso, mas vale revisar se algum grant pode ser reduzido.
+- Prioridade: tabelas privadas (`User`, `Address`, `Card`, `CartItems`, `Favorites`).
+
+4. Documentar o contrato Prisma + RLS
+
+- Registrar que RLS protege acesso direto via Supabase client/REST, enquanto as APIs Next.js ainda precisam validar token e autorização porque Prisma pode usar conexão privilegiada.
+- Isso evita a falsa sensação de que RLS substitui `supabase.auth.getUser(token)` no backend.
+
+5. Adicionar checklist de segurança para novas tabelas
+
+- Toda nova tabela no schema `public` deve responder: é pública ou privada? precisa de RLS? quais operações (`select/insert/update/delete`) são permitidas?
+- Evita novas tabelas sem policy quando o projeto crescer.
 
 ### Sugestões Codex (auth/login: UX, segurança e manutenção)
 
