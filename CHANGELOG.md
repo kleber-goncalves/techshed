@@ -76,6 +76,39 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.35 - 2026-05-12
+
+**Resumo**
+
+- Endurecidas as rotas legadas de usuarios para remover acesso publico a listagem, criacao e exclusao.
+
+**Motivação**
+
+- Evitar vazamento de dados por `GET /api/users`, criacao indevida por `POST /api/users` e exclusao sem autorizacao por `DELETE /api/users/[id]`.
+
+**Impacto**
+
+- Componentes afetados: `src/app/api/users/route.js`, `src/app/api/users/[id]/route.js`, `src/lib/userApi.js` e `docs/autenticacao-rotas-rls.md`.
+- Compatibilidade: `sim` para fluxos atuais de perfil, header e avatar; `GET/POST /api/users` e `DELETE /api/users/[id]` agora exigem usuario admin.
+- Risco: `baixo`, porque as rotas protegidas nao eram usadas pela UI atual e os fluxos ativos continuam usando `GET/PUT /api/users/[id]` com token do proprio usuario.
+
+**Mudanças**
+
+- **Changed**
+    - `GET /api/users` e `POST /api/users` agora passam por `requireAdmin`.
+    - `DELETE /api/users/[id]` agora passa por `requireAdmin`.
+    - `src/lib/userApi.js` passou a enviar `Authorization: Bearer <token>` em chamadas para `/api/users`.
+- **Security**
+    - Removido acesso anonimo a operacoes globais de usuario.
+    - Mantido o acesso de usuario comum apenas para leitura/atualizacao do proprio perfil.
+
+**Como testar**
+
+1. Chamar `GET /api/users` sem token e confirmar `401`.
+2. Chamar `GET /api/users` com usuario sem `ADMIN` e confirmar bloqueio.
+3. Chamar `GET /api/users/[id]` com token do proprio usuario e confirmar sucesso.
+4. Chamar `PUT /api/users/[id]` pela tela de conta e confirmar que o perfil continua atualizando.
+
 ### v0.1.34 - 2026-05-12
 
 **Resumo**

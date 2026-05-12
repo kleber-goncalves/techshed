@@ -148,29 +148,24 @@ Esta tabela descreve o comportamento esperado sem expor payloads sensiveis.
 | Enderecos | `GET/POST /api/addresses`, `PUT/DELETE /api/addresses/[id]` | Requer Bearer token; filtra por dono da linha |
 | Cartoes | `GET/POST /api/cards`, `DELETE /api/cards/[id]` | Requer Bearer token; filtra por dono da linha |
 | Usuario | `GET/PUT /api/users/[id]`, `POST/DELETE /api/users/avatar` | Requer Bearer token; usuario so pode acessar o proprio perfil/avatar |
+| Admin usuarios | `GET/POST /api/users`, `DELETE /api/users/[id]` | Requer Bearer token e `role = ADMIN` |
 | Admin check | `GET /api/admin/check` | Requer Bearer token e `role = ADMIN` |
 | Admin produtos | `/api/admin/products`, `/api/admin/products/[id]`, `/api/admin/products/categories` | Requer Bearer token e `role = ADMIN` |
 | Admin uploads | `POST /api/admin/uploads` | Requer Bearer token e `role = ADMIN` |
 
-## Pontos de Atencao em Rotas Legadas
+## Rotas de Usuario
 
-As rotas abaixo merecem revisao antes de ambiente publico/produção:
+As rotas de usuario seguem dois niveis de permissao:
 
-- `GET /api/users`
-- `POST /api/users`
-- `DELETE /api/users/[id]`
+- perfil proprio: `GET/PUT /api/users/[id]` exige Bearer token e bloqueia `id` diferente do usuario autenticado;
+- avatar proprio: `POST/DELETE /api/users/avatar` exige Bearer token e usa o `user.id` autenticado;
+- gestao de usuarios: `GET/POST /api/users` e `DELETE /api/users/[id]` exigem `role = ADMIN`.
 
-Motivo:
+Motivo da separacao:
 
-- rotas de usuario devem exigir autenticacao e autorizacao explicita;
-- operacoes de leitura global, criacao livre ou exclusao direta podem expor ou alterar dados indevidamente se ficarem publicas.
-
-Recomendacao:
-
-- proteger com token;
-- restringir uso a admin quando fizer sentido;
-- remover rotas nao usadas;
-- evitar retornar campos sensiveis ou desnecessarios.
+- o usuario comum pode gerenciar apenas o proprio perfil;
+- operacoes globais de listagem, criacao e exclusao de usuarios ficam restritas ao backend admin;
+- helpers client-side devem enviar o Bearer token quando chamarem rotas de usuario.
 
 ## RLS e Policies no Supabase
 

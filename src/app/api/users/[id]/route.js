@@ -1,7 +1,6 @@
 import prisma from "@/lib/prisma/prisma";
-
-
 import { supabase } from "@/lib/supabase/supabaseClient";
+import { requireAdmin } from "@/lib/helpers/server/auth/adminAuth";
 
 export async function GET(request, { params }) {
     try {
@@ -116,8 +115,14 @@ export async function PUT(request, { params }) {
 
 
 export async function DELETE(request, { params }) {
+    const auth = await requireAdmin(request);
+    if (auth.error) return auth.error;
+
+    const { id } = await params;
+
     await prisma.user.delete({
-        where: { id: params.id },
+        where: { id },
     });
+
     return Response.json({ success: true });
 }
