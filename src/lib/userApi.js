@@ -1,11 +1,41 @@
 // lib/api/userApi.js
 
+import { supabase } from "@/lib/supabase/supabaseClient";
+
+async function getAccessToken() {
+    const {
+        data: { session },
+    } = await supabase.auth.getSession();
+
+    return session?.access_token;
+}
+
+async function authFetch(url, init = {}) {
+    const token = await getAccessToken();
+
+    if (!token) {
+        throw new Error("Usuário não autenticado");
+    }
+
+    const headers = new Headers(init.headers || {});
+    headers.set("Authorization", `Bearer ${token}`);
+
+    if (init.body && !headers.has("Content-Type")) {
+        headers.set("Content-Type", "application/json");
+    }
+
+    return fetch(url, {
+        ...init,
+        headers,
+    });
+}
+
 /**
  * Busca todos os usuários
  * @returns {Promise<Array>}
  */
 export async function getAllUsers() {
-    const response = await fetch("/api/users");
+    const response = await authFetch("/api/users");
     if (!response.ok) {
         throw new Error("Erro ao buscar usuários");
     }
@@ -18,7 +48,7 @@ export async function getAllUsers() {
  * @returns {Promise<Object>}
  */
 export async function getUserById(id) {
-    const response = await fetch(`/api/users/${id}`);
+    const response = await authFetch(`/api/users/${id}`);
     if (!response.ok) {
         throw new Error("Erro ao buscar usuário");
     }
@@ -30,11 +60,8 @@ export async function getUserById(id) {
  * @param {{name: string, email: string}} data
  */
 export async function createUser(data) {
-    const response = await fetch("/api/users", {
+    const response = await authFetch("/api/users", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
         body: JSON.stringify(data),
     });
     if (!response.ok) {
@@ -49,11 +76,8 @@ export async function createUser(data) {
  * @param {{name?: string, email?: string}} data
  */
 export async function updateUser(id, data) {
-    const response = await fetch(`/api/users/${id}`, {
+    const response = await authFetch(`/api/users/${id}`, {
         method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
         body: JSON.stringify(data),
     });
     if (!response.ok) {
@@ -67,7 +91,7 @@ export async function updateUser(id, data) {
  * @param {string} id
  */
 export async function deleteUser(id) {
-    const response = await fetch(`/api/users/${id}`, {
+    const response = await authFetch(`/api/users/${id}`, {
         method: "DELETE",
     });
     if (!response.ok) {

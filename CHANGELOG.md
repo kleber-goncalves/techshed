@@ -76,6 +76,88 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.35 - 2026-05-12
+
+**Resumo**
+
+- Endurecidas as rotas legadas de usuarios para remover acesso publico a listagem, criacao e exclusao.
+
+**Motivação**
+
+- Evitar vazamento de dados por `GET /api/users`, criacao indevida por `POST /api/users` e exclusao sem autorizacao por `DELETE /api/users/[id]`.
+
+**Impacto**
+
+- Componentes afetados: `src/app/api/users/route.js`, `src/app/api/users/[id]/route.js`, `src/lib/userApi.js` e `docs/autenticacao-rotas-rls.md`.
+- Compatibilidade: `sim` para fluxos atuais de perfil, header e avatar; `GET/POST /api/users` e `DELETE /api/users/[id]` agora exigem usuario admin.
+- Risco: `baixo`, porque as rotas protegidas nao eram usadas pela UI atual e os fluxos ativos continuam usando `GET/PUT /api/users/[id]` com token do proprio usuario.
+
+**Mudanças**
+
+- **Changed**
+    - `GET /api/users` e `POST /api/users` agora passam por `requireAdmin`.
+    - `DELETE /api/users/[id]` agora passa por `requireAdmin`.
+    - `src/lib/userApi.js` passou a enviar `Authorization: Bearer <token>` em chamadas para `/api/users`.
+- **Security**
+    - Removido acesso anonimo a operacoes globais de usuario.
+    - Mantido o acesso de usuario comum apenas para leitura/atualizacao do proprio perfil.
+
+**Como testar**
+
+1. Chamar `GET /api/users` sem token e confirmar `401`.
+2. Chamar `GET /api/users` com usuario sem `ADMIN` e confirmar bloqueio.
+3. Chamar `GET /api/users/[id]` com token do proprio usuario e confirmar sucesso.
+4. Chamar `PUT /api/users/[id]` pela tela de conta e confirmar que o perfil continua atualizando.
+
+### v0.1.34 - 2026-05-12
+
+**Resumo**
+
+- Adicionadas migrations de RLS/Policies no Supabase para proteger dados privados do usuário e leitura pública controlada do catálogo.
+
+**Motivação**
+
+- Reduzir risco de acesso direto indevido via Supabase REST/client.
+- Garantir que dados privados como perfil, endereços, cartões, carrinho e favoritos sejam acessíveis apenas pelo usuário autenticado dono da linha.
+- Manter o catálogo público acessível, mas limitado a produtos ativos e seus relacionamentos.
+
+**Impacto**
+
+- Componentes afetados: migrations Supabase em `supabase/migrations/*_rls.sql`.
+- Compatibilidade: `sim`, desde que as APIs Next.js continuem usando token Supabase e o acesso direto ao Supabase respeite as novas policies.
+- Risco: `médio`, porque RLS pode bloquear consultas diretas se alguma tela ou integração depender de acesso Supabase sem token/policy adequada.
+
+**Mudanças**
+
+- **Added**
+    - RLS e policies para `"Favorites"`, permitindo `select/insert/update/delete` apenas ao dono via `auth.uid()`.
+    - RLS e policies para `"CartItems"`, permitindo acesso apenas ao próprio carrinho e exigindo `quantity >= 1`.
+    - RLS e policies para `"Card"`, restringindo cartões ao usuário autenticado dono da linha.
+    - RLS e policies para `"Address"`, restringindo endereços ao usuário autenticado dono da linha e validando campos obrigatórios não vazios.
+    - RLS e policies para `"User"`, permitindo leitura/atualização do próprio perfil e impedindo promoção direta para `ADMIN`.
+    - RLS e policies de leitura pública para `"Produtos"`, `"ProdutoImagens"`, `"ProdutoVariantes"` e `"ProdutoVarianteImagens"` quando o produto relacionado está ativo.
+- **Security**
+    - Dados privados passam a ter defesa adicional no banco contra acesso direto pelo Supabase client/REST.
+    - Escrita de produtos permanece sem policy pública, preservando o fluxo seguro via API admin com `requireAdmin`.
+    - Policies usam `auth.uid()::text` para comparar com os IDs armazenados como `text/String` no schema atual.
+
+**Como testar**
+
+1. Aplicar as migrations em ambiente de teste/staging.
+2. No Postman, autenticar com Supabase Auth e salvar `access_token` e `user.id`.
+3. Testar `/rest/v1/Favorites`, `/rest/v1/CartItems`, `/rest/v1/Card`, `/rest/v1/Address` e `/rest/v1/User` com `Authorization: Bearer <token>`.
+4. Confirmar que o usuário autenticado acessa apenas seus próprios registros.
+5. Tentar inserir/atualizar registros com `userId` de outro usuário e confirmar bloqueio por RLS.
+6. Testar `/rest/v1/Produtos?select=*` sem token e confirmar que somente produtos ativos aparecem.
+7. Validar que as APIs Next.js (`/api/cart`, `/api/favorites`, `/api/users/[id]`, `/api/admin/products`) continuam funcionando com token válido.
+
+**Diagrama**
+
+```
+Supabase REST/client -> RLS -> somente dono da linha
+Next.js API -> valida token -> Prisma -> regras de backend preservadas
+```
+
 ### v0.1.33 - 2026-05-09
 
 **Resumo**
