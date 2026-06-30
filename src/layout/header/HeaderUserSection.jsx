@@ -46,10 +46,13 @@ export default function HeaderUserSection() {
     if (!isAuthenticated) {
         return (
             <div className="flex items-center gap-3">
-                <Link href="/auth" className="text-sm hover:underline">
+                <Link href="/auth/signUp" className="text-sm hover:underline">
                     Criar a sua conta
                 </Link>
-                <Link href="/auth" className="text-sm font-medium hover:underline">
+                <Link
+                    href="/auth/login"
+                    className="text-sm font-medium hover:underline"
+                >
                     Entre
                 </Link>
             </div>
