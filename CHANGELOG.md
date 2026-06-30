@@ -76,6 +76,42 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.36 - 2026-06-30
+
+**Resumo**
+
+- Separadas as telas de autenticacao em rotas dedicadas de login e cadastro, com fluxo compartilhado de formulario, sincronizacao do usuario e ajustes no header para apontar para as novas rotas.
+
+**Motivacao**
+
+- Reduzir acoplamento entre login e cadastro, melhorar a clareza da navegacao e deixar o fluxo de autenticacao mais facil de manter.
+
+**Impacto**
+
+- Componentes afetados: `src/app/(login)/auth/login/page.jsx`, `src/app/(login)/auth/signUp/page.jsx`, `src/hooks/useAuth.js`, `src/lib/helpers/authHelper.js`, `src/layout/header/HeaderUserSection.jsx`.
+- Compatibilidade: sim, com a navegacao atual atualizada para `/auth/login` e `/auth/signUp`.
+- Risco: baixo, porque a mudanca ficou concentrada em UI, roteamento e compartilhamento de logica.
+
+**Mudancas**
+
+- **Added**
+    - Rota dedicada para login em `src/app/(login)/auth/login/page.jsx`.
+    - Rota dedicada para cadastro em `src/app/(login)/auth/signUp/page.jsx`.
+    - Hook compartilhado `src/hooks/useAuth.js` para email, senha, loading, mensagens e handlers.
+    - Helper `src/lib/helpers/authHelper.js` para sincronizar a sessao do Supabase com a API interna.
+- **Changed**
+    - A tela de login ganhou feedback inline, loading e redirecionamento apos `syncUser`.
+    - A tela de cadastro ganhou o mesmo padrao visual e de feedback do login.
+    - `HeaderUserSection` agora aponta para `/auth/login` e `/auth/signUp` quando o usuario nao esta autenticado.
+    - A antiga rota unica `/auth` foi removida.
+
+**Como testar**
+
+1. Abrir `/auth/login` e validar o formulario, mensagens inline e o redirecionamento apos login.
+2. Abrir `/auth/signUp` e validar a criacao de conta com feedback de sucesso ou erro.
+3. Verificar que o header nao autenticado mostra links separados para login e cadastro.
+4. Confirmar que uma sessao existente continua sincronizando e redirecionando para `/account/minha_conta`.
+
 ### v0.1.35 - 2026-05-12
 
 **Resumo**

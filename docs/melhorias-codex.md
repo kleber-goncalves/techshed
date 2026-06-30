@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-05-12
-Branch: `style/login`
+Última atualização: 2026-06-30
+Branch: `feat/login`
 
 ## Visão Geral
 
@@ -81,6 +81,35 @@ Status: concluído (ver `src/app/api/users/route.js` e `src/app/api/users/[id]/r
 
 - Criar um mapper para erros (ex.: credenciais inválidas, email não confirmado) melhora clareza e consistência no app.
 
+### Melhorias concluídas nesta branch
+
+1. Separar login e cadastro em rotas dedicadas
+
+- O fluxo saiu de uma tela unica em `/auth` e foi dividido em `/auth/login` e `/auth/signUp`.
+- Isso reduz o tamanho de cada tela e deixa o caminho do usuario mais explicito.
+
+Status: concluido.
+
+2. Compartilhar a logica de autenticacao entre as telas
+
+- O hook `useAuth` centraliza estado, validacao basica, mensagens e handlers de login/cadastro.
+- A sincronizacao com o backend ficou isolada no helper `syncUserWithBackend`.
+
+Status: concluido.
+
+3. Atualizar a navegacao do header para as novas rotas
+
+- O header autenticado agora aponta para as rotas especificas de login e cadastro.
+- Isso evita links genericos e melhora a leitura da interface para usuarios deslogados.
+
+Status: concluido.
+
+4. Manter o redirect pos-login para a conta do usuario
+
+- O login continua sincronizando a sessao com a API interna antes de redirecionar.
+- O destino permanece `/account/minha_conta`, preservando o fluxo atual do usuario.
+
+Status: concluido.
 ### Sugestões Codex (avatar de perfil: robustez e manutenção)
 
 1. Sincronizar avatar também no `user_metadata` do Supabase Auth
@@ -1232,3 +1261,4 @@ Status: concluído (ver `src/app/api/users/route.js` e `src/app/api/users/[id]/r
 - 2026-03-20: Incluidas sugestoes de evolucao para a galeria hibrida de imagens de produto.
 - 2026-03-20: Incluidas sugestoes de evolucao para galerias por variante e fallback da pagina publica do produto.
 - 2026-04-20: Incluidas sugestoes de evolucao para o novo layout e a manutencao do editor `settingsProduct`.
+- 2026-06-30: Incluidas melhorias concluídas desta branch para o fluxo de autenticacao (login/cadastro separados, hook compartilhado e header atualizado).

@@ -1,165 +1,81 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/lib/supabase/supabaseClient";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/useAuth";
+import Link from "next/link";
 
-export default function AuthPage() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState(null); // { type: 'error' | 'success' | 'info', text: string }
-    const router = useRouter();
-
-    const isFormValid = useMemo(() => {
-        return Boolean(email?.trim()) && Boolean(password);
-    }, [email, password]);
-
-    /**
-     * Tenta criar uma conta no Supabase com o email e senha fornecidos.
-     * Se houver erro, alerta o erro.
-     * Se a conta for criada com sucesso, alerta que a conta foi criada e pede para verificar o email.
-     */
-    const handleSignUp = async () => {
-        setIsLoading(true);
-        setMessage(null);
-
-        const { error } = await supabase.auth.signUp({ email, password });
-
-        if (error) {
-            setMessage({ type: "error", text: error.message });
-        } else {
-            setMessage({ type: "success", text: "Conta criada! Verifique seu email para confirmar." });
-        }
-
-        setIsLoading(false);
-    };
-
-    /**
-     * Tenta fazer login no Supabase com o email e senha fornecidos.
-     * Se houver erro, alerta o erro.
-     * Se o login for feito com sucesso, manda o token do Supabase para o backend
-     * e redireciona para a pagina de perfil.
-     */
-
-    async function handleLogin() {
-        setIsLoading(true);
-        setMessage(null);
-
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-        if (error) {
-            setMessage({ type: "error", text: error.message });
-            setIsLoading(false);
-            return;
-        }
-
-        if (!data?.session?.access_token) {
-            setMessage({ type: "error", text: "Não foi possível iniciar a sessão. Tente novamente." });
-            setIsLoading(false);
-            return;
-        }
-
-        await syncUserAndRedirect(data.session.access_token);
-        setIsLoading(false);
-    }
-
-    async function syncUserAndRedirect(accessToken) {
-        try {
-            await fetch("/api/syncUser", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ access_token: accessToken }),
-            });
-        } finally {
-            router.push("/account/minha_conta");
-        }
-    }
-
-    // Se já existir sessão, sincroniza com o backend e redireciona.
-    useEffect(() => {
-        let isMounted = true;
-
-        async function run() {
-            try {
-                const { data } = await supabase.auth.getSession();
-                const accessToken = data?.session?.access_token;
-                if (!accessToken) return;
-
-                if (!isMounted) return;
-                setIsLoading(true);
-                setMessage({ type: "info", text: "Entrando..." });
-                await syncUserAndRedirect(accessToken);
-            } catch {
-                // silencioso: não bloqueia a tela se o getSession falhar
-            } finally {
-                if (isMounted) setIsLoading(false);
-            }
-        }
-
-        run();
-
-        return () => {
-            isMounted = false;
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+export default function Login() {
+    const {
+        email,
+        setEmail,
+        password,
+        setPassword,
+        isLoading,
+        message,
+        isFormValid,
+        handleLogin,
+    } = useAuth();
 
     return (
-        <div className="min-h-screen bg-[#F5F5F5]">
-            <header className="bg-[#FFE600] border-b border-black/10">
+        <div className="min-h-screen bg-[#F5F5F5] dark:bg-black">
+            <header className="bg-[#8000ff] border-b border-black/10">
                 <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="h-9 w-9 rounded-lg bg-black/10 flex items-center justify-center font-black text-black">
+                        <div className="h-9 w-9 rounded-lg bg-black/20 flex items-center justify-center font-black text-white">
                             TS
                         </div>
                         <div className="leading-tight">
-                            <div className="font-extrabold tracking-tight text-black">TechShed</div>
-                            <div className="text-xs text-black/70">Acesse sua conta</div>
+                            <div className="font-extrabold tracking-tight text-white">
+                                TechShed
+                            </div>
+                            <div className="text-xs text-white/80">
+                                Acesse sua conta
+                            </div>
                         </div>
                     </div>
-                    <div className="text-xs text-black/70 hidden sm:block">Compra e venda com mais confiança</div>
+                    <div className="text-sm text-white/80 hidden sm:block">
+                        Compra e venda com mais confiança
+                    </div>
                 </div>
             </header>
 
-            <main className="mx-auto max-w-5xl px-4 py-10">
+            <main className="mx-auto max-w-5xl px-4 py-10 ">
                 <div className="grid gap-6 lg:grid-cols-2 items-start">
                     <div className="hidden lg:block">
-                        <div className="rounded-2xl bg-white border border-black/10 p-8">
-                            <div className="text-sm font-semibold text-black/70">
+                        <div className="rounded-2xl bg-white dark:bg-card border border-black/10 p-8">
+                            <div className="text-sm font-semibold text-black/70 dark:text-white/80">
                                 Bem-vindo de volta
                             </div>
-                            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-black">
+                            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-black dark:text-white">
                                 Entre para acompanhar seus pedidos e sua conta
                             </h2>
-                            <p className="mt-4 text-sm text-black/70">
+                            <p className="mt-4 text-sm text-black/70 dark:text-white/80">
                                 Login rápido e seguro para acessar sua conta.
                             </p>
                             <div className="mt-6 grid gap-3">
                                 <div className="flex items-center gap-3">
-                                    <div className="h-9 w-9 rounded-full bg-[#EAF2FF] flex items-center justify-center text-[#1D4ED8] font-bold">
+                                    <div className="h-9 w-9 rounded-full bg-[#bc7bfe43] flex items-center justify-center text-[#9b38ff] font-bold">
                                         ✓
                                     </div>
-                                    <div className="text-sm text-black/80">
+                                    <div className="text-sm text-black/80 dark:text-white/70">
                                         Sincroniza sua conta automaticamente
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="h-9 w-9 rounded-full bg-[#EAF2FF] flex items-center justify-center text-[#1D4ED8] font-bold">
+                                    <div className="h-9 w-9 rounded-full bg-[#bc7bfe43] flex items-center justify-center text-[#9b38ff] font-bold">
                                         ✓
                                     </div>
-                                    <div className="text-sm text-black/80">
+                                    <div className="text-sm text-black/80 dark:text-white/70">
                                         Sessão protegida pelo Supabase
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="h-9 w-9 rounded-full bg-[#EAF2FF] flex items-center justify-center text-[#1D4ED8] font-bold">
+                                    <div className="h-9 w-9 rounded-full bg-[#bc7bfe43] flex items-center justify-center text-[#9b38ff] font-bold">
                                         ✓
                                     </div>
-                                    <div className="text-sm text-black/80">
+                                    <div className="text-sm text-black/80 dark:text-white/70">
                                         Acesso em segundos
                                     </div>
                                 </div>
@@ -238,22 +154,21 @@ export default function AuthPage() {
                             <Button
                                 onClick={handleLogin}
                                 disabled={!isFormValid || isLoading}
-                                className="w-full bg-[#3483FA] hover:bg-[#2C6FE0] text-white"
+                                className="w-full cursor-pointer bg-[#8000ff] hover:bg-[#a743ff] text-white"
                             >
                                 {isLoading ? "Entrando..." : "Entrar"}
                             </Button>
                         </CardContent>
-                        <CardFooter className="flex flex-col gap-3">
+                        <CardFooter className="flex flex-row gap-2 mt-4 items-center justify-center">
                             <div className="text-xs text-muted-foreground text-center">
-                                Não tem conta? Crie uma agora.
+                                Não tem uma conta?
                             </div>
-                            <Button
-                                onClick={handleSignUp}
-                                disabled={!isFormValid || isLoading}
-                                className="w-full rounded-xl bg-black text-white hover:bg-black/90"
+                            <Link
+                                href="/auth/signUp"
+                                className="text-sm font-semibold dark:font-semibold text-fuchsia-700 dark:text-fuchsia-400"
                             >
-                                Criar conta
-                            </Button>
+                                Crie uma agora
+                            </Link>
                         </CardFooter>
                     </Card>
                 </div>
