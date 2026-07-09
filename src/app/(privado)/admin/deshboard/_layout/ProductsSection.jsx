@@ -35,6 +35,8 @@ import ProductStatusBadge from "../_components/ProductStatusBadge";
 import InfiniteScrollSentinel from "../_components/InfiniteScrollSentinel";
 import ProductCategorySelect from "../_components/ProductCategorySelect";
 
+
+
 export default function ProductsSection({
     search,
     onSearchChange,

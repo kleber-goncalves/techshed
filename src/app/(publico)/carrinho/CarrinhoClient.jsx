@@ -28,15 +28,15 @@ export default function CarrinhoClient() {
 
     if (!isReady) {
         return (
-            <section className="py-25 px-6 md:px-20 min-h-[60vh] dark:bg-black flex items-center justify-center">
-                <p>Carregando carrinho...</p>
+            <section className="mt-45 py-20 px-6 md:px-20 w-full h-full flex flex-col items-center justify-center">
+                <p>Carregando Carrinho...</p>
             </section>
         );
     }
 
     if (isEmpty) {
         return (
-            <section className="py-25 px-6 md:px-20 min-h-[60vh] dark:bg-black flex flex-col items-center justify-center gap-6">
+            <section className="py-20 px-6 md:px-20 w-full h-full dark:bg-black flex flex-col items-center justify-center gap-34">
                 <Button
                     variant="ghost"
                     className="self-start flex items-center gap-2"
@@ -45,7 +45,7 @@ export default function CarrinhoClient() {
                     <ArrowLeft className="w-4 h-4" />
                     Voltar
                 </Button>
-                <h1 className="text-4xl font-semibold dark:text-white">
+                 <section className="w-full h-full flex flex-col items-center justify-between  gap-6">                <h1 className="text-4xl font-semibold dark:text-white">
                     Seu carrinho está vazio
                 </h1>
                 <p className="text-gray-600 dark:text-gray-300 text-center max-w-xl">
@@ -53,7 +53,8 @@ export default function CarrinhoClient() {
                 </p>
                 <Link href="/loja">
                     <Button size="lg">Continuar comprando</Button>
-                </Link>
+                </Link>  </section>
+
             </section>
         );
     }
@@ -64,7 +65,7 @@ export default function CarrinhoClient() {
                 <div className="flex items-center gap-2">
                     <Button
                         variant="ghost"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 cursor-pointer"
                         onClick={handleBack}
                     >
                         <ArrowLeft className="w-4 h-4" />
@@ -74,7 +75,11 @@ export default function CarrinhoClient() {
                         Meu carrinho
                     </h1>
                 </div>
-                <Button variant="outline" onClick={clearCart}>
+                <Button
+                    className="cursor-pointer"
+                    variant="outline"
+                    onClick={clearCart}
+                >
                     Limpar carrinho
                 </Button>
             </div>
@@ -144,7 +149,9 @@ export default function CarrinhoClient() {
                                         <button
                                             type="button"
                                             className="w-9 h-9 disabled:opacity-40 cursor-pointer"
-                                            disabled={item.quantity >= item.stock}
+                                            disabled={
+                                                item.quantity >= item.stock
+                                            }
                                             onClick={() =>
                                                 setItemQuantity({
                                                     lineKey: item.lineKey,
@@ -162,7 +169,7 @@ export default function CarrinhoClient() {
 
                                     <Button
                                         variant="ghost"
-                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer"
                                         onClick={() => removeItem(item.lineKey)}
                                     >
                                         Remover
@@ -199,18 +206,23 @@ export default function CarrinhoClient() {
                     <div className="h-px bg-gray-200 dark:bg-neutral-700" />
 
                     <div className="flex items-center justify-between text-lg">
-                        <span className="font-semibold dark:text-white">Total</span>
+                        <span className="font-semibold dark:text-white">
+                            Total
+                        </span>
                         <span className="font-semibold text-green-600 dark:text-green-400">
                             {formatCurrency(subtotalCents)}
                         </span>
                     </div>
 
-                    <Button className="w-full" disabled>
+                    <Button className="w-full cursor-pointer" disabled>
                         Finalizar compra (em breve)
                     </Button>
 
                     <Link href="/loja" className="w-full">
-                        <Button variant="outline" className="w-full">
+                        <Button
+                            variant="outline "
+                            className="w-full cursor-pointer"
+                        >
                             Continuar comprando
                         </Button>
                     </Link>

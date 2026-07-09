@@ -31,43 +31,51 @@ export default function FavoritoClient() {
 
     // Loading
     if (!isReady) {
-        return <p>Carregando favoritos...</p>;
+        return (
+          
+                <section className="mt-45 py-20 px-6 md:px-20 w-full h-full flex flex-col items-center justify-center">
+                    <p>Carregando favoritos...</p>
+                </section>
+            
+        );
     }
 
     // se não tiver favoritos
     if (isEmpty) {
         return (
-            <section className="py-25 px-6 md:px-20 min-h-[60vh] dark:bg-black flex flex-col items-center justify-center gap-6">
+            <section className="py-20 px-6 md:px-20 w-full h-full dark:bg-black flex flex-col items-center justify-center gap-34">
                 <Button
                     variant="ghost"
-                    className="self-start flex items-center gap-2"
+                    className="self-start flex items-center gap-2 cursor-pointer"
                     onClick={handleBack}
+                  
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Voltar
                 </Button>
-                <h1 className="text-4xl font-semibold dark:text-white">
-                    Você ainda não tem favoritos
-                </h1>
-                <p className="text-gray-600 dark:text-gray-300 text-center max-w-xl">
-                    Favorite produtos para encontrá-los rapidamente depois.
-                </p>
-                <Link href="/loja">
-                    <Button size="lg">Explorar produtos</Button>
-                </Link>
+                <section className="w-full h-full flex flex-col items-center justify-between  gap-6">
+                    <h1 className="text-4xl font-semibold dark:text-white">
+                        Você ainda não tem favoritos
+                    </h1>
+                    <p className="text-gray-600 dark:text-gray-300 text-center max-w-xl">
+                        Favorite produtos para encontrá-los rapidamente depois.
+                    </p>
+                    <Link href="/loja">
+                        <Button className="cursor-pointer" size="lg">Explorar produtos</Button>
+                    </Link>
+                </section>
             </section>
         );
     }
 
     return (
-        <section className="py-25 px-6 md:px-20 dark:bg-black min-h-[60vh]">
-            
+        <section className="py-20 px-6 md:px-20 dark:bg-black min-h-[60vh]">
             {/* Header */}
             <div className="flex items-center justify-between mb-10">
                 <div className="flex items-center gap-2">
                     <Button
                         variant="ghost"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 cursor-pointer"
                         onClick={handleBack}
                     >
                         <ArrowLeft className="w-4 h-4" />
@@ -77,7 +85,7 @@ export default function FavoritoClient() {
                         Meus favoritos
                     </h1>
                 </div>
-                <Button variant="outline" onClick={clearFavorites}>
+                <Button className="cursor-pointer" variant="outline" onClick={clearFavorites}>
                     Limpar favoritos
                 </Button>
             </div>
@@ -124,11 +132,12 @@ export default function FavoritoClient() {
 
                                 <div className="flex flex-wrap items-center gap-2">
                                     <Link href={`/produto/${item.slug}`}>
-                                        <Button variant="outline">
+                                        <Button className="cursor-pointer" variant="outline">
                                             Ver produto
                                         </Button>
                                     </Link>
                                     <Button
+                                        className="cursor-pointer"
                                         onClick={() => handleAddToCart(item.id)}
                                         disabled={isOutOfStock}
                                     >
@@ -136,7 +145,7 @@ export default function FavoritoClient() {
                                     </Button>
                                     <Button
                                         variant="ghost"
-                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30   cursor-pointer"
                                         onClick={() => removeFavorite(item.id)}
                                     >
                                         Remover dos favoritos

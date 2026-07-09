@@ -63,7 +63,7 @@ export default function HeaderUserSection() {
         <div className="flex items-center gap-2">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center gap-1">
+                    <Button variant="ghost" className="flex items-center gap-1 cursor-pointer">
                         <Avatar className="w-8 h-8">
                             {avatarUrl ? (
                                 <AvatarImage
@@ -84,11 +84,12 @@ export default function HeaderUserSection() {
                     <DropdownMenuItem disabled className="opacity-100">
                         Olá, {displayName}
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild className="cursor-pointer">
                         <Link href="/account">Configurações da Conta</Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>Meus Pedidos</DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">Meus Pedidos</DropdownMenuItem>
                     <DropdownMenuItem
+                        className="cursor-pointer"
                         disabled={isLoggingOut}
                         onSelect={(event) => {
                             event.preventDefault();

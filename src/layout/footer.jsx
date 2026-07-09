@@ -1,3 +1,7 @@
+"use client";
+
+import React, { useState } from "react";
+
 import {
     FacebookIcon,
     Instagram,
@@ -15,21 +19,37 @@ import {
 } from "@/components/ui/accordion";
 
 export default function Footer() {
+    const [openValue, setOpenValue] = useState("");
+
+    
     return (
-        <footer className="w-full rounded-2xl bg-slate-200 dark:bg-[#0f172a] ">
-            <Accordion type="single" collapsible className="w-full">
+        <footer className="w-full bg-slate-200 dark:bg-[#0f172a] rounded-t-2xl overflow-hidden">
+            <Accordion
+                type="single"
+                collapsible
+                value={openValue}
+                onValueChange={setOpenValue}
+                className="w-full"
+            >
                 <AccordionItem value="more-info" className="border-0">
                     <AccordionTrigger
-                        className="relative w-full hover:no-underline space-x-7 items-center justify-center border-b border-black/10 
-                     py-6 text-center text-xl font-semibold text-black transition-colors dark:border-white/10
-                      bg-white/5 dark:text-white [&>svg]:relative [&>svg]:right-6  [&>svg]:size-6 [&>svg]:text-center [&>svg]:justify-center"
+                        className={`
+                            cursor-pointer relative w-fit hover:no-underline space-x-7 items-center justify-center border-b border-black/10 
+                            py-2 text-center text-sm font-semibold text-black transition-colors dark:border-white/10
+                            bg-white/5 dark:text-white [&>svg]:relative [&>svg]:right-6  [&>svg]:size-6 [&>svg]:text-center [&>svg]:justify-center
+                            ${openValue === "more-info" ? "rounded-none" : "rounded-none"} 
+                        `}
                     >
                         <span>Mais Informações</span>
                     </AccordionTrigger>
-                    <AccordionContent className="pt-4">
-                        <section id="dentroAcrodion">
+
+                    <AccordionContent className="p-0 bg-slate-200 dark:bg-[#0f172a]">
+                        <section
+                            id="dentroAcrodion"
+                            className="flex flex-col w-full "
+                        >
                             <section className="flex flex-row justify-between px-23">
-                                <section className="flex flex-col p-10 gap-13">
+                                <section className="flex flex-col p-10 gap-6">
                                     <div>
                                         <h2 className="text-xl font-semibold">
                                             Endereço
@@ -50,7 +70,7 @@ export default function Footer() {
                                         </div>
                                     </div>
                                 </section>
-                                <section className="flex flex-col p-10 gap-12">
+                                <section className="flex flex-col p-10 gap-6">
                                     <div>
                                         <h2 className="text-xl font-semibold">
                                             Loja
@@ -69,7 +89,7 @@ export default function Footer() {
                                         <p>Promoções</p>
                                     </div>
                                 </section>
-                                <section className="flex flex-col p-10 gap-12">
+                                <section className="flex flex-col p-10 gap-6">
                                     <div>
                                         <h2 className="text-xl font-semibold">
                                             Endereço
@@ -82,7 +102,7 @@ export default function Footer() {
                                         <p>Carreiras</p>
                                     </div>
                                 </section>
-                                <section className="flex flex-col p-10 gap-12">
+                                <section className="flex flex-col p-10 gap-6">
                                     <div>
                                         <h2 className="text-xl font-semibold">
                                             Endereço
@@ -97,24 +117,27 @@ export default function Footer() {
                                         <p>FAQ</p>
                                     </div>
                                 </section>
+                                {/* ... Mantenha as outras seções/colunas normais aqui ... */}
                             </section>
-                            <span className="absolute bg-white w-2/3 border left-1/2 -translate-x-1/2 rounded-full"></span>
+                            <div
+                            className="flex flex-row w-full pt-1 pb-1 px-56 items-center justify-between"
+                        >
+                            <span className=" bg-white w-full border  rounded-full"></span>
+                        </div>
+                            
                             <MetodosPagamentos />
                         </section>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
-            <section className="w-full flex flex-col items-center py-12 gap-2 bg-gray-400 text-black rounded-b-2xl">
+
+            <section className="w-full flex flex-col py-5 px-12 gap-2 bg-gray-400 text-black text-sm">
                 <p>© 2023 Meu Site. Todos os direitos reservados.</p>
                 <p>
-                    TechShed -  CPF/CNPJ: 12.345.678/0000-01 - Rua Prates, 194 -
-                    Bom Retiro
+                    TechShed - CPF/CNPJ: 12.345.678/0000-01 - Rua Prates, 194 -
+                    Bom Retiro - São Paulo - SP, 01121-000. SP 12345-678 -
+                    info@meusite.com. Telefone: (11) 3456-7890
                 </p>
-                <p>
-                    São Paulo - SP, 01121-000. SP 12345-678 - info@meusite.com.
-                    Telefone: (11) 3456-7890
-                </p>
-                <p>Estimativa de entrega 2 - 5 dias úteis</p>
             </section>
         </footer>
     );
