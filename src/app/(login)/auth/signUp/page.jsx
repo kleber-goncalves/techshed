@@ -20,27 +20,6 @@ export default function SignUp() {
 
     return (
         <div className="min-h-screen bg-[#F5F5F5]  dark:bg-black">
-            <header className="bg-[#8000ff] border-b border-black/10">
-                <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="h-9 w-9 rounded-lg bg-black/20 flex items-center justify-center font-black text-white">
-                            TS
-                        </div>
-                        <div className="leading-tight">
-                            <div className="font-extrabold tracking-tight text-white">
-                                TechShed
-                            </div>
-                            <div className="text-xs text-white/80">
-                                Crie sua conta
-                            </div>
-                        </div>
-                    </div>
-                    <div className="text-sm text-white/80 hidden sm:block">
-                        Compra e venda com mais confiança
-                    </div>
-                </div>
-            </header>
-
             <main className="mx-auto max-w-5xl px-4 py-10">
                 <div className="grid gap-6 lg:grid-cols-2 items-start">
                     <div className="hidden lg:block">
@@ -49,12 +28,9 @@ export default function SignUp() {
                                 Bem-vindo ao TechShed
                             </div>
                             <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-black dark:text-white">
-                                Entre para acompanhar seus pedidos e sua conta
-                            </h2>
-                            <p className="mt-4 text-sm text-black/70 dark:text-white/80">
                                 Crie uma conta rápida e segura para acompanhar
                                 seus pedidos.
-                            </p>
+                            </h2>
                         </div>
                     </div>
 

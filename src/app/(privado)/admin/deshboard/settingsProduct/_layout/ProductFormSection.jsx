@@ -33,26 +33,6 @@ export default function ProductFormSection({
                 className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]"
             >
                 <div className="space-y-6">
-                    <ProductBasicInfoSection
-                        form={form}
-                        onFieldChange={onFieldChange}
-                    />
-
-                    <ProductPricingSection
-                        form={form}
-                        onFieldChange={onFieldChange}
-                    />
-
-                    <ProductVariantsField
-                        productId={productId}
-                        title="Variantes"
-                        description="Cadastre cores e outras variações com preço, estoque e galeria própria."
-                        cardClassName={solidFormCardClassName}
-                        value={form.variants}
-                        onChange={(variants) =>
-                            onFieldChange("variants", variants)
-                        }
-                    />
                     {selectedId ? (
                         <ProductImagesField
                             productId={productId}
@@ -74,6 +54,27 @@ export default function ProductFormSection({
                             </p>
                         </SectionCard>
                     )}
+
+                    <ProductVariantsField
+                        productId={productId}
+                        title="Variantes"
+                        description="Cadastre cores e outras variações com preço, estoque e galeria própria."
+                        cardClassName={solidFormCardClassName}
+                        value={form.variants}
+                        onChange={(variants) =>
+                            onFieldChange("variants", variants)
+                        }
+                    />
+
+                    <ProductBasicInfoSection
+                        form={form}
+                        onFieldChange={onFieldChange}
+                    />
+
+                    <ProductPricingSection
+                        form={form}
+                        onFieldChange={onFieldChange}
+                    />
 
                     <ProductStatusSection
                         form={form}

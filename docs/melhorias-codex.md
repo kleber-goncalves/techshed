@@ -3,8 +3,8 @@
 Este documento registra **as próximas melhorias planejadas** para o projeto.
 Ele serve como checklist de execução e memória de decisões, para não esquecermos o que foi combinado.
 
-Última atualização: 2026-06-30
-Branch: `feat/login`
+Última atualização: 2026-07-09
+Branch: `fix/refactor-estrutura-folder`
 
 ## Visão Geral
 
@@ -110,6 +110,15 @@ Status: concluido.
 - O destino permanece `/account/minha_conta`, preservando o fluxo atual do usuario.
 
 Status: concluido.
+
+5. Reorganizar rotas e layouts por dominio
+
+- A estrutura agora separa a base publica em `(publico)`, a autenticacao em `(login)` e a area restrita em `(privado)`.
+- Carrinho e favoritos passaram a viver no fluxo publico, com o footer sendo escondido apenas nas telas que nao o precisam.
+- O root layout ficou mais enxuto e a composicao visual passou para os grupos de rota.
+
+Status: concluido.
+
 ### Sugestões Codex (avatar de perfil: robustez e manutenção)
 
 1. Sincronizar avatar também no `user_metadata` do Supabase Auth
@@ -1262,3 +1271,7 @@ Status: concluido.
 - 2026-03-20: Incluidas sugestoes de evolucao para galerias por variante e fallback da pagina publica do produto.
 - 2026-04-20: Incluidas sugestoes de evolucao para o novo layout e a manutencao do editor `settingsProduct`.
 - 2026-06-30: Incluidas melhorias concluídas desta branch para o fluxo de autenticacao (login/cadastro separados, hook compartilhado e header atualizado).
+- 2026-07-09: Incluidas melhorias concluídas desta branch para a reorganizacao de rotas e layouts por dominio.
+
+
+

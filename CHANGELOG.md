@@ -76,6 +76,47 @@ User -> Página A -> Componente X (largura opcional)
 
 ## Releases
 
+### v0.1.37 - 2026-07-09
+
+**Resumo**
+
+- Reorganizada a arquitetura de rotas e layouts em grupos distintos para publico, autenticacao, area privada e admin, com carrinho e favoritos migrados para o fluxo publico e footer controlado por contexto de rota.
+
+**Motivacao**
+
+- Separar responsabilidades por dominio de pagina, reduzir acoplamento do layout raiz e deixar a navegacao mais previsivel para telas publicas e internas.
+
+**Impacto**
+
+- Componentes afetados: `src/app/layout.js`, `src/app/(publico)/layout.js`, `src/app/(publico)/page.js`, `src/app/(publico)/carrinho/*`, `src/app/(publico)/favoritos/*`, `src/app/(login)/auth/*`, `src/app/(privado)/account/layout.jsx`, `src/app/(privado)/admin/deshboard/page.jsx`, `src/layout/footer.jsx`, `src/layout/header/HeaderUserSection.jsx`, `src/app/page.js`.
+- Compatibilidade: sim, com as rotas publicas reorganizadas sob o grupo `(publico)` e a manutencao dos mesmos caminhos de uso para loja, produto, busca, carrinho e favoritos.
+- Risco: medio, porque a alteracao mexe na estrutura global de layout e na forma como o header/footer sao renderizados por grupo de rota.
+
+**Mudancas**
+
+- **Added**
+    - Layout dedicado em `src/app/(publico)/layout.js` para as paginas publicas, com header, nav e footer controlados pelo caminho atual.
+    - Rota de home publica em `src/app/(publico)/page.js` com o conteudo principal da vitrine.
+    - Rotas publicas dedicadas para carrinho e favoritos em `src/app/(publico)/carrinho/*` e `src/app/(publico)/favoritos/*`.
+    - Layout dedicado para a area de autenticacao em `src/app/(login)/auth/layout.jsx`.
+- **Changed**
+    - `src/app/layout.js` passou a ser um root layout mais enxuto, deixando a composicao visual para os grupos de rota.
+    - `src/app/(privado)/account/layout.jsx` e `src/app/(privado)/admin/deshboard/page.jsx` passaram a montar header e nav localmente.
+    - `src/layout/footer.jsx` ganhou controle de abertura via estado e refinamentos de densidade visual.
+    - `src/layout/header/HeaderUserSection.jsx` recebeu ajustes de cursor e consistencia de interacao.
+    - As telas de login e cadastro perderam o cabeçalho duplicado interno e ficaram alinhadas ao novo fluxo de layout.
+- **Removed**
+    - Remocao da home antiga em `src/app/page.js` para evitar duplicidade com a nova estrutura publica.
+    - Remocao das rotas antigas de carrinho e favoritos fora do grupo publico.
+
+**Como testar**
+
+1. Abrir a home em `/` e confirmar que o conteudo da vitrine carrega com header, nav e footer.
+2. Abrir `/carrinho` e `/favoritos` e confirmar que o footer nao aparece nessas telas.
+3. Abrir `/auth/login` e `/auth/signUp` e validar que o layout de autenticacao ficou sem cabeçalho duplicado.
+4. Abrir `/account` e `/admin/deshboard` e validar que o header e o nav continuam aparecendo corretamente.
+5. Verificar que o footer abre e fecha sem quebrar o conteudo de pagamento e contato.
+
 ### v0.1.36 - 2026-06-30
 
 **Resumo**
@@ -1527,3 +1568,6 @@ Slider -> ProductCard -> max-w-xs (fixo)
 Depois:
 Slider -> ProductCard -> max-w-xs (opcional)
 ```
+
+
+
